@@ -15,16 +15,16 @@ export function ThemeBackground() {
   // 安全地获取主题 Context，如果不存在则使用默认值
   const context = React.useContext(VisualThemeContext)
   
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
   // 如果 Context 不存在，返回 null（优雅降级）
   if (!context) {
     return null
   }
   
   const { theme, useSimplified } = context
-
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
 
   if (!mounted) {
     return null

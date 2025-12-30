@@ -296,7 +296,7 @@ export default function PostsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
             <AlertDialogDescription>
-              确定要删除文章 "{selectedPost?.title}" 吗？此操作不可撤销。
+              确定要删除文章 &quot;{selectedPost?.title}&quot; 吗？此操作不可撤销。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

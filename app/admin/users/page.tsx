@@ -253,7 +253,7 @@ export default function UsersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>修改用户角色</AlertDialogTitle>
             <AlertDialogDescription>
-              修改用户 "{selectedUser?.name}" 的角色
+              修改用户 &quot;{selectedUser?.name}&quot; 的角色
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-4 py-4">
@@ -290,7 +290,7 @@ export default function UsersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
             <AlertDialogDescription>
-              确定要删除用户 "{selectedUser?.name}" 吗？此操作不可撤销。
+              确定要删除用户 &quot;{selectedUser?.name}&quot; 吗？此操作不可撤销。
               {selectedUser && selectedUser._count && (
                 <span className="block mt-2 text-destructive">
                   该用户有 {selectedUser._count.posts} 篇文章和 {selectedUser._count.comments}{" "}

@@ -292,7 +292,7 @@ export default function TagsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
             <AlertDialogDescription>
-              确定要删除标签 "{selectedTag?.name}" 吗？此操作不可撤销。
+              确定要删除标签 &quot;{selectedTag?.name}&quot; 吗？此操作不可撤销。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

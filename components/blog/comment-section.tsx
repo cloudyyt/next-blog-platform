@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -23,11 +23,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
   const [submitting, setSubmitting] = useState(false)
 
   // 加载评论
-  useEffect(() => {
-    loadComments()
-  }, [postId])
-
-  const loadComments = async () => {
+  const loadComments = useCallback(async () => {
     setLoading(true)
     try {
       const response = await fetch(`/api/comments?postId=${postId}`)
@@ -40,7 +36,11 @@ export function CommentSection({ postId }: CommentSectionProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [postId])
+
+  useEffect(() => {
+    loadComments()
+  }, [loadComments])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

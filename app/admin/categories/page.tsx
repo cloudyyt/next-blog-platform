@@ -322,7 +322,7 @@ export default function CategoriesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
             <AlertDialogDescription>
-              确定要删除分类 "{selectedCategory?.name}" 吗？此操作不可撤销。
+              确定要删除分类 &quot;{selectedCategory?.name}&quot; 吗？此操作不可撤销。
               {selectedCategory && selectedCategory._count && selectedCategory._count.posts > 0 && (
                 <span className="block mt-2 text-destructive">
                   该分类下有 {selectedCategory._count.posts} 篇文章，删除后这些文章将失去分类。
