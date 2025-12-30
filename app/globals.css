@@ -1,0 +1,543 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    position: relative;
+    overflow-x: hidden;
+  }
+}
+
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* 文章内容样式优化 - 配合 typography 插件 */
+.prose {
+  @apply text-foreground;
+}
+
+/* 覆盖 typography 默认颜色，使用主题色 */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  @apply text-foreground font-bold;
+}
+
+.prose h1 {
+  @apply scroll-mt-20;
+}
+
+.prose h2 {
+  @apply scroll-mt-20;
+}
+
+.prose h3 {
+  @apply scroll-mt-20;
+}
+
+.prose a {
+  @apply text-primary hover:text-primary/80 no-underline hover:underline;
+}
+
+.prose code {
+  @apply font-mono;
+}
+
+.prose pre {
+  @apply bg-[#1e1e1e] rounded-lg;
+}
+
+.prose pre code {
+  @apply text-gray-100;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-primary;
+}
+
+.prose img {
+  @apply rounded-lg;
+}
+
+.prose table {
+  @apply border-collapse;
+}
+
+.prose th,
+.prose td {
+  @apply border border-border;
+}
+
+.prose th {
+  @apply bg-muted;
+}
+
+/* 确保代码块在暗色模式下也正常显示 */
+.dark .prose pre {
+  @apply bg-[#1e1e1e];
+}
+
+/* ============================================
+   视觉主题系统 - CSS变量和背景效果
+   ============================================ */
+
+/* 默认主题 */
+[data-visual-theme="default"] {
+  --theme-bg-primary: hsl(var(--background));
+  --theme-bg-secondary: hsl(var(--background));
+  --theme-overlay-opacity: 0;
+}
+
+/* 深邃星空主题 */
+[data-visual-theme="deep-space"] {
+  --theme-bg-primary: #0a0e27;
+  --theme-bg-secondary: #1a1f3a;
+  --theme-stars-color: #ffffff;
+  --theme-stars-opacity: 0.8;
+  --theme-particles-color: #4a90e2;
+  --theme-particles-opacity: 0.6;
+  --theme-overlay-opacity: 0.3;
+}
+
+/* 高山凌云主题 - 改进版，更写实 */
+[data-visual-theme="mountain-clouds"] {
+  --theme-bg-primary: #a8c8e0;
+  --theme-bg-secondary: #c8d8e8;
+  --theme-bg-tertiary: #e8f0f8;
+  --theme-clouds-color: #ffffff;
+  --theme-clouds-opacity: 0.6;
+  --theme-clouds-shadow: rgba(100, 120, 140, 0.3);
+  --theme-mountain-color: #4a5a4a;
+  --theme-mountain-shadow: rgba(0, 0, 0, 0.2);
+  --theme-overlay-opacity: 0.15;
+}
+
+/* 赛博霓虹主题 */
+[data-visual-theme="cyber-neon"] {
+  --theme-bg-primary: #0a0a1a;
+  --theme-bg-secondary: #1a1a2e;
+  --theme-neon-primary: #00ffff;
+  --theme-neon-secondary: #ff00ff;
+  --theme-neon-accent: #00ff88;
+  --theme-grid-opacity: 0.3;
+  --theme-particle-opacity: 0.6;
+  --theme-overlay-opacity: 0.4;
+}
+
+/* 暮色海岸主题 */
+[data-visual-theme="dusk-shore"] {
+  --theme-bg-primary: #ff6b6b;
+  --theme-bg-secondary: #ffa07a;
+  --theme-bg-tertiary: #4a90e2;
+  --theme-bg-quaternary: #2c3e50;
+  --theme-wave-color: rgba(255, 255, 255, 0.1);
+  --theme-sun-glow: rgba(255, 200, 100, 0.3);
+  --theme-overlay-opacity: 0.2;
+}
+
+/* 背景容器 - 固定在页面底部 */
+.theme-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* 内容层 - 确保在背景之上 */
+.theme-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================
+   深邃星空 - 动画效果
+   ============================================ */
+
+/* 星空背景渐变 */
+[data-visual-theme="deep-space"] .theme-background {
+  background: linear-gradient(
+    180deg,
+    var(--theme-bg-primary) 0%,
+    var(--theme-bg-secondary) 50%,
+    #000000 100%
+  );
+}
+
+/* 星星闪烁动画 - 增强版 */
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+    filter: brightness(0.5);
+  }
+  25% {
+    opacity: 0.8;
+    transform: scale(1.1);
+    filter: brightness(1.2);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+    filter: brightness(1.5);
+  }
+  75% {
+    opacity: 0.6;
+    transform: scale(1.15);
+    filter: brightness(1);
+  }
+}
+
+/* 星星移动动画 */
+@keyframes starMove {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  100% {
+    transform: translateY(-100vh) translateX(20px);
+  }
+}
+
+/* 粒子流动动画 */
+@keyframes particleFlow {
+  0% {
+    transform: translateY(100vh) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--theme-particles-opacity);
+  }
+  90% {
+    opacity: var(--theme-particles-opacity);
+  }
+  100% {
+    transform: translateY(-100vh) translateX(100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* 流星划过动画 - 从东北（右上）到西南（左下），和水平面呈45-60°夹角 */
+/* 注意：先旋转再移动，确保流星沿着旋转后的方向运动 */
+/* 从可视区右上角（东北）到左下角（西南） */
+@keyframes meteorFall {
+  0% {
+    transform: rotate(var(--meteor-angle, -52.5deg)) translateY(0) translateX(0);
+    opacity: 0;
+  }
+  2% {
+    opacity: 1;
+  }
+  98% {
+    opacity: 1;
+  }
+  100% {
+    /* 从右上到左下：向下移动（100vh），向左移动（负值） */
+    transform: rotate(var(--meteor-angle, -52.5deg)) translateY(100vh) translateX(var(--meteor-translate-x, -100vw));
+    opacity: 0;
+  }
+}
+
+/* 简化版动画（低性能设备） */
+[data-simplified="true"] [data-visual-theme="deep-space"] .star,
+[data-simplified="true"] [data-visual-theme="deep-space"] .particle {
+  animation-duration: 8s !important;
+  animation-iteration-count: 1 !important;
+}
+
+/* 流星样式优化 */
+.meteor {
+  will-change: transform, opacity;
+  z-index: 1;
+}
+
+/* 简化模式下减少流星数量 */
+[data-simplified="true"] [data-visual-theme="deep-space"] .meteor {
+  animation-duration: 1s !important;
+}
+
+/* 尊重用户偏好 - 减少动画 */
+@media (prefers-reduced-motion: reduce) {
+  .star,
+  .particle,
+  .cloud,
+  .meteor {
+    animation: none !important;
+    opacity: 0.5 !important;
+  }
+  
+  [data-visual-theme="cyber-neon"] .absolute,
+  [data-visual-theme="dusk-shore"] .absolute {
+    animation: none !important;
+    opacity: 0.5 !important;
+  }
+}
+
+/* ============================================
+   高山凌云 - 动画效果
+   ============================================ */
+
+/* 天空背景渐变 - 改进版，更写实 */
+[data-visual-theme="mountain-clouds"] .theme-background {
+  background: linear-gradient(
+    180deg,
+    var(--theme-bg-primary) 0%,
+    var(--theme-bg-secondary) 30%,
+    var(--theme-bg-tertiary) 60%,
+    #d0e0f0 100%
+  );
+}
+
+/* 云朵流动动画 - 改进版，更写实 */
+@keyframes cloudMove {
+  0% {
+    transform: translateX(-120%);
+    opacity: 0.3;
+  }
+  50% {
+    opacity: var(--theme-clouds-opacity);
+  }
+  100% {
+    transform: translateX(120vw);
+    opacity: 0.3;
+  }
+}
+
+/* 云朵上下浮动 - 更柔和 */
+@keyframes cloudFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+/* 云朵阴影动画 */
+@keyframes cloudShadow {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* ============================================
+   赛博霓虹 - 动画效果
+   ============================================ */
+
+/* 赛博背景渐变 */
+[data-visual-theme="cyber-neon"] .theme-background {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-primary) 0%,
+    var(--theme-bg-secondary) 50%,
+    #0f0f1f 100%
+  );
+}
+
+/* 霓虹网格动画 */
+@keyframes neonGrid {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: var(--theme-grid-opacity);
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
+/* 数字粒子下落 */
+@keyframes digitalRain {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--theme-particle-opacity);
+  }
+  90% {
+    opacity: var(--theme-particle-opacity);
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+/* 霓虹闪烁 */
+@keyframes neonPulse {
+  0%, 100% {
+    opacity: 0.4;
+    filter: blur(1px);
+  }
+  50% {
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+/* ============================================
+   暮色海岸 - 动画效果
+   ============================================ */
+
+/* 暮色背景渐变 */
+[data-visual-theme="dusk-shore"] .theme-background {
+  background: linear-gradient(
+    180deg,
+    var(--theme-bg-primary) 0%,
+    var(--theme-bg-secondary) 25%,
+    var(--theme-bg-tertiary) 60%,
+    var(--theme-bg-quaternary) 100%
+  );
+}
+
+/* 海浪波动 */
+@keyframes waveMove {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* 海浪起伏 */
+@keyframes waveRise {
+  0%, 100% {
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    transform: translateY(-10px) scaleY(1.1);
+  }
+}
+
+/* 太阳光晕 */
+@keyframes sunGlow {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: var(--theme-sun-glow);
+    transform: scale(1.1);
+  }
+}
+
+/* ============================================
+   响应式优化
+   ============================================ */
+
+/* 移动端优化 - 减少元素数量 */
+@media (max-width: 768px) {
+  [data-visual-theme="deep-space"] .star:nth-child(n+20),
+  [data-visual-theme="deep-space"] .particle:nth-child(n+10) {
+    display: none;
+  }
+
+  [data-visual-theme="mountain-clouds"] .cloud:nth-child(n+5) {
+    display: none;
+  }
+
+  [data-visual-theme="cyber-neon"] .absolute:nth-child(n+12) {
+    display: none;
+  }
+
+  [data-visual-theme="dusk-shore"] .absolute:nth-child(n+4) {
+    display: none;
+  }
+}
+
+/* 小屏幕进一步优化 */
+@media (max-width: 640px) {
+  [data-visual-theme="deep-space"] .star:nth-child(n+15),
+  [data-visual-theme="deep-space"] .particle:nth-child(n+6) {
+    display: none;
+  }
+
+  [data-visual-theme="mountain-clouds"] .cloud:nth-child(n+3) {
+    display: none;
+  }
+
+  [data-visual-theme="cyber-neon"] .absolute:nth-child(n+8) {
+    display: none;
+  }
+
+  [data-visual-theme="dusk-shore"] .absolute:nth-child(n+3) {
+    display: none;
+  }
+}
+

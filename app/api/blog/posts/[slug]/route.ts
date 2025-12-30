@@ -1,0 +1,81 @@
+import { NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
+
+/**
+ * GET /api/blog/posts/[slug]
+ * 根据 slug 获取单篇文章详情
+ */
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  try {
+    const { slug } = await params
+
+    const post = await prisma.post.findUnique({
+      where: {
+        slug,
+        published: true,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        categories: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+        tags: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+      },
+    })
+
+    if (!post) {
+      return NextResponse.json(
+        { message: "文章不存在" },
+        { status: 404 }
+      )
+    }
+
+    // 格式化返回数据
+    const formattedPost = {
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      content: post.content,
+      excerpt: post.excerpt,
+      coverImage: post.coverImage,
+      published: post.published,
+      authorId: post.authorId,
+      author: {
+        id: post.author.id,
+        name: post.author.name,
+        email: "", // 保持兼容性
+      },
+      categories: post.categories,
+      tags: post.tags,
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
+    }
+
+    return NextResponse.json(formattedPost)
+  } catch (error) {
+    console.error("Error fetching post:", error)
+    return NextResponse.json(
+      { message: "获取文章失败" },
+      { status: 500 }
+    )
+  }
+}
+

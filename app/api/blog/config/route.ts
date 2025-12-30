@@ -1,0 +1,61 @@
+import { NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
+
+/**
+ * GET /api/blog/config
+ * 获取博客配置信息
+ */
+export async function GET() {
+  try {
+    // 获取第一个管理员用户作为博主
+    const author = await prisma.user.findFirst({
+      where: {
+        role: "admin",
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    })
+
+    // 如果没有管理员，获取第一个用户
+    const fallbackAuthor = author || await prisma.user.findFirst({
+      select: {
+        id: true,
+        name: true,
+      },
+    })
+
+    if (!fallbackAuthor) {
+      return NextResponse.json(
+        { message: "未找到博主信息" },
+        { status: 404 }
+      )
+    }
+
+    // 统计文章数量
+    const postCount = await prisma.post.count({
+      where: {
+        published: true,
+      },
+    })
+
+    return NextResponse.json({
+      siteName: "技术博客",
+      siteDescription: "分享前端开发经验和技术思考",
+      author: {
+        id: fallbackAuthor.id,
+        name: fallbackAuthor.name,
+        email: "", // User 模型中没有 email，保持兼容
+        postCount,
+      },
+    })
+  } catch (error) {
+    console.error("Error fetching blog config:", error)
+    return NextResponse.json(
+      { message: "获取博客配置失败" },
+      { status: 500 }
+    )
+  }
+}
+
