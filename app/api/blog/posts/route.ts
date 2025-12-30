@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/blog/posts
  * 获取文章列表（支持筛选和分页）

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getTokenFromRequest, verifyToken } from "@/lib/auth"
 
+export const dynamic = 'force-dynamic'
+
 // 获取评论列表
 export async function GET(request: Request) {
   try {

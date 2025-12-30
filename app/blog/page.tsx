@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { PostCard } from "@/components/blog/post-card"
 import { TagList } from "@/components/blog/tag-list"
@@ -10,7 +10,7 @@ import { Loading } from "@/components/ui/loading"
 import { getPosts, getTags, getCategories, getBlogConfig } from "@/lib/api/blog"
 import { BlogPost, Tag, Category } from "@/lib/types/blog"
 
-export default function BlogPage() {
+function BlogContent() {
   const searchParams = useSearchParams()
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [tags, setTags] = useState<Tag[]>([])
@@ -134,5 +134,13 @@ export default function BlogPage() {
         </aside>
       </div>
     </div>
+  )
+}
+
+export default function BlogPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-12"><Loading size="lg" text="加载中..." /></div>}>
+      <BlogContent />
+    </Suspense>
   )
 }
