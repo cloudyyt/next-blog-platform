@@ -9,19 +9,27 @@ export const dynamic = 'force-dynamic'
  * GET /api/admin/init-db
  */
 export async function GET() {
+  // 添加超时处理
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('数据库连接超时')), 5000) // 5秒超时
+  })
+
   try {
-    // 使用 prisma db push 的逻辑，通过 Prisma Client 检查表是否存在
-    // 如果表不存在，Prisma 会报错，我们可以捕获并提示用户运行迁移
+    // 使用 Promise.race 实现超时
+    await Promise.race([
+      prisma.$queryRaw`SELECT 1`,
+      timeoutPromise
+    ])
     
-    // 尝试查询一个表来检查数据库连接
-    await prisma.$queryRaw`SELECT 1`
-    
-    // 检查 users 表是否存在
-    const tables = await prisma.$queryRaw<Array<{ tablename: string }>>`
-      SELECT tablename 
-      FROM pg_tables 
-      WHERE schemaname = 'public'
-    `
+    // 检查表是否存在（也添加超时）
+    const tables = await Promise.race([
+      prisma.$queryRaw<Array<{ tablename: string }>>`
+        SELECT tablename 
+        FROM pg_tables 
+        WHERE schemaname = 'public'
+      `,
+      timeoutPromise
+    ]) as Array<{ tablename: string }>
     
     const tableNames = tables.map(t => t.tablename)
     const requiredTables = ['users', 'posts', 'categories', 'tags', 'comments']
@@ -31,7 +39,7 @@ export async function GET() {
       return NextResponse.json({
         message: "数据库表未初始化",
         missingTables,
-        instruction: "请在 Vercel 项目设置中添加构建后命令，或手动运行: pnpm prisma db push"
+        instruction: "数据库连接正常，但表未创建。请在 Vercel 项目设置中运行: pnpm prisma db push"
       }, { status: 400 })
     }
     
@@ -40,8 +48,27 @@ export async function GET() {
       tables: tableNames
     })
   } catch (error: any) {
-    // 如果表不存在，Prisma 会抛出错误
-    if (error.code === 'P2021' || error.message?.includes('does not exist')) {
+    console.error("Init DB error:", error)
+    
+    // 超时错误
+    if (error.message === '数据库连接超时') {
+      return NextResponse.json({
+        message: "数据库连接超时",
+        error: "无法连接到数据库服务器",
+        possibleCauses: [
+          "DATABASE_URL 环境变量未正确配置",
+          "数据库服务器无法访问",
+          "网络连接问题"
+        ],
+        instruction: "请检查 Vercel 项目设置中的 DATABASE_URL 环境变量"
+      }, { status: 504 }) // Gateway Timeout
+    }
+    
+    // 表不存在错误
+    const errorMessage = error.message || ''
+    if (error.code === 'P2021' || 
+        errorMessage.includes('does not exist') || 
+        (errorMessage.includes('relation') && errorMessage.includes('does not exist'))) {
       return NextResponse.json({
         message: "数据库表未创建",
         error: error.message,
@@ -49,10 +76,12 @@ export async function GET() {
       }, { status: 400 })
     }
     
-    console.error("Init DB error:", error)
+    // 其他数据库错误
     return NextResponse.json({
       message: "检查数据库失败",
-      error: error.message
+      error: error.message || 'Unknown error',
+      code: error.code,
+      suggestion: "请检查 DATABASE_URL 环境变量是否正确配置"
     }, { status: 500 })
   }
 }
