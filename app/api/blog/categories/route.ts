@@ -7,6 +7,17 @@ import { prisma } from "@/lib/prisma"
  */
 export async function GET() {
   try {
+    // 检查数据库表是否存在
+    try {
+      await prisma.$queryRaw`SELECT 1 FROM categories LIMIT 1`
+    } catch (error: any) {
+      // 如果表不存在，返回空数组
+      if (error.code === 'P2021' || error.message?.includes('does not exist') || error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        return NextResponse.json([])
+      }
+      throw error
+    }
+
     const categories = await prisma.category.findMany({
       orderBy: {
         createdAt: "desc",

@@ -38,18 +38,33 @@ export async function getPosts(params?: {
   if (params?.tag) query.set('tag', params.tag)
   if (params?.category) query.set('category', params.category)
   
-  const response = await fetch(`/api/blog/posts?${query.toString()}`, {
-    cache: 'no-store',
-  })
+  // 添加超时处理
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒超时
   
-  if (!response.ok) {
-    throw new Error('获取文章列表失败')
-  }
-  
-  const data = await response.json()
-  return {
-    posts: data.posts,
-    total: data.total,
+  try {
+    const response = await fetch(`/api/blog/posts?${query.toString()}`, {
+      cache: 'no-store',
+      signal: controller.signal,
+    })
+    
+    clearTimeout(timeoutId)
+    
+    if (!response.ok) {
+      throw new Error('获取文章列表失败')
+    }
+    
+    const data = await response.json()
+    return {
+      posts: data.posts || [],
+      total: data.total || 0,
+    }
+  } catch (error: any) {
+    clearTimeout(timeoutId)
+    if (error.name === 'AbortError') {
+      throw new Error('请求超时，请检查数据库是否已初始化')
+    }
+    throw error
   }
 }
 
@@ -78,15 +93,29 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
  * GET /api/blog/tags
  */
 export async function getTags(): Promise<Tag[]> {
-  const response = await fetch('/api/blog/tags', {
-    cache: 'no-store',
-  })
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒超时
   
-  if (!response.ok) {
-    throw new Error('获取标签列表失败')
+  try {
+    const response = await fetch('/api/blog/tags', {
+      cache: 'no-store',
+      signal: controller.signal,
+    })
+    
+    clearTimeout(timeoutId)
+    
+    if (!response.ok) {
+      throw new Error('获取标签列表失败')
+    }
+    
+    return response.json() || []
+  } catch (error: any) {
+    clearTimeout(timeoutId)
+    if (error.name === 'AbortError') {
+      return [] // 超时返回空数组
+    }
+    throw error
   }
-  
-  return response.json()
 }
 
 /**
@@ -94,15 +123,29 @@ export async function getTags(): Promise<Tag[]> {
  * GET /api/blog/categories
  */
 export async function getCategories(): Promise<Category[]> {
-  const response = await fetch('/api/blog/categories', {
-    cache: 'no-store',
-  })
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒超时
   
-  if (!response.ok) {
-    throw new Error('获取分类列表失败')
+  try {
+    const response = await fetch('/api/blog/categories', {
+      cache: 'no-store',
+      signal: controller.signal,
+    })
+    
+    clearTimeout(timeoutId)
+    
+    if (!response.ok) {
+      throw new Error('获取分类列表失败')
+    }
+    
+    return response.json() || []
+  } catch (error: any) {
+    clearTimeout(timeoutId)
+    if (error.name === 'AbortError') {
+      return [] // 超时返回空数组
+    }
+    throw error
   }
-  
-  return response.json()
 }
 
 /**

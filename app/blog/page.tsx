@@ -41,9 +41,13 @@ function BlogContent() {
         setPosts(postsData.posts)
         setTags(tagsData)
         setCategories(categoriesData)
-      } catch (err) {
-        setError("加载数据失败，请稍后重试")
+      } catch (err: any) {
         console.error("Failed to fetch blog data:", err)
+        if (err.message?.includes('超时') || err.message?.includes('数据库')) {
+          setError("数据库未初始化，请访问 /api/admin/init-db 初始化数据库")
+        } else {
+          setError("加载数据失败，请稍后重试")
+        }
       } finally {
         setLoading(false)
       }
@@ -63,8 +67,25 @@ function BlogContent() {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <div className="text-center">
+        <div className="text-center space-y-4">
           <p className="text-destructive">{error}</p>
+          {error.includes('数据库未初始化') && (
+            <div className="mt-4 p-4 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground mb-2">
+                数据库需要初始化才能使用。请访问：
+              </p>
+              <a 
+                href="/api/admin/init-db" 
+                target="_blank"
+                className="text-primary hover:underline text-sm"
+              >
+                /api/admin/init-db
+              </a>
+              <p className="text-xs text-muted-foreground mt-2">
+                或者使用 Vercel CLI 运行: pnpm prisma db push
+              </p>
+            </div>
+          )}
         </div>
       </div>
     )

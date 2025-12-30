@@ -14,6 +14,23 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET(request: Request) {
   try {
+    // 检查数据库表是否存在
+    try {
+      await prisma.$queryRaw`SELECT 1 FROM posts LIMIT 1`
+    } catch (error: any) {
+      // 如果表不存在，返回空列表
+      if (error.code === 'P2021' || error.message?.includes('does not exist') || error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        return NextResponse.json({
+          posts: [],
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+        })
+      }
+      throw error
+    }
+
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get("page") || "1")
     const limit = parseInt(searchParams.get("limit") || "10")
