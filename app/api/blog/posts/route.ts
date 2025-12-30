@@ -14,37 +14,6 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET(request: Request) {
   try {
-    // 检查数据库表是否存在（添加超时处理）
-    try {
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('查询超时')), 3000)
-      })
-      
-      await Promise.race([
-        prisma.$queryRaw`SELECT 1 FROM posts LIMIT 1`,
-        timeoutPromise
-      ])
-    } catch (error: any) {
-      // 如果表不存在或超时，返回空列表
-      const errorMessage = error.message || ''
-      if (error.message === '查询超时' ||
-          error.code === 'P2021' || 
-          error.code === 'P1001' || // 连接错误
-          errorMessage.includes('does not exist') || 
-          (errorMessage.includes('relation') && errorMessage.includes('does not exist')) ||
-          errorMessage.includes('Unknown table') ||
-          errorMessage.includes('Can\'t reach database')) {
-        return NextResponse.json({
-          posts: [],
-          total: 0,
-          page: 1,
-          limit: 10,
-          totalPages: 0,
-        })
-      }
-      throw error
-    }
-
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get("page") || "1")
     const limit = parseInt(searchParams.get("limit") || "10")
@@ -74,75 +43,105 @@ export async function GET(request: Request) {
       }
     }
 
-    // 获取总数
-    const total = await prisma.post.count({ where })
+    // 直接查询，如果失败则返回空列表
+    try {
+      // 获取总数
+      const total = await prisma.post.count({ where })
 
-    // 获取文章列表
-    const posts = await prisma.post.findMany({
-      where,
-      include: {
+      // 获取文章列表
+      const posts = await prisma.post.findMany({
+        where,
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          categories: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+          tags: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+      })
+
+      // 格式化返回数据
+      const formattedPosts = posts.map((post) => ({
+        id: post.id,
+        title: post.title,
+        slug: post.slug,
+        content: post.content,
+        excerpt: post.excerpt,
+        coverImage: post.coverImage,
+        published: post.published,
+        authorId: post.authorId,
         author: {
-          select: {
-            id: true,
-            name: true,
-          },
+          id: post.author.id,
+          name: post.author.name,
+          email: "", // 保持兼容性
         },
-        categories: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-        tags: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      skip: (page - 1) * limit,
-      take: limit,
-    })
+        categories: post.categories,
+        tags: post.tags,
+        createdAt: post.createdAt.toISOString(),
+        updatedAt: post.updatedAt.toISOString(),
+      }))
 
-    // 格式化返回数据
-    const formattedPosts = posts.map((post) => ({
-      id: post.id,
-      title: post.title,
-      slug: post.slug,
-      content: post.content,
-      excerpt: post.excerpt,
-      coverImage: post.coverImage,
-      published: post.published,
-      authorId: post.authorId,
-      author: {
-        id: post.author.id,
-        name: post.author.name,
-        email: "", // 保持兼容性
-      },
-      categories: post.categories,
-      tags: post.tags,
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString(),
-    }))
-
-    return NextResponse.json({
-      posts: formattedPosts,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    })
+      return NextResponse.json({
+        posts: formattedPosts,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      })
+    } catch (dbError: any) {
+      // 数据库错误（表不存在、连接失败等），返回空列表
+      const errorMessage = dbError.message || ''
+      const errorCode = dbError.code || ''
+      
+      // 如果是表不存在或连接错误，返回空列表
+      if (errorCode === 'P2021' || 
+          errorCode === 'P1001' ||
+          errorMessage.includes('does not exist') || 
+          (errorMessage.includes('relation') && errorMessage.includes('does not exist')) ||
+          errorMessage.includes('Unknown table') ||
+          errorMessage.includes('Can\'t reach database') ||
+          errorMessage.includes('timeout')) {
+        return NextResponse.json({
+          posts: [],
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+        })
+      }
+      
+      // 其他错误继续抛出
+      throw dbError
+    }
   } catch (error) {
     console.error("Error fetching posts:", error)
-    return NextResponse.json(
-      { message: "获取文章列表失败" },
-      { status: 500 }
-    )
+    // 任何错误都返回空列表，确保页面能正常显示
+    return NextResponse.json({
+      posts: [],
+      total: 0,
+      page: 1,
+      limit: 10,
+      totalPages: 0,
+    })
   }
 }
-
