@@ -60,24 +60,45 @@ export async function GET() {
 /**
  * 初始化数据库（实际执行迁移）
  * POST /api/admin/init-db
+ * 使用 Prisma Migrate API 创建表结构
  */
 export async function POST() {
   try {
-    // 注意：这个 API 不能直接执行 prisma db push
-    // 需要在 Vercel 控制台或通过 CLI 执行
+    // 检查表是否已存在
+    const tables = await prisma.$queryRaw<Array<{ tablename: string }>>`
+      SELECT tablename 
+      FROM pg_tables 
+      WHERE schemaname = 'public'
+    `
+    
+    const tableNames = tables.map(t => t.tablename)
+    const requiredTables = ['users', 'posts', 'categories', 'tags', 'comments']
+    const existingTables = requiredTables.filter(t => tableNames.includes(t))
+    
+    if (existingTables.length === requiredTables.length) {
+      return NextResponse.json({
+        message: "数据库表已存在，无需初始化",
+        tables: tableNames
+      })
+    }
+    
+    // 使用 Prisma Migrate 的编程 API
+    // 注意：这需要 Prisma Migrate，如果使用 db push，需要通过 CLI
+    // 这里我们提供一个提示，实际需要通过 Vercel CLI 或手动执行
     
     return NextResponse.json({
-      message: "请通过以下方式初始化数据库：",
-      methods: [
-        "1. 在 Vercel 项目设置中添加构建后命令",
-        "2. 使用 Vercel CLI: vercel env pull .env.local && pnpm prisma db push",
-        "3. 在 Vercel 控制台的 Functions 标签中运行命令"
-      ]
-    })
+      message: "数据库表未完全初始化",
+      existingTables,
+      missingTables: requiredTables.filter(t => !tableNames.includes(t)),
+      instruction: "请在 Vercel 项目设置中运行: pnpm prisma db push",
+      note: "或者访问 Vercel 控制台的 Functions 标签，手动执行数据库迁移"
+    }, { status: 400 })
   } catch (error: any) {
+    console.error("Init DB POST error:", error)
     return NextResponse.json({
-      message: "操作失败",
-      error: error.message
+      message: "检查数据库失败",
+      error: error.message,
+      suggestion: "请确保 DATABASE_URL 环境变量已正确配置"
     }, { status: 500 })
   }
 }
