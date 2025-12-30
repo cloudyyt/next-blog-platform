@@ -43,11 +43,9 @@ function BlogContent() {
         setCategories(categoriesData)
       } catch (err: any) {
         console.error("Failed to fetch blog data:", err)
-        if (err.message?.includes('超时') || err.message?.includes('数据库')) {
-          setError("数据库未初始化，请访问 /api/admin/init-db 初始化数据库")
-        } else {
-          setError("加载数据失败，请稍后重试")
-        }
+        // API 调用失败时会返回空数据，所以这里不应该有错误
+        // 但如果真的出错了，显示友好提示
+        setError("加载数据失败，请稍后重试")
       } finally {
         setLoading(false)
       }
