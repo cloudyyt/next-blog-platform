@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { safeQuery } from "@/lib/db-utils"
 
 export const dynamic = 'force-dynamic'
 
@@ -9,25 +10,34 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET() {
   try {
-    const categories = await prisma.category.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-    })
+    // 获取分类列表（添加超时保护）
+    const categories = await safeQuery(
+      prisma.category.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+      [],
+      3000
+    )
 
-    // 计算每个分类的文章数量
+    // 计算每个分类的文章数量（添加超时保护）
     const categoriesWithCount = await Promise.all(
       categories.map(async (category) => {
-        const postCount = await prisma.post.count({
-          where: {
-            categories: {
-              some: {
-                id: category.id,
+        const postCount = await safeQuery(
+          prisma.post.count({
+            where: {
+              categories: {
+                some: {
+                  id: category.id,
+                },
               },
+              published: true,
             },
-            published: true,
-          },
-        })
+          }),
+          0,
+          2000
+        )
         return {
           ...category,
           postCount,

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { withTimeout } from "@/lib/db-utils"
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +15,9 @@ export async function GET(
   try {
     const { slug } = await params
 
-    const post = await prisma.post.findUnique({
+    // 添加超时保护（3秒）
+    const post = await withTimeout(
+      prisma.post.findUnique({
       where: {
         slug,
         published: true,
@@ -41,7 +44,9 @@ export async function GET(
           },
         },
       },
-    })
+      }),
+      3000
+    )
 
     if (!post) {
       return NextResponse.json(

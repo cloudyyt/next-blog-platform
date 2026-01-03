@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { safeQuery } from "@/lib/db-utils"
 
 export const dynamic = 'force-dynamic'
 
@@ -9,24 +10,32 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET() {
   try {
-    // 获取第一个管理员用户作为博主
-    const author = await prisma.user.findFirst({
-      where: {
-        role: "admin",
-      },
-      select: {
-        id: true,
-        name: true,
-      },
-    })
+    // 获取第一个管理员用户作为博主（添加超时保护）
+    const author = await safeQuery(
+      prisma.user.findFirst({
+        where: {
+          role: "admin",
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      }),
+      null,
+      3000
+    )
 
-    // 如果没有管理员，获取第一个用户
-    const fallbackAuthor = author || await prisma.user.findFirst({
-      select: {
-        id: true,
-        name: true,
-      },
-    })
+    // 如果没有管理员，获取第一个用户（添加超时保护）
+    const fallbackAuthor = author || await safeQuery(
+      prisma.user.findFirst({
+        select: {
+          id: true,
+          name: true,
+        },
+      }),
+      null,
+      3000
+    )
 
     if (!fallbackAuthor) {
       // 如果数据库未初始化，返回默认配置
@@ -42,12 +51,16 @@ export async function GET() {
       })
     }
 
-    // 统计文章数量
-    const postCount = await prisma.post.count({
-      where: {
-        published: true,
-      },
-    })
+    // 统计文章数量（添加超时保护）
+    const postCount = await safeQuery(
+      prisma.post.count({
+        where: {
+          published: true,
+        },
+      }),
+      0,
+      3000
+    )
 
     return NextResponse.json({
       siteName: "技术博客",

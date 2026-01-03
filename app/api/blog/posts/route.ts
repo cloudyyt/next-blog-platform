@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { withTimeout } from "@/lib/db-utils"
 
 export const dynamic = 'force-dynamic'
 
@@ -45,11 +46,15 @@ export async function GET(request: Request) {
 
     // 直接查询，如果失败则返回空列表
     try {
-      // 获取总数
-      const total = await prisma.post.count({ where })
+      // 获取总数（添加 3 秒超时）
+      const total = await withTimeout(
+        prisma.post.count({ where }),
+        3000
+      )
 
-      // 获取文章列表
-      const posts = await prisma.post.findMany({
+      // 获取文章列表（添加 3 秒超时）
+      const posts = await withTimeout(
+        prisma.post.findMany({
         where,
         include: {
           author: {
@@ -78,7 +83,9 @@ export async function GET(request: Request) {
         },
         skip: (page - 1) * limit,
         take: limit,
-      })
+        }),
+        3000
+      )
 
       // 格式化返回数据
       const formattedPosts = posts.map((post) => ({
