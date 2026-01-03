@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/blog/config
  * 获取博客配置信息
@@ -27,10 +29,17 @@ export async function GET() {
     })
 
     if (!fallbackAuthor) {
-      return NextResponse.json(
-        { message: "未找到博主信息" },
-        { status: 404 }
-      )
+      // 如果数据库未初始化，返回默认配置
+      return NextResponse.json({
+        siteName: "技术博客",
+        siteDescription: "分享前端开发经验和技术思考",
+        author: {
+          id: "1",
+          name: "博主",
+          email: "",
+          postCount: 0,
+        },
+      })
     }
 
     // 统计文章数量
@@ -50,12 +59,19 @@ export async function GET() {
         postCount,
       },
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching blog config:", error)
-    return NextResponse.json(
-      { message: "获取博客配置失败" },
-      { status: 500 }
-    )
+    // 数据库连接失败时返回默认配置，确保页面能正常显示
+    return NextResponse.json({
+      siteName: "技术博客",
+      siteDescription: "分享前端开发经验和技术思考",
+      author: {
+        id: "1",
+        name: "博主",
+        email: "",
+        postCount: 0,
+      },
+    })
   }
 }
 

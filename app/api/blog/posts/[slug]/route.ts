@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/blog/posts/[slug]
  * 根据 slug 获取单篇文章详情
@@ -70,8 +72,19 @@ export async function GET(
     }
 
     return NextResponse.json(formattedPost)
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching post:", error)
+    // 数据库连接失败时返回 404，而不是 500，避免服务器崩溃
+    const errorMessage = error.message || ''
+    if (error.code === 'P2021' || 
+        error.code === 'P1001' ||
+        errorMessage.includes('does not exist') || 
+        errorMessage.includes('Can\'t reach database')) {
+      return NextResponse.json(
+        { message: "文章不存在" },
+        { status: 404 }
+      )
+    }
     return NextResponse.json(
       { message: "获取文章失败" },
       { status: 500 }
