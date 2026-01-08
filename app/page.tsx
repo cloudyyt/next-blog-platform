@@ -4,14 +4,19 @@ import { redirect } from "next/navigation"
 export const dynamic = 'force-dynamic'
 
 export default function Home() {
-  // 根据环境变量判断是admin端口还是blog端口
-  // 如果是admin端口（PORT=3001），重定向到/admin
-  // 否则重定向到/blog
-  const isAdminPort = process.env.PORT === "3001" || process.env.ADMIN_PORT === "true"
+  // 在 Vercel 生产环境，默认重定向到 /blog（博客主页）
+  // 在本地开发时，可以通过环境变量控制重定向到 /admin
+  const isVercel = !!process.env.VERCEL
+  const isAdminPort = 
+    !isVercel && (
+      process.env.PORT === "3001" || 
+      process.env.ADMIN_PORT === "true"
+    )
   
   if (isAdminPort) {
     redirect("/admin")
   } else {
+    // 默认重定向到博客主页（包括 Vercel 生产环境）
     redirect("/blog")
   }
 }
