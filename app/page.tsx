@@ -4,11 +4,11 @@ import { redirect } from "next/navigation"
 export const dynamic = 'force-dynamic'
 
 export default function Home() {
-  // 在 Vercel 生产环境，默认重定向到 /blog（博客主页）
+  // 备用重定向方案（如果 next.config.js 中的重定向不工作）
   // 在本地开发时，可以通过环境变量控制重定向到 /admin
-  const isVercel = !!process.env.VERCEL
+  // 在 Vercel 生产环境，默认重定向到 /blog
   const isAdminPort = 
-    !isVercel && (
+    !process.env.VERCEL && (
       process.env.PORT === "3001" || 
       process.env.ADMIN_PORT === "true"
     )
@@ -16,7 +16,7 @@ export default function Home() {
   if (isAdminPort) {
     redirect("/admin")
   } else {
-    // 默认重定向到博客主页（包括 Vercel 生产环境）
+    // 默认重定向到博客主页
     redirect("/blog")
   }
 }
