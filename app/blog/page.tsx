@@ -27,8 +27,8 @@ function BlogContent() {
         setLoading(true)
         setError(null)
 
-        // 并行获取数据
-        const [postsData, tagsData, categoriesData] = await Promise.all([
+        // 并行获取数据，添加超时保护
+        const fetchPromise = Promise.all([
           getPosts({
             tag: activeTag,
             category: activeCategory,
@@ -38,14 +38,26 @@ function BlogContent() {
           getCategories(),
         ])
 
+        // 添加总体超时保护（10秒）
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('请求超时')), 10000)
+        })
+
+        const [postsData, tagsData, categoriesData] = await Promise.race([
+          fetchPromise,
+          timeoutPromise,
+        ]) as [Awaited<ReturnType<typeof getPosts>>, Awaited<ReturnType<typeof getTags>>, Awaited<ReturnType<typeof getCategories>>]
+
         setPosts(postsData.posts)
         setTags(tagsData)
         setCategories(categoriesData)
       } catch (err: any) {
         console.error("Failed to fetch blog data:", err)
-        // API 调用失败时会返回空数据，所以这里不应该有错误
-        // 但如果真的出错了，显示友好提示
-        setError("加载数据失败，请稍后重试")
+        // 即使出错也设置空数据，确保页面能显示
+        setPosts([])
+        setTags([])
+        setCategories([])
+        // 不显示错误，因为 API 已经有错误处理，会返回空数据
       } finally {
         setLoading(false)
       }
