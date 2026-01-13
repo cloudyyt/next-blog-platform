@@ -32,17 +32,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // 初始化：从 localStorage 读取用户信息
   React.useEffect(() => {
-    const token = localStorage.getItem("token")
-    const userStr = localStorage.getItem("user")
+    // 确保在客户端环境才访问 localStorage
+    if (typeof window === "undefined") {
+      setLoading(false)
+      return
+    }
     
-    if (token && userStr) {
-      try {
-        const userData = JSON.parse(userStr)
-        setUser(userData)
-      } catch (error) {
-        localStorage.removeItem("token")
-        localStorage.removeItem("user")
+    try {
+      const token = localStorage.getItem("token")
+      const userStr = localStorage.getItem("user")
+      
+      if (token && userStr) {
+        try {
+          const userData = JSON.parse(userStr)
+          setUser(userData)
+        } catch (error) {
+          localStorage.removeItem("token")
+          localStorage.removeItem("user")
+        }
       }
+    } catch (error) {
+      // 如果 localStorage 访问失败（例如隐私模式），静默处理
+      console.warn("Failed to access localStorage:", error)
     }
     
     setLoading(false)
@@ -61,8 +72,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     const data = await response.json()
-    localStorage.setItem("token", data.token)
-    localStorage.setItem("user", JSON.stringify(data.user))
+    
+    // 确保在客户端环境才访问 localStorage
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("token", data.token)
+        localStorage.setItem("user", JSON.stringify(data.user))
+      } catch (error) {
+        console.warn("Failed to save to localStorage:", error)
+      }
+    }
+    
     setUser(data.user)
   }
 
@@ -79,14 +99,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     const data = await response.json()
-    localStorage.setItem("token", data.token)
-    localStorage.setItem("user", JSON.stringify(data.user))
+    
+    // 确保在客户端环境才访问 localStorage
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("token", data.token)
+        localStorage.setItem("user", JSON.stringify(data.user))
+      } catch (error) {
+        console.warn("Failed to save to localStorage:", error)
+      }
+    }
+    
     setUser(data.user)
   }
 
   const logout = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
+    // 确保在客户端环境才访问 localStorage
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+      } catch (error) {
+        console.warn("Failed to remove from localStorage:", error)
+      }
+    }
     setUser(null)
   }
 
