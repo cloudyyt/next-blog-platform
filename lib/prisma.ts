@@ -12,13 +12,22 @@ if (!process.env.PRISMA_DATABASE_URL) {
 }
 
 // 创建 Prisma 客户端实例
-// 在 Vercel 环境中，每次请求都会创建新的实例，所以不需要全局缓存
+// 在 Vercel 环境中，使用 Prisma Accelerate 连接池
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+  // Prisma Accelerate 会自动处理连接池，无需手动配置
 })
 
-// 只在非生产环境缓存 Prisma 实例（开发环境）
-if (process.env.NODE_ENV !== 'production') {
+// 在 Vercel 环境中，每次请求都可能创建新实例，但为了性能，我们仍然使用全局缓存
+// 这可以避免在同一个请求中创建多个 Prisma Client 实例
+if (!globalForPrisma.prisma) {
   globalForPrisma.prisma = prisma
+}
+
+// 优雅关闭连接（在开发环境中）
+if (process.env.NODE_ENV !== 'production') {
+  process.on('beforeExit', async () => {
+    await prisma.$disconnect()
+  })
 }
 
