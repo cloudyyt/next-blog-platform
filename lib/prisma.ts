@@ -8,6 +8,7 @@ const globalForPrisma = globalThis as unknown as {
 if (!process.env.PRISMA_DATABASE_URL) {
   console.error('❌ PRISMA_DATABASE_URL is not set. Database operations will fail.')
   console.error('Please ensure Vercel Postgres database is connected to your project.')
+  console.error('If you are using direct connection, set POSTGRES_URL instead.')
 }
 
 // 创建 Prisma 客户端实例
