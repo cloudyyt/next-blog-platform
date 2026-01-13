@@ -8,12 +8,12 @@ import { PrismaClient } from '@prisma/client'
 /**
  * 带超时的数据库查询
  * @param query 数据库查询 Promise
- * @param timeoutMs 超时时间（毫秒），默认 3 秒
+ * @param timeoutMs 超时时间（毫秒），默认 5 秒（Vercel 冷启动可能需要更长时间）
  * @returns 查询结果
  */
 export async function withTimeout<T>(
   query: Promise<T>,
-  timeoutMs: number = 3000
+  timeoutMs: number = 5000
 ): Promise<T> {
   const timeoutPromise = new Promise<never>((_, reject) => {
     setTimeout(() => reject(new Error('数据库查询超时')), timeoutMs)
@@ -34,13 +34,13 @@ export async function withTimeout<T>(
  * 安全执行数据库查询，失败时返回默认值
  * @param query 数据库查询 Promise
  * @param defaultValue 默认值
- * @param timeoutMs 超时时间（毫秒），默认 3 秒
+ * @param timeoutMs 超时时间（毫秒），默认 5 秒（Vercel 冷启动可能需要更长时间）
  * @returns 查询结果或默认值
  */
 export async function safeQuery<T>(
   query: Promise<T>,
   defaultValue: T,
-  timeoutMs: number = 3000
+  timeoutMs: number = 5000
 ): Promise<T> {
   try {
     return await withTimeout(query, timeoutMs)

@@ -15,7 +15,7 @@ export async function GET(
   try {
     const { slug } = await params
 
-    // 添加超时保护（3秒）
+    // 添加超时保护（5秒，适应 Vercel 冷启动）
     const post = await withTimeout(
       prisma.post.findUnique({
       where: {
@@ -45,7 +45,7 @@ export async function GET(
         },
       },
       }),
-      3000
+      5000
     )
 
     if (!post) {

@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET() {
   try {
-    // 获取标签列表（添加超时保护）
+    // 获取标签列表（添加超时保护，5秒适应 Vercel 冷启动）
     const tags = await safeQuery(
       prisma.tag.findMany({
         orderBy: {
@@ -18,7 +18,7 @@ export async function GET() {
         },
       }),
       [],
-      3000
+      5000
     )
 
     // 计算每个标签的文章数量（添加超时保护）
@@ -36,7 +36,7 @@ export async function GET() {
             },
           }),
           0,
-          2000
+          3000
         )
         return {
           ...tag,
