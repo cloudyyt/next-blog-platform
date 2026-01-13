@@ -38,9 +38,9 @@ function BlogContent() {
           getCategories(),
         ])
 
-        // 添加总体超时保护（10秒）
+        // 添加总体超时保护（15秒，适应 Vercel 冷启动）
         const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('请求超时')), 10000)
+          setTimeout(() => reject(new Error('请求超时')), 15000)
         })
 
         const [postsData, tagsData, categoriesData] = await Promise.race([

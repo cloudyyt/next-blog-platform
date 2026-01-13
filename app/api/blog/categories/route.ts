@@ -21,8 +21,14 @@ export async function GET() {
       5000
     )
 
+    // 如果分类为空，直接返回空数组，避免额外的查询
+    if (categories.length === 0) {
+      return NextResponse.json([])
+    }
+
     // 计算每个分类的文章数量（添加超时保护）
-    const categoriesWithCount = await Promise.all(
+    // 使用 Promise.allSettled 确保即使某些查询失败也能继续
+    const categoriesWithCount = await Promise.allSettled(
       categories.map(async (category) => {
         const postCount = await safeQuery(
           prisma.post.count({
@@ -45,7 +51,12 @@ export async function GET() {
       })
     )
 
-    return NextResponse.json(categoriesWithCount)
+    // 处理结果，只返回成功的
+    const result = categoriesWithCount
+      .filter((item): item is PromiseFulfilledResult<any> => item.status === 'fulfilled')
+      .map(item => item.value)
+
+    return NextResponse.json(result)
   } catch (error: any) {
     // 任何错误都返回空数组，确保页面能正常显示
     console.error("Error fetching categories:", error)
