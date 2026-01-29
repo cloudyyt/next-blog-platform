@@ -22,48 +22,55 @@ function BlogContent() {
   const activeCategory = searchParams.get("category") || undefined
 
   useEffect(() => {
+    let cancelled = false
+    // 保底：最多 12 秒后一定结束 loading，避免一直转圈
+    const forceFinishTimer = setTimeout(() => {
+      if (cancelled) return
+      setLoading(false)
+      setPosts((p) => (p.length ? p : []))
+      setTags((t) => (t.length ? t : []))
+      setCategories((c) => (c.length ? c : []))
+    }, 12000)
+
     async function fetchData() {
       try {
         setLoading(true)
         setError(null)
 
-        // 并行获取数据，添加超时保护
         const fetchPromise = Promise.all([
-          getPosts({
-            tag: activeTag,
-            category: activeCategory,
-            limit: 10,
-          }),
+          getPosts({ tag: activeTag, category: activeCategory, limit: 10 }),
           getTags(),
           getCategories(),
         ])
-
-        // 添加总体超时保护（15秒，适应 Vercel 冷启动）
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('请求超时')), 15000)
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error("请求超时")), 10000)
         })
 
-        const [postsData, tagsData, categoriesData] = await Promise.race([
+        const [postsData, tagsData, categoriesData] = (await Promise.race([
           fetchPromise,
           timeoutPromise,
-        ]) as [Awaited<ReturnType<typeof getPosts>>, Awaited<ReturnType<typeof getTags>>, Awaited<ReturnType<typeof getCategories>>]
+        ])) as [Awaited<ReturnType<typeof getPosts>>, Awaited<ReturnType<typeof getTags>>, Awaited<ReturnType<typeof getCategories>>]
 
-        setPosts(postsData.posts)
-        setTags(tagsData)
-        setCategories(categoriesData)
+        if (cancelled) return
+        setPosts(postsData?.posts ?? [])
+        setTags(tagsData ?? [])
+        setCategories(categoriesData ?? [])
       } catch (err: any) {
+        if (cancelled) return
         console.error("Failed to fetch blog data:", err)
-        // 即使出错也设置空数据，确保页面能显示
         setPosts([])
         setTags([])
         setCategories([])
-        // 不显示错误，因为 API 已经有错误处理，会返回空数据
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
 
     fetchData()
+    return () => {
+      cancelled = true
+      clearTimeout(forceFinishTimer)
+    }
   }, [activeTag, activeCategory])
 
   if (loading) {

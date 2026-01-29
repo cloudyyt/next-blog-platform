@@ -4,13 +4,30 @@ import { safeQuery } from "@/lib/db-utils"
 
 export const dynamic = 'force-dynamic'
 
+const API_TIMEOUT_MS = 8000
+
+async function runWithTimeout<T>(promise: Promise<T>, fallback: T): Promise<T> {
+  const timeout = new Promise<T>((resolve) =>
+    setTimeout(() => resolve(fallback), API_TIMEOUT_MS)
+  )
+  return Promise.race([promise, timeout])
+}
+
 /**
  * GET /api/blog/tags
  * 获取所有标签列表
  */
 export async function GET() {
   try {
-    // 获取标签列表（添加超时保护，5秒适应 Vercel 冷启动）
+    return await runWithTimeout(handleGet(), NextResponse.json([]))
+  } catch (error: any) {
+    console.error("Error fetching tags:", error)
+    return NextResponse.json([])
+  }
+}
+
+async function handleGet() {
+  try {
     const tags = await safeQuery(
       prisma.tag.findMany({
         orderBy: {
@@ -58,7 +75,6 @@ export async function GET() {
 
     return NextResponse.json(result)
   } catch (error: any) {
-    // 任何错误都返回空数组，确保页面能正常显示
     console.error("Error fetching tags:", error)
     return NextResponse.json([])
   }
