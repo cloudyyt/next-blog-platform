@@ -1,3 +1,7 @@
+/**
+ * App Router 根布局（必须存在）
+ * Next.js 13+ 使用 App Router 时，app/layout.tsx 为必需文件。
+ */
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
