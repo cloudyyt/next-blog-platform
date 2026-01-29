@@ -5,6 +5,7 @@
   "installCommand": "pnpm install",
   "framework": "nextjs",
   "fluid": true,
+  "regions": ["hkg1"],
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 60
