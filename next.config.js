@@ -4,7 +4,7 @@ const nextConfig = {
   // Next.js 14.x 使用 experimental；15+ 可用顶层 serverExternalPackages
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
-    optimizePackageImports: ['@prisma/client', 'lucide-react'],
+    optimizePackageImports: ['lucide-react'],
   },
   images: {
     remotePatterns: [
