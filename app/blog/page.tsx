@@ -1,112 +1,159 @@
-"use client"
-
-import { useEffect, useState, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
+/**
+ * 博客列表页 - 服务端组件版本
+ * 在服务端获取数据，避免客户端多次 API 请求
+ */
+import { Suspense } from "react"
+import { prisma } from "@/lib/prisma"
 import { PostCard } from "@/components/blog/post-card"
 import { TagList } from "@/components/blog/tag-list"
 import { CategoryList } from "@/components/blog/category-list"
 import { StatsCard } from "@/components/blog/stats-card"
 import { Loading } from "@/components/ui/loading"
-import { getPosts, getTags, getCategories, getBlogConfig } from "@/lib/api/blog"
-import { BlogPost, Tag, Category } from "@/lib/types/blog"
+import { notFound } from "next/navigation"
 
-function BlogContent() {
-  const searchParams = useSearchParams()
-  const [posts, setPosts] = useState<BlogPost[]>([])
-  const [tags, setTags] = useState<Tag[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
-  const activeTag = searchParams.get("tag") || undefined
-  const activeCategory = searchParams.get("category") || undefined
+async function getPostsFromDB(tagSlug?: string, categorySlug?: string) {
+  try {
+    const where: any = {
+      published: true,
+    }
 
-  useEffect(() => {
-    let cancelled = false
-    // 保底：最多 12 秒后一定结束 loading，避免一直转圈
-    const forceFinishTimer = setTimeout(() => {
-      if (cancelled) return
-      setLoading(false)
-      setPosts((p) => (p.length ? p : []))
-      setTags((t) => (t.length ? t : []))
-      setCategories((c) => (c.length ? c : []))
-    }, 12000)
+    if (tagSlug) {
+      where.tags = { some: { slug: tagSlug } }
+    }
 
-    async function fetchData() {
-      try {
-        setLoading(true)
-        setError(null)
+    if (categorySlug) {
+      where.categories = { some: { slug: categorySlug } }
+    }
 
-        const fetchPromise = Promise.all([
-          getPosts({ tag: activeTag, category: activeCategory, limit: 10 }),
-          getTags(),
-          getCategories(),
-        ])
-        const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error("请求超时")), 10000)
+    const posts = await prisma.post.findMany({
+      where,
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        categories: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+        tags: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 10,
+    })
+
+    return posts.map((post) => ({
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      content: post.content,
+      excerpt: post.excerpt,
+      coverImage: post.coverImage,
+      published: post.published,
+      authorId: post.authorId,
+      author: {
+        id: post.author.id,
+        name: post.author.name,
+        email: "",
+      },
+      categories: post.categories,
+      tags: post.tags,
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
+    }))
+  } catch (error) {
+    console.error("Failed to fetch posts:", error)
+    return []
+  }
+}
+
+async function getTagsFromDB() {
+  try {
+    const tags = await prisma.tag.findMany({
+      orderBy: { createdAt: "desc" },
+    })
+
+    // 计算每个标签的文章数量
+    const tagsWithCount = await Promise.all(
+      tags.map(async (tag) => {
+        const postCount = await prisma.post.count({
+          where: {
+            tags: { some: { id: tag.id } },
+            published: true,
+          },
         })
-
-        const [postsData, tagsData, categoriesData] = (await Promise.race([
-          fetchPromise,
-          timeoutPromise,
-        ])) as [Awaited<ReturnType<typeof getPosts>>, Awaited<ReturnType<typeof getTags>>, Awaited<ReturnType<typeof getCategories>>]
-
-        if (cancelled) return
-        setPosts(postsData?.posts ?? [])
-        setTags(tagsData ?? [])
-        setCategories(categoriesData ?? [])
-      } catch (err: any) {
-        if (cancelled) return
-        console.error("Failed to fetch blog data:", err)
-        setPosts([])
-        setTags([])
-        setCategories([])
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-
-    fetchData()
-    return () => {
-      cancelled = true
-      clearTimeout(forceFinishTimer)
-    }
-  }, [activeTag, activeCategory])
-
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <Loading size="lg" text="加载中..." />
-      </div>
+        return {
+          ...tag,
+          postCount,
+        }
+      })
     )
-  }
 
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center space-y-4">
-          <p className="text-destructive">{error}</p>
-          {error.includes('数据库未初始化') && (
-            <div className="mt-4 p-4 bg-muted rounded-lg">
-              <p className="text-sm text-muted-foreground mb-2">
-                数据库需要初始化才能使用。请访问：
-              </p>
-              <a 
-                href="/api/admin/init-db" 
-                target="_blank"
-                className="text-primary hover:underline text-sm"
-              >
-                /api/admin/init-db
-              </a>
-              <p className="text-xs text-muted-foreground mt-2">
-                或者使用 Vercel CLI 运行: pnpm prisma db push
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-    )
+    return tagsWithCount
+  } catch (error) {
+    console.error("Failed to fetch tags:", error)
+    return []
   }
+}
+
+async function getCategoriesFromDB() {
+  try {
+    const categories = await prisma.category.findMany({
+      orderBy: { createdAt: "desc" },
+    })
+
+    // 计算每个分类的文章数量
+    const categoriesWithCount = await Promise.all(
+      categories.map(async (category) => {
+        const postCount = await prisma.post.count({
+          where: {
+            categories: { some: { id: category.id } },
+            published: true,
+          },
+        })
+        return {
+          ...category,
+          postCount,
+        }
+      })
+    )
+
+    return categoriesWithCount
+  } catch (error) {
+    console.error("Failed to fetch categories:", error)
+    return []
+  }
+}
+
+async function BlogContent({
+  tagSlug,
+  categorySlug,
+}: {
+  tagSlug?: string
+  categorySlug?: string
+}) {
+  // 并行获取所有数据
+  const [posts, tags, categories] = await Promise.all([
+    getPostsFromDB(tagSlug, categorySlug),
+    getTagsFromDB(),
+    getCategoriesFromDB(),
+  ])
 
   return (
     <div className="container mx-auto px-4 py-8 sm:py-12">
@@ -114,18 +161,23 @@ function BlogContent() {
         {/* 主内容区 - 文章列表 */}
         <main className="lg:col-span-8 space-y-6">
           {/* 筛选提示 */}
-          {(activeTag || activeCategory) && (
+          {(tagSlug || categorySlug) && (
             <div className="rounded-lg border bg-card/50 backdrop-blur-sm p-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">
                   当前筛选：
-                  {activeTag && <span className="ml-2 px-2 py-1 rounded bg-primary/10 text-primary">#{tags.find(t => t.slug === activeTag)?.name}</span>}
-                  {activeCategory && <span className="ml-2 px-2 py-1 rounded bg-primary/10 text-primary">{categories.find(c => c.slug === activeCategory)?.name}</span>}
+                  {tagSlug && (
+                    <span className="ml-2 px-2 py-1 rounded bg-primary/10 text-primary">
+                      #{tags.find((t) => t.slug === tagSlug)?.name}
+                    </span>
+                  )}
+                  {categorySlug && (
+                    <span className="ml-2 px-2 py-1 rounded bg-primary/10 text-primary">
+                      {categories.find((c) => c.slug === categorySlug)?.name}
+                    </span>
+                  )}
                 </span>
-                <a
-                  href="/blog"
-                  className="text-sm text-primary hover:underline"
-                >
+                <a href="/blog" className="text-sm text-primary hover:underline">
                   清除筛选
                 </a>
               </div>
@@ -158,16 +210,14 @@ function BlogContent() {
 
             {/* 分类列表 */}
             {categories.length > 0 && (
-              <CategoryList 
-                categories={categories} 
-                activeCategory={activeCategory}
+              <CategoryList
+                categories={categories}
+                activeCategory={categorySlug}
               />
             )}
 
             {/* 标签列表 */}
-            {tags.length > 0 && (
-              <TagList tags={tags} activeTag={activeTag} />
-            )}
+            {tags.length > 0 && <TagList tags={tags} activeTag={tagSlug} />}
           </div>
         </aside>
       </div>
@@ -175,10 +225,24 @@ function BlogContent() {
   )
 }
 
-export default function BlogPage() {
+interface BlogPageProps {
+  searchParams: Promise<{ tag?: string; category?: string }>
+}
+
+export default async function BlogPage({ searchParams }: BlogPageProps) {
+  const params = await searchParams
+  const tagSlug = params.tag
+  const categorySlug = params.category
+
   return (
-    <Suspense fallback={<div className="container mx-auto px-4 py-12"><Loading size="lg" text="加载中..." /></div>}>
-      <BlogContent />
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-12">
+          <Loading size="lg" text="加载中..." />
+        </div>
+      }
+    >
+      <BlogContent tagSlug={tagSlug} categorySlug={categorySlug} />
     </Suspense>
   )
 }
