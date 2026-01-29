@@ -2,6 +2,9 @@
   "name": "blog-platform",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "dev:admin": "PORT=3001 ADMIN_PORT=true next dev",
