@@ -106,9 +106,9 @@ export default async function TestPage() {
           <h3 className="font-semibold text-yellow-900">📝 如何使用此页面</h3>
           <ol className="list-decimal list-inside mt-2 text-sm text-yellow-800 space-y-1">
             <li>如果此页面能正常打开 → 说明 Next.js 运行正常</li>
-            <li>检查"环境变量"部分是否都是 ✅</li>
-            <li>检查"数据库连接"是否显示 ✅</li>
-            <li>逐个点击"快速测试链接"看哪个能打开</li>
+            <li>检查环境变量部分是否都是 ✅</li>
+            <li>检查数据库连接是否显示 ✅</li>
+            <li>逐个点击快速测试链接看哪个能打开</li>
             <li>将此页面的截图发给我分析</li>
           </ol>
         </div>
