@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Prisma 不打包进 serverless，减少冷启动
-  serverExternalPackages: ['@prisma/client', 'prisma'],
+  // Next.js 14.x 使用 experimental；15+ 可用顶层 serverExternalPackages
   experimental: {
+    serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
     optimizePackageImports: ['@prisma/client', 'lucide-react'],
   },
   images: {

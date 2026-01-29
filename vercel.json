@@ -1,14 +1,13 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm prisma generate --no-engine && pnpm run build",
   "devCommand": "pnpm run dev",
   "installCommand": "pnpm install",
   "framework": "nextjs",
+  "fluid": true,
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 60
-    },
-    "app/**/*.tsx": {
-      "maxDuration": 30
     }
   }
 }

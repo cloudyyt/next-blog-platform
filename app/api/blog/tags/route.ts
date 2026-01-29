@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { safeQuery } from "@/lib/db-utils"
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60
 
 const API_TIMEOUT_MS = 8000
 

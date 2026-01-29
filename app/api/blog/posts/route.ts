@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { withTimeout } from "@/lib/db-utils"
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60
 
 /**
  * GET /api/blog/posts
