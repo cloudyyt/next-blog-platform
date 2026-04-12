@@ -19,7 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Search, Trash2, Eye, MessageSquare } from "lucide-react"
+import { Search, Trash2, Eye } from "lucide-react"
 import { toast } from "sonner"
 import {
   AlertDialog,
@@ -33,6 +33,9 @@ import {
 } from "@/components/ui/alert-dialog"
 import Link from "next/link"
 import { format } from "date-fns"
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton"
+import { authFetch } from "@/lib/admin-fetch"
+import { Pagination } from "@/components/admin/admin-pagination"
 
 interface Comment {
   id: string
@@ -62,22 +65,23 @@ export default function CommentsPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
 
   useEffect(() => {
     fetchComments()
-  }, [])
+  }, [page])
 
   const fetchComments = async () => {
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch("/api/admin/comments", {
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      })
+      const response = await authFetch(`/api/admin/comments?page=${page}`)
       if (response.ok) {
-        const data = await response.json()
+        const result = await response.json()
+        const { data, total, totalPages } = result
         setComments(data)
+        setTotal(total)
+        setTotalPages(totalPages)
       } else {
         toast.error("加载评论失败")
       }
@@ -93,18 +97,15 @@ export default function CommentsPage() {
 
     setSubmitting(true)
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch(`/api/admin/comments/${selectedComment.id}`, {
+      const response = await authFetch(`/api/admin/comments/${selectedComment.id}`, {
         method: "DELETE",
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
       })
 
       if (response.ok) {
         toast.success("删除成功")
         setShowDeleteDialog(false)
         setSelectedComment(null)
+        setPage(1)
         fetchComments()
       } else {
         const error = await response.json()
@@ -126,7 +127,7 @@ export default function CommentsPage() {
   })
 
   if (loading) {
-    return <div className="text-center py-12">加载中...</div>
+    return <AdminPageSkeleton />
   }
 
   return (
@@ -138,10 +139,10 @@ export default function CommentsPage() {
         </div>
       </div>
 
-      <Card>
+      <Card className="bg-card/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>评论列表</CardTitle>
-          <CardDescription>共 {filteredComments.length} 条评论</CardDescription>
+          <CardDescription>共 {total} 条评论</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-4">
@@ -178,7 +179,7 @@ export default function CommentsPage() {
                   </TableRow>
                 ) : (
                   filteredComments.map((comment) => (
-                    <TableRow key={comment.id}>
+                    <TableRow key={comment.id} className="hover:bg-muted/30">
                       <TableCell className="max-w-md">
                         <div className="line-clamp-2 text-sm">{comment.content}</div>
                       </TableCell>
@@ -238,10 +239,17 @@ export default function CommentsPage() {
               </TableBody>
             </Table>
           </div>
+
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            onPageChange={(p) => setPage(p)}
+          />
         </CardContent>
       </Card>
 
-      {/* 删除确认对话框 */}
+      {/* Delete confirmation dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -270,4 +278,3 @@ export default function CommentsPage() {
     </div>
   )
 }
-

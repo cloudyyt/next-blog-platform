@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, Tag, FolderTree, Users, Eye, TrendingUp } from "lucide-react"
+import { FileText, Tag, FolderTree, Users, MessageSquare, Eye, Plus } from "lucide-react"
+import { AdminDashboardSkeleton } from "@/components/admin/admin-page-skeleton"
+import { authFetch } from "@/lib/admin-fetch"
 
 interface DashboardStats {
   posts: {
@@ -15,6 +17,108 @@ interface DashboardStats {
   users: number
 }
 
+const statCards = [
+  {
+    title: "文章总数",
+    getDescription: (stats: DashboardStats) =>
+      `已发布 ${stats.posts.published}，草稿 ${stats.posts.draft}`,
+    getValue: (stats: DashboardStats) => stats.posts.total,
+    icon: FileText,
+    iconBg: "bg-blue-500/10",
+    iconColor: "text-blue-500",
+  },
+  {
+    title: "分类数量",
+    getDescription: () => "文章分类",
+    getValue: (stats: DashboardStats) => stats.categories,
+    icon: FolderTree,
+    iconBg: "bg-emerald-500/10",
+    iconColor: "text-emerald-500",
+  },
+  {
+    title: "标签数量",
+    getDescription: () => "文章标签",
+    getValue: (stats: DashboardStats) => stats.tags,
+    icon: Tag,
+    iconBg: "bg-violet-500/10",
+    iconColor: "text-violet-500",
+  },
+  {
+    title: "用户数量",
+    getDescription: () => "注册用户",
+    getValue: (stats: DashboardStats) => stats.users,
+    icon: Users,
+    iconBg: "bg-amber-500/10",
+    iconColor: "text-amber-500",
+  },
+]
+
+const quickActions = [
+  {
+    title: "新建文章",
+    description: "创建一篇新文章",
+    href: "/admin/posts/new",
+    external: false,
+    icon: Plus,
+    iconBg: "bg-primary/10",
+    iconColor: "text-primary",
+  },
+  {
+    title: "文章管理",
+    description: "创建和编辑文章",
+    href: "/admin/posts",
+    external: false,
+    icon: FileText,
+    iconBg: "bg-primary/10",
+    iconColor: "text-primary",
+  },
+  {
+    title: "评论管理",
+    description: "管理文章评论",
+    href: "/admin/comments",
+    external: false,
+    icon: MessageSquare,
+    iconBg: "bg-emerald-500/10",
+    iconColor: "text-emerald-500",
+  },
+  {
+    title: "分类管理",
+    description: "管理文章分类",
+    href: "/admin/categories",
+    external: false,
+    icon: FolderTree,
+    iconBg: "bg-violet-500/10",
+    iconColor: "text-violet-500",
+  },
+  {
+    title: "标签管理",
+    description: "管理文章标签",
+    href: "/admin/tags",
+    external: false,
+    icon: Tag,
+    iconBg: "bg-amber-500/10",
+    iconColor: "text-amber-500",
+  },
+  {
+    title: "用户管理",
+    description: "管理用户账号",
+    href: "/admin/users",
+    external: false,
+    icon: Users,
+    iconBg: "bg-rose-500/10",
+    iconColor: "text-rose-500",
+  },
+  {
+    title: "查看博客",
+    description: "在新标签页中预览前台",
+    href: "/blog",
+    external: true,
+    icon: Eye,
+    iconBg: "bg-sky-500/10",
+    iconColor: "text-sky-500",
+  },
+]
+
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -25,59 +129,33 @@ export default function AdminDashboardPage() {
 
   const fetchStats = async () => {
     try {
-      // TODO: 实现统计API
-      // const response = await fetch("/api/admin/stats")
-      // const data = await response.json()
-      // setStats(data)
-      
-      // 临时数据
+      const response = await authFetch("/api/admin/stats")
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data)
+      } else {
+        setStats({
+          posts: { total: 0, published: 0, draft: 0 },
+          categories: 0,
+          tags: 0,
+          users: 0,
+        })
+      }
+    } catch (error) {
       setStats({
         posts: { total: 0, published: 0, draft: 0 },
         categories: 0,
         tags: 0,
         users: 0,
       })
-    } catch (error) {
-      console.error("Failed to fetch stats:", error)
     } finally {
       setLoading(false)
     }
   }
 
-  if (loading) {
-    return <div className="text-center py-12">加载中...</div>
+  if (loading || !stats) {
+    return <AdminDashboardSkeleton />
   }
-
-  const statCards = [
-    {
-      title: "文章总数",
-      value: stats?.posts.total || 0,
-      description: `已发布 ${stats?.posts.published || 0}，草稿 ${stats?.posts.draft || 0}`,
-      icon: FileText,
-      color: "text-blue-600",
-    },
-    {
-      title: "分类数量",
-      value: stats?.categories || 0,
-      description: "文章分类",
-      icon: FolderTree,
-      color: "text-green-600",
-    },
-    {
-      title: "标签数量",
-      value: stats?.tags || 0,
-      description: "文章标签",
-      icon: Tag,
-      color: "text-purple-600",
-    },
-    {
-      title: "用户数量",
-      value: stats?.users || 0,
-      description: "注册用户",
-      icon: Users,
-      color: "text-orange-600",
-    },
-  ]
 
   return (
     <div className="space-y-6">
@@ -86,73 +164,54 @@ export default function AdminDashboardPage() {
         <p className="text-muted-foreground mt-2">欢迎回来，这里是您的管理概览</p>
       </div>
 
-      {/* 统计卡片 */}
+      {/* Stat cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statCards.map((card) => {
           const Icon = card.icon
           return (
-            <Card key={card.title}>
+            <Card key={card.title} className="bg-card/80 backdrop-blur-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-                <Icon className={`h-4 w-4 ${card.color}`} />
+                <div className={`h-8 w-8 rounded-md ${card.iconBg} flex items-center justify-center`}>
+                  <Icon className={`h-4 w-4 ${card.iconColor}`} />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{card.value}</div>
-                <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
+                <div className="text-2xl font-bold">{card.getValue(stats)}</div>
+                <p className="text-xs text-muted-foreground mt-1">{card.getDescription(stats)}</p>
               </CardContent>
             </Card>
           )
         })}
       </div>
 
-      {/* 快捷操作 */}
-      <Card>
+      {/* Quick actions */}
+      <Card className="bg-card/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>快捷操作</CardTitle>
           <CardDescription>常用管理功能</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <a
-              href="/admin/posts"
-              className="flex items-center gap-3 p-4 rounded-lg border hover:bg-accent transition-colors"
-            >
-              <FileText className="h-5 w-5" />
-              <div>
-                <div className="font-medium">文章管理</div>
-                <div className="text-sm text-muted-foreground">创建和编辑文章</div>
-              </div>
-            </a>
-            <a
-              href="/admin/categories"
-              className="flex items-center gap-3 p-4 rounded-lg border hover:bg-accent transition-colors"
-            >
-              <FolderTree className="h-5 w-5" />
-              <div>
-                <div className="font-medium">分类管理</div>
-                <div className="text-sm text-muted-foreground">管理文章分类</div>
-              </div>
-            </a>
-            <a
-              href="/admin/tags"
-              className="flex items-center gap-3 p-4 rounded-lg border hover:bg-accent transition-colors"
-            >
-              <Tag className="h-5 w-5" />
-              <div>
-                <div className="font-medium">标签管理</div>
-                <div className="text-sm text-muted-foreground">管理文章标签</div>
-              </div>
-            </a>
-            <a
-              href="/admin/users"
-              className="flex items-center gap-3 p-4 rounded-lg border hover:bg-accent transition-colors"
-            >
-              <Users className="h-5 w-5" />
-              <div>
-                <div className="font-medium">用户管理</div>
-                <div className="text-sm text-muted-foreground">管理用户账号</div>
-              </div>
-            </a>
+            {quickActions.map((action) => {
+              const Icon = action.icon
+              return (
+                <a
+                  key={action.href + action.title}
+                  href={action.href}
+                  {...(action.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  className="flex items-center gap-3 p-4 rounded-lg border hover:bg-muted/30 transition-colors"
+                >
+                  <div className={`h-10 w-10 rounded-lg ${action.iconBg} flex items-center justify-center shrink-0`}>
+                    <Icon className={`h-5 w-5 ${action.iconColor}`} />
+                  </div>
+                  <div>
+                    <div className="font-medium">{action.title}</div>
+                    <div className="text-sm text-muted-foreground">{action.description}</div>
+                  </div>
+                </a>
+              )
+            })}
           </div>
         </CardContent>
       </Card>

@@ -32,6 +32,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton"
+import { Pagination } from "@/components/admin/admin-pagination"
+import { authFetch } from "@/lib/admin-fetch"
 
 interface Post {
   id: string
@@ -56,22 +59,24 @@ export default function PostsPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [selectedPost, setSelectedPost] = useState<Post | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [showToggleDialog, setShowToggleDialog] = useState(false)
+  const [selectedTogglePost, setSelectedTogglePost] = useState<Post | null>(null)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
 
   useEffect(() => {
     fetchPosts()
-  }, [])
+  }, [page])
 
   const fetchPosts = async () => {
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch("/api/admin/posts", {
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      })
+      const response = await authFetch(`/api/admin/posts?page=${page}`)
       if (response.ok) {
-        const data = await response.json()
+        const { data, total, totalPages } = await response.json()
         setPosts(data)
+        setTotal(total)
+        setTotalPages(totalPages)
       } else {
         toast.error("加载文章失败")
       }
@@ -84,18 +89,15 @@ export default function PostsPage() {
 
   const handleTogglePublish = async (post: Post) => {
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch(`/api/admin/posts/${post.id}`, {
+      const response = await authFetch(`/api/admin/posts/${post.id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ published: !post.published }),
       })
 
       if (response.ok) {
         toast.success(post.published ? "已取消发布" : "已发布")
+        setPage(1)
         fetchPosts()
       } else {
         const error = await response.json()
@@ -111,18 +113,15 @@ export default function PostsPage() {
 
     setSubmitting(true)
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch(`/api/admin/posts/${selectedPost.id}`, {
+      const response = await authFetch(`/api/admin/posts/${selectedPost.id}`, {
         method: "DELETE",
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
       })
 
       if (response.ok) {
         toast.success("删除成功")
         setShowDeleteDialog(false)
         setSelectedPost(null)
+        setPage(1)
         fetchPosts()
       } else {
         const error = await response.json()
@@ -142,7 +141,7 @@ export default function PostsPage() {
   )
 
   if (loading) {
-    return <div className="text-center py-12">加载中...</div>
+    return <AdminPageSkeleton />
   }
 
   return (
@@ -158,10 +157,10 @@ export default function PostsPage() {
         </Button>
       </div>
 
-      <Card>
+      <Card className="bg-card/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>文章列表</CardTitle>
-          <CardDescription>共 {filteredPosts.length} 篇文章</CardDescription>
+          <CardDescription>共 {total} 篇文章</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-4">
@@ -198,7 +197,7 @@ export default function PostsPage() {
                   </TableRow>
                 ) : (
                   filteredPosts.map((post) => (
-                    <TableRow key={post.id}>
+                    <TableRow key={post.id} className="hover:bg-muted/30">
                       <TableCell>
                         <div className="font-medium">{post.title}</div>
                         {post.excerpt && (
@@ -263,7 +262,10 @@ export default function PostsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleTogglePublish(post)}
+                            onClick={() => {
+                              setSelectedTogglePost(post)
+                              setShowToggleDialog(true)
+                            }}
                             title={post.published ? "取消发布" : "发布"}
                           >
                             {post.published ? "下架" : "发布"}
@@ -287,10 +289,17 @@ export default function PostsPage() {
               </TableBody>
             </Table>
           </div>
+
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            onPageChange={(p) => setPage(p)}
+          />
         </CardContent>
       </Card>
 
-      {/* 删除确认对话框 */}
+      {/* Delete confirmation dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -311,7 +320,31 @@ export default function PostsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Toggle publish confirmation dialog */}
+      <AlertDialog open={showToggleDialog} onOpenChange={setShowToggleDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认操作</AlertDialogTitle>
+            <AlertDialogDescription>
+              确定要{selectedTogglePost?.published ? "取消发布" : "发布"}文章 &quot;{selectedTogglePost?.title}&quot; 吗？
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (selectedTogglePost) {
+                  handleTogglePublish(selectedTogglePost)
+                }
+                setShowToggleDialog(false)
+              }}
+            >
+              确定
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
-

@@ -3,7 +3,7 @@
  * 与 next-themes 的 light/dark 模式独立，可组合使用
  */
 
-export type VisualTheme = "default" | "deep-space" | "mountain-clouds" | "cyber-neon" | "dusk-shore"
+export type VisualTheme = "cyber-neon" | "tranquil-ink"
 
 export interface ThemeConfig {
   id: VisualTheme
@@ -16,27 +16,6 @@ export interface ThemeConfig {
 }
 
 export const visualThemes: Record<VisualTheme, ThemeConfig> = {
-  default: {
-    id: "default",
-    name: "默认",
-    description: "简洁清爽的默认主题",
-    mobileOptimized: true,
-    requiresPerformanceCheck: false,
-  },
-  "deep-space": {
-    id: "deep-space",
-    name: "深邃星空",
-    description: "神秘的星空背景，闪烁的星星和流动的粒子",
-    mobileOptimized: true,
-    requiresPerformanceCheck: true,
-  },
-  "mountain-clouds": {
-    id: "mountain-clouds",
-    name: "高山凌云",
-    description: "写实的天空背景，流动的云层和远山剪影",
-    mobileOptimized: true,
-    requiresPerformanceCheck: true,
-  },
   "cyber-neon": {
     id: "cyber-neon",
     name: "赛博霓虹",
@@ -44,16 +23,16 @@ export const visualThemes: Record<VisualTheme, ThemeConfig> = {
     mobileOptimized: true,
     requiresPerformanceCheck: true,
   },
-  "dusk-shore": {
-    id: "dusk-shore",
-    name: "暮色海岸",
-    description: "黄昏时分，渐变天空和柔和海浪",
+  "tranquil-ink": {
+    id: "tranquil-ink",
+    name: "清风竹韵",
+    description: "竹青黛墨，溪山薄雾，清爽宜人",
     mobileOptimized: true,
-    requiresPerformanceCheck: true,
+    requiresPerformanceCheck: false,
   },
 }
 
-export const defaultVisualTheme: VisualTheme = "deep-space"
+export const defaultVisualTheme: VisualTheme = "cyber-neon"
 
 /**
  * 检测设备性能等级
@@ -125,5 +104,3 @@ export function shouldUseSimplifiedEffects(
 
   return false
 }
-
-

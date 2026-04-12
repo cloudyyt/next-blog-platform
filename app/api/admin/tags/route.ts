@@ -2,22 +2,38 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { verifyAdmin } from "@/lib/auth-middleware"
 
-// GET /api/admin/tags - 获取所有标签
+// GET /api/admin/tags - 获取标签列表（支持分页）
 export async function GET(request: NextRequest) {
   const { error } = await verifyAdmin(request)
   if (error) return error
 
   try {
-    const tags = await prisma.tag.findMany({
-      include: {
-        _count: {
-          select: { posts: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    })
+    const { searchParams } = new URL(request.url)
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1"))
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20")))
+    const skip = (page - 1) * limit
 
-    return NextResponse.json(tags)
+    const [tags, total] = await Promise.all([
+      prisma.tag.findMany({
+        include: {
+          _count: {
+            select: { posts: true },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.tag.count(),
+    ])
+
+    return NextResponse.json({
+      data: tags,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    })
   } catch (error) {
     console.error("Get tags error:", error)
     return NextResponse.json({ message: "获取标签失败" }, { status: 500 })
@@ -60,4 +76,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "创建标签失败" }, { status: 500 })
   }
 }
-

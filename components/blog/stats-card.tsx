@@ -33,8 +33,8 @@ export function StatsCard({ postCount, tagCount, categoryCount, className }: Sta
   ]
 
   return (
-    <div className={cn("rounded-lg border bg-card/50 backdrop-blur-sm p-4", className)}>
-      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+    <div className={cn("rounded-xl border border-border/80 bg-card/80 backdrop-blur-sm p-4 shadow-soft", className)}>
+      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 font-display">
         <Calendar className="w-5 h-5" />
         统计
       </h3>

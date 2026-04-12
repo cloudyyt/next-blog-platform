@@ -14,7 +14,7 @@ interface TagListProps {
 export function TagList({ tags, activeTag, className }: TagListProps) {
   return (
     <div className={cn("space-y-4", className)}>
-      <h3 className="text-lg font-semibold flex items-center gap-2">
+      <h3 className="text-lg font-semibold flex items-center gap-2 font-display">
         <Hash className="w-5 h-5" />
         标签
       </h3>
@@ -26,7 +26,7 @@ export function TagList({ tags, activeTag, className }: TagListProps) {
               key={tag.id}
               href={isActive ? "/blog" : `/blog?tag=${tag.slug}`}
               className={cn(
-                "inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm transition-all",
+                "inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 isActive
                   ? "bg-primary text-primary-foreground shadow-md"
                   : "bg-secondary text-secondary-foreground hover:bg-secondary/80"

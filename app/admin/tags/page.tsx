@@ -32,6 +32,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton"
+import { authFetch } from "@/lib/admin-fetch"
+import { Pagination } from "@/components/admin/admin-pagination"
 
 interface Tag {
   id: string
@@ -52,22 +55,19 @@ export default function TagsPage() {
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null)
   const [newTagName, setNewTagName] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
 
-  useEffect(() => {
-    fetchTags()
-  }, [])
-
-  const fetchTags = async () => {
+  const fetchTags = async (p: number = page) => {
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch("/api/admin/tags", {
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      })
+      const response = await authFetch(`/api/admin/tags?page=${p}`)
       if (response.ok) {
-        const data = await response.json()
+        const result = await response.json()
+        const { data, total, page: returnedPage, totalPages } = result
         setTags(data)
+        setTotal(total)
+        setTotalPages(totalPages)
       } else {
         toast.error("加载标签失败")
       }
@@ -78,6 +78,10 @@ export default function TagsPage() {
     }
   }
 
+  useEffect(() => {
+    fetchTags()
+  }, [page])
+
   const handleCreate = async () => {
     if (!newTagName.trim()) {
       toast.error("请输入标签名称")
@@ -86,18 +90,14 @@ export default function TagsPage() {
 
     setSubmitting(true)
     try {
-      const token = localStorage.getItem("token")
       const url = selectedTag
         ? `/api/admin/tags/${selectedTag.id}`
         : "/api/admin/tags"
       const method = selectedTag ? "PUT" : "POST"
 
-      const response = await fetch(url, {
+      const response = await authFetch(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newTagName.trim() }),
       })
 
@@ -106,7 +106,8 @@ export default function TagsPage() {
         setShowCreateDialog(false)
         setSelectedTag(null)
         setNewTagName("")
-        fetchTags()
+        setPage(1)
+        fetchTags(1)
       } else {
         const error = await response.json()
         toast.error(error.message || "操作失败")
@@ -123,19 +124,16 @@ export default function TagsPage() {
 
     setSubmitting(true)
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch(`/api/admin/tags/${selectedTag.id}`, {
+      const response = await authFetch(`/api/admin/tags/${selectedTag.id}`, {
         method: "DELETE",
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
       })
 
       if (response.ok) {
         toast.success("删除成功")
         setShowDeleteDialog(false)
         setSelectedTag(null)
-        fetchTags()
+        setPage(1)
+        fetchTags(1)
       } else {
         const error = await response.json()
         toast.error(error.message || "删除失败")
@@ -152,7 +150,7 @@ export default function TagsPage() {
   )
 
   if (loading) {
-    return <div className="text-center py-12">加载中...</div>
+    return <AdminPageSkeleton />
   }
 
   return (
@@ -168,10 +166,10 @@ export default function TagsPage() {
         </Button>
       </div>
 
-      <Card>
+      <Card className="bg-card/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>标签列表</CardTitle>
-          <CardDescription>共 {filteredTags.length} 个标签</CardDescription>
+          <CardDescription>共 {total} 个标签</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-4">
@@ -206,7 +204,7 @@ export default function TagsPage() {
                   </TableRow>
                 ) : (
                   filteredTags.map((tag) => (
-                    <TableRow key={tag.id}>
+                    <TableRow key={tag.id} className="hover:bg-muted/30">
                       <TableCell>
                         <Badge variant="secondary">{tag.name}</Badge>
                       </TableCell>
@@ -246,10 +244,17 @@ export default function TagsPage() {
               </TableBody>
             </Table>
           </div>
+
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            onPageChange={(p) => setPage(p)}
+          />
         </CardContent>
       </Card>
 
-      {/* 创建/编辑对话框 */}
+      {/* Create/Edit dialog */}
       <AlertDialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -286,7 +291,7 @@ export default function TagsPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* 删除确认对话框 */}
+      {/* Delete confirmation dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -310,4 +315,3 @@ export default function TagsPage() {
     </div>
   )
 }
-

@@ -38,6 +38,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton"
+import { Pagination } from "@/components/admin/admin-pagination"
+import { authFetch } from "@/lib/admin-fetch"
 
 interface User {
   id: string
@@ -59,22 +62,18 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [newRole, setNewRole] = useState("")
   const [submitting, setSubmitting] = useState(false)
-
-  useEffect(() => {
-    fetchUsers()
-  }, [])
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch("/api/admin/users", {
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      })
+      const response = await authFetch(`/api/admin/users?page=${page}`)
       if (response.ok) {
-        const data = await response.json()
+        const { data, total, totalPages } = await response.json()
         setUsers(data)
+        setTotal(total)
+        setTotalPages(totalPages)
       } else {
         toast.error("加载用户失败")
       }
@@ -85,18 +84,18 @@ export default function UsersPage() {
     }
   }
 
+  useEffect(() => {
+    fetchUsers()
+  }, [page])
+
   const handleRoleChange = async () => {
     if (!selectedUser || !newRole) return
 
     setSubmitting(true)
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch(`/api/admin/users/${selectedUser.id}`, {
+      const response = await authFetch(`/api/admin/users/${selectedUser.id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: newRole }),
       })
 
@@ -105,7 +104,7 @@ export default function UsersPage() {
         setShowRoleDialog(false)
         setSelectedUser(null)
         setNewRole("")
-        fetchUsers()
+        setPage(1)
       } else {
         const error = await response.json()
         toast.error(error.message || "更新失败")
@@ -122,19 +121,15 @@ export default function UsersPage() {
 
     setSubmitting(true)
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch(`/api/admin/users/${selectedUser.id}`, {
+      const response = await authFetch(`/api/admin/users/${selectedUser.id}`, {
         method: "DELETE",
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
       })
 
       if (response.ok) {
         toast.success("删除成功")
         setShowDeleteDialog(false)
         setSelectedUser(null)
-        fetchUsers()
+        setPage(1)
       } else {
         const error = await response.json()
         toast.error(error.message || "删除失败")
@@ -151,7 +146,7 @@ export default function UsersPage() {
   )
 
   if (loading) {
-    return <div className="text-center py-12">加载中...</div>
+    return <AdminPageSkeleton />
   }
 
   return (
@@ -161,10 +156,10 @@ export default function UsersPage() {
         <p className="text-muted-foreground mt-2">管理用户账号和权限</p>
       </div>
 
-      <Card>
+      <Card className="bg-card/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>用户列表</CardTitle>
-          <CardDescription>共 {filteredUsers.length} 个用户</CardDescription>
+          <CardDescription>共 {total} 个用户</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-4">
@@ -200,7 +195,7 @@ export default function UsersPage() {
                   </TableRow>
                 ) : (
                   filteredUsers.map((user) => (
-                    <TableRow key={user.id}>
+                    <TableRow key={user.id} className="hover:bg-muted/30">
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>
                         <Badge variant={user.role === "admin" ? "default" : "secondary"}>
@@ -244,10 +239,17 @@ export default function UsersPage() {
               </TableBody>
             </Table>
           </div>
+
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            onPageChange={(p) => setPage(p)}
+          />
         </CardContent>
       </Card>
 
-      {/* 角色编辑对话框 */}
+      {/* Role edit dialog */}
       <AlertDialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -284,7 +286,7 @@ export default function UsersPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* 删除确认对话框 */}
+      {/* Delete confirmation dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -314,4 +316,3 @@ export default function UsersPage() {
     </div>
   )
 }
-

@@ -6,16 +6,17 @@ import Link from "next/link"
 import { useAuth } from "@/components/auth/auth-provider"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Tag, 
-  FolderTree, 
-  Users, 
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  LayoutDashboard,
+  FileText,
+  Tag,
+  FolderTree,
+  Users,
   MessageSquare,
   LogOut,
   Menu,
-  X
+  X,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -34,13 +35,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, logout, isAuthenticated, loading } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // 如果是登录页面，不执行权限检查
   const isLoginPage = pathname === "/admin/login"
 
   useEffect(() => {
-    // 登录页面不需要权限检查
     if (isLoginPage) return
-    
+
     if (!loading && (!isAuthenticated || user?.role !== "admin")) {
       router.push("/admin/login")
     }
@@ -52,15 +51,24 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     router.push("/admin/login")
   }
 
-  // 如果是登录页面，直接渲染children，不显示侧边栏等
   if (isLoginPage) {
     return <>{children}</>
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-muted-foreground">加载中...</div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="space-y-4 text-center">
+          <div className="flex justify-center">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <LayoutDashboard className="h-5 w-5 text-primary animate-pulse" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24 mx-auto" />
+            <Skeleton className="h-3 w-16 mx-auto" />
+          </div>
+        </div>
       </div>
     )
   }
@@ -69,12 +77,22 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     return null
   }
 
+  // Get initials for avatar
+  const initials = user?.name
+    ? user.name.slice(0, 2).toUpperCase()
+    : "AD"
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* 移动端顶部栏 */}
-      <div className="lg:hidden border-b bg-white dark:bg-gray-800">
+    <div className="min-h-screen bg-background">
+      {/* Mobile top bar */}
+      <div className="lg:hidden border-b bg-card/80 backdrop-blur-sm">
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-lg font-semibold">管理后台</h1>
+          <div className="flex items-center gap-2">
+            <div className="h-7 w-7 rounded-md bg-primary/10 flex items-center justify-center">
+              <LayoutDashboard className="h-4 w-4 text-primary" />
+            </div>
+            <h1 className="text-lg font-semibold">管理后台</h1>
+          </div>
           <Button
             variant="ghost"
             size="icon"
@@ -86,10 +104,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       <div className="flex">
-        {/* 侧边栏 */}
+        {/* Sidebar */}
         <aside
           className={`
-            fixed lg:sticky top-0 left-0 z-40 h-screen w-64 bg-white dark:bg-gray-800 border-r
+            fixed lg:sticky top-0 left-0 z-40 h-screen w-64
+            bg-card/90 backdrop-blur-md border-r
             transform transition-transform duration-200 ease-in-out
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
           `}
@@ -97,11 +116,16 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <div className="flex flex-col h-full">
             {/* Logo */}
             <div className="h-16 flex items-center px-6 border-b">
-              <h2 className="text-xl font-bold">管理后台</h2>
+              <div className="flex items-center gap-2">
+                <div className="h-7 w-7 rounded-md bg-primary/10 flex items-center justify-center">
+                  <LayoutDashboard className="h-4 w-4 text-primary" />
+                </div>
+                <h2 className="text-xl font-bold">管理后台</h2>
+              </div>
             </div>
 
-            {/* 导航菜单 */}
-            <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+            {/* Navigation */}
+            <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
               {navigation.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href
@@ -114,8 +138,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                       flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors
                       ${
                         isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          ? "border-l-2 border-primary bg-primary/5 text-primary"
+                          : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                       }
                     `}
                   >
@@ -126,14 +150,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               })}
             </nav>
 
-            {/* 底部用户信息 */}
+            {/* User area */}
             <div className="p-4 border-t">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary shrink-0">
+                  {initials}
+                </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                  <p className="text-sm font-medium text-foreground truncate">
                     {user?.name}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">管理员</p>
+                  <p className="text-xs text-muted-foreground">管理员</p>
                 </div>
               </div>
               <Button
@@ -149,7 +176,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
 
-        {/* 遮罩层（移动端） */}
+        {/* Mobile overlay */}
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black/50 z-30 lg:hidden"
@@ -157,10 +184,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           />
         )}
 
-        {/* 主内容区 */}
+        {/* Main content */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* 顶部栏 */}
-          <header className="sticky top-0 z-20 bg-white dark:bg-gray-800 border-b">
+          {/* Header */}
+          <header className="sticky top-0 z-20 bg-card/80 backdrop-blur-sm border-b">
             <div className="flex items-center justify-between px-6 h-16">
               <div className="flex items-center gap-4">
                 <h1 className="text-lg font-semibold hidden lg:block">
@@ -169,18 +196,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               </div>
               <div className="flex items-center gap-4">
                 <ThemeToggle />
-                <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
                   <span>{user?.name}</span>
                 </div>
               </div>
             </div>
           </header>
 
-          {/* 内容区域 */}
+          {/* Content */}
           <main className="flex-1 p-6">{children}</main>
         </div>
       </div>
     </div>
   )
 }
-

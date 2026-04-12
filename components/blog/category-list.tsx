@@ -22,7 +22,7 @@ export function CategoryList({
 
   return (
     <div className={cn("space-y-4", className)}>
-      <h3 className="text-lg font-semibold flex items-center gap-2">
+      <h3 className="text-lg font-semibold flex items-center gap-2 font-display">
         <Folder className="w-5 h-5" />
         分类
       </h3>
@@ -34,7 +34,7 @@ export function CategoryList({
               key={category.id}
               href={isActive ? "/blog" : `/blog?category=${category.slug}`}
               className={cn(
-                "flex items-center justify-between p-3 rounded-lg transition-all",
+                "flex items-center justify-between p-3 rounded-lg transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 isActive
                   ? "bg-primary text-primary-foreground shadow-md"
                   : "bg-secondary/50 text-secondary-foreground hover:bg-secondary"

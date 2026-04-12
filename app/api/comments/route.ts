@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getTokenFromRequest, verifyToken } from "@/lib/auth"
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit"
 
 export const dynamic = 'force-dynamic'
 
@@ -61,6 +62,10 @@ export async function GET(request: Request) {
 
 // 创建评论
 export async function POST(request: Request) {
+  // Rate limit: 5 条评论 / 分钟
+  const { limited, resetAt } = checkRateLimit(request, { maxRequests: 5, windowMs: 60_000 })
+  if (limited) return rateLimitResponse(resetAt)
+
   try {
     // 验证登录
     const token = getTokenFromRequest(request)

@@ -98,4 +98,3 @@ export function AuthorCard({ author, className }: AuthorCardProps) {
     </div>
   )
 }
-

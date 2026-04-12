@@ -18,6 +18,10 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        display: ["var(--font-fraunces)", "serif"],
+        body: ["var(--font-nunito)", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -57,6 +61,10 @@ const config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        "soft": "0 4px 20px -2px rgba(30, 25, 20, 0.08), 0 2px 8px -2px rgba(30, 25, 20, 0.04)",
+        "soft-lg": "0 12px 40px -4px rgba(30, 25, 20, 0.1), 0 4px 12px -2px rgba(30, 25, 20, 0.06)",
       },
       keyframes: {
         "accordion-down": {

@@ -33,6 +33,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton"
+import { Pagination } from "@/components/admin/admin-pagination"
+import { authFetch } from "@/lib/admin-fetch"
 
 interface Category {
   id: string
@@ -54,22 +57,19 @@ export default function CategoriesPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [formData, setFormData] = useState({ name: "", description: "" })
   const [submitting, setSubmitting] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
 
-  useEffect(() => {
-    fetchCategories()
-  }, [])
-
-  const fetchCategories = async () => {
+  const fetchCategories = async (targetPage: number = page) => {
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch("/api/admin/categories", {
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      })
+      const response = await authFetch(`/api/admin/categories?page=${targetPage}`)
       if (response.ok) {
-        const data = await response.json()
+        const result = await response.json()
+        const { data, total, totalPages } = result
         setCategories(data)
+        setTotal(total)
+        setTotalPages(totalPages)
       } else {
         toast.error("加载分类失败")
       }
@@ -79,6 +79,10 @@ export default function CategoriesPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchCategories()
+  }, [page])
 
   const handleCreate = async () => {
     if (!formData.name.trim()) {
@@ -93,13 +97,9 @@ export default function CategoriesPage() {
         : "/api/admin/categories"
       const method = selectedCategory ? "PUT" : "POST"
 
-      const token = localStorage.getItem("token")
-      const response = await fetch(url, {
+      const response = await authFetch(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name.trim(),
           description: formData.description.trim() || null,
@@ -111,7 +111,8 @@ export default function CategoriesPage() {
         setShowCreateDialog(false)
         setSelectedCategory(null)
         setFormData({ name: "", description: "" })
-        fetchCategories()
+        setPage(1)
+        fetchCategories(1)
       } else {
         const error = await response.json()
         toast.error(error.message || "操作失败")
@@ -128,19 +129,16 @@ export default function CategoriesPage() {
 
     setSubmitting(true)
     try {
-      const token = localStorage.getItem("token")
-      const response = await fetch(`/api/admin/categories/${selectedCategory.id}`, {
+      const response = await authFetch(`/api/admin/categories/${selectedCategory.id}`, {
         method: "DELETE",
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
       })
 
       if (response.ok) {
         toast.success("删除成功")
         setShowDeleteDialog(false)
         setSelectedCategory(null)
-        fetchCategories()
+        setPage(1)
+        fetchCategories(1)
       } else {
         const error = await response.json()
         toast.error(error.message || "删除失败")
@@ -166,7 +164,7 @@ export default function CategoriesPage() {
   )
 
   if (loading) {
-    return <div className="text-center py-12">加载中...</div>
+    return <AdminPageSkeleton />
   }
 
   return (
@@ -188,10 +186,10 @@ export default function CategoriesPage() {
         </Button>
       </div>
 
-      <Card>
+      <Card className="bg-card/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>分类列表</CardTitle>
-          <CardDescription>共 {filteredCategories.length} 个分类</CardDescription>
+          <CardDescription>共 {total} 个分类</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-4">
@@ -227,7 +225,7 @@ export default function CategoriesPage() {
                   </TableRow>
                 ) : (
                   filteredCategories.map((category) => (
-                    <TableRow key={category.id}>
+                    <TableRow key={category.id} className="hover:bg-muted/30">
                       <TableCell>
                         <Badge variant="secondary">{category.name}</Badge>
                       </TableCell>
@@ -266,10 +264,17 @@ export default function CategoriesPage() {
               </TableBody>
             </Table>
           </div>
+
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            onPageChange={(p) => setPage(p)}
+          />
         </CardContent>
       </Card>
 
-      {/* 创建/编辑对话框 */}
+      {/* Create/Edit dialog */}
       <AlertDialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
@@ -316,7 +321,7 @@ export default function CategoriesPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* 删除确认对话框 */}
+      {/* Delete confirmation dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -345,4 +350,3 @@ export default function CategoriesPage() {
     </div>
   )
 }
-

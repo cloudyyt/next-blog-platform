@@ -3,10 +3,16 @@
 import * as React from "react"
 import { User } from "@/lib/types/auth"
 
+interface LoginResponse {
+  user: User
+  token: string
+}
+
 interface AuthContextType {
   user: User | null
   loading: boolean
-  login: (name: string, password: string) => Promise<void>
+  login: (name: string, password: string) => Promise<LoginResponse>
+  completeLogin: (data: LoginResponse) => void
   register: (name: string, password: string) => Promise<void>
   logout: () => void
   isAuthenticated: boolean
@@ -30,18 +36,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = React.useState<User | null>(null)
   const [loading, setLoading] = React.useState(true)
 
-  // 初始化：从 localStorage 读取用户信息
   React.useEffect(() => {
-    // 确保在客户端环境才访问 localStorage
     if (typeof window === "undefined") {
       setLoading(false)
       return
     }
-    
+
     try {
       const token = localStorage.getItem("token")
       const userStr = localStorage.getItem("user")
-      
+
       if (token && userStr) {
         try {
           const userData = JSON.parse(userStr)
@@ -52,14 +56,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       }
     } catch (error) {
-      // 如果 localStorage 访问失败（例如隐私模式），静默处理
       console.warn("Failed to access localStorage:", error)
     }
-    
+
     setLoading(false)
   }, [])
 
-  const login = async (name: string, password: string) => {
+  const persistSession = (data: LoginResponse) => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("token", data.token)
+        localStorage.setItem("user", JSON.stringify(data.user))
+      } catch (error) {
+        console.warn("Failed to save to localStorage:", error)
+      }
+    }
+    setUser(data.user)
+  }
+
+  const login = async (name: string, password: string): Promise<LoginResponse> => {
     const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -71,19 +86,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       throw new Error(error.message || "登录失败")
     }
 
-    const data = await response.json()
-    
-    // 确保在客户端环境才访问 localStorage
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("token", data.token)
-        localStorage.setItem("user", JSON.stringify(data.user))
-      } catch (error) {
-        console.warn("Failed to save to localStorage:", error)
-      }
-    }
-    
-    setUser(data.user)
+    const data: LoginResponse = await response.json()
+    persistSession(data)
+    return data
+  }
+
+  const completeLogin = (data: LoginResponse) => {
+    persistSession(data)
   }
 
   const register = async (name: string, password: string) => {
@@ -98,23 +107,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       throw new Error(error.message || "注册失败")
     }
 
-    const data = await response.json()
-    
-    // 确保在客户端环境才访问 localStorage
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("token", data.token)
-        localStorage.setItem("user", JSON.stringify(data.user))
-      } catch (error) {
-        console.warn("Failed to save to localStorage:", error)
-      }
-    }
-    
-    setUser(data.user)
+    const data: LoginResponse = await response.json()
+    persistSession(data)
   }
 
   const logout = () => {
-    // 确保在客户端环境才访问 localStorage
     if (typeof window !== "undefined") {
       try {
         localStorage.removeItem("token")
@@ -131,6 +128,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       user,
       loading,
       login,
+      completeLogin,
       register,
       logout,
       isAuthenticated: !!user,
@@ -140,4 +138,3 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
-

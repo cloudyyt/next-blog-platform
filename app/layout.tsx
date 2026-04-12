@@ -1,16 +1,25 @@
 /**
  * App Router 根布局（必须存在）
- * Next.js 13+ 使用 App Router 时，app/layout.tsx 为必需文件。
+ * B 方向「有机/自然」：标题 Fraunces，正文 Nunito
  */
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Fraunces, Nunito } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { VisualThemeProvider } from "@/components/providers/visual-theme-provider"
 import { ToastProvider } from "@/components/providers/toast-provider"
 import { AuthProvider } from "@/components/auth/auth-provider"
 
-const inter = Inter({ subsets: ["latin"] })
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  display: "swap",
+})
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-nunito",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
   title: "Blog Platform",
@@ -23,8 +32,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
-      <body className={inter.className}>
+    <html lang="zh-CN" suppressHydrationWarning className={`${fraunces.variable} ${nunito.variable}`}>
+      <body className="font-body antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

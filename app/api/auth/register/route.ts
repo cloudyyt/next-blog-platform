@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { hashPassword, generateToken, validateName, validatePassword } from "@/lib/auth"
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
+  // Rate limit: 3 次注册 / 分钟
+  const { limited, resetAt } = checkRateLimit(request, { maxRequests: 3, windowMs: 60_000 })
+  if (limited) return rateLimitResponse(resetAt)
+
   try {
     const { name, password } = await request.json()
 
