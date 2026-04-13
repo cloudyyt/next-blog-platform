@@ -8,9 +8,10 @@ import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 interface PostDetailClientProps {
   title: string
+  slug: string
 }
 
-export function PostDetailClient({ title }: PostDetailClientProps) {
+export function PostDetailClient({ title, slug }: PostDetailClientProps) {
   const router = useRouter()
   const [copied, setCopied] = useState(false)
 
@@ -23,6 +24,24 @@ export function PostDetailClient({ title }: PostDetailClientProps) {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Track page view (count every open/refresh). Avoid dev StrictMode double-fire.
+  useEffect(() => {
+    if (!slug) return
+
+    // In React StrictMode (dev), effects may run twice. Guard per page-load only.
+    const w = window as any
+    w.__postViewTracked = w.__postViewTracked || {}
+    if (w.__postViewTracked[slug]) return
+    w.__postViewTracked[slug] = true
+
+    fetch("/api/track/post-view", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug }),
+      keepalive: true,
+    }).catch(() => {})
+  }, [slug])
 
   // Find the scrollable main container (layout uses overflow-y-auto on <main>)
   const getScrollContainer = useCallback(() => {

@@ -118,19 +118,13 @@ export default function BlogLayout({
               </div>
               <div className="flex items-center gap-4">
                 <a
-                  href="/blog/about"
-                  className="hover:text-primary transition-colors duration-200 cursor-pointer"
-                >
-                  关于
-                </a>
-                <a
                   href="/blog/feed.xml"
                   className="hover:text-primary transition-colors duration-200 cursor-pointer inline-flex items-center gap-1"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <Rss className="w-3.5 h-3.5" />
-                  RSS
+                  订阅更新（RSS）
                 </a>
                 <a
                   href="/blog/sitemap.xml"

@@ -6,7 +6,7 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
-import { Calendar, User, Clock } from "lucide-react"
+import { Calendar, User, Clock, Eye } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { PostContent } from "@/components/blog/post-content"
 import { TableOfContents } from "@/components/blog/table-of-contents"
@@ -53,6 +53,7 @@ async function getPostBySlug(slug: string) {
     excerpt: post.excerpt,
     coverImage: post.coverImage,
     published: post.published,
+    viewCount: post.viewCount ?? 0,
     authorId: post.authorId,
     author: {
       id: post.author.id,
@@ -196,7 +197,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
   return (
     <>
       {/* Client-side interactive shell (reading progress, share, back-to-top) */}
-      <PostDetailClient title={post.title} />
+      <PostDetailClient title={post.title} slug={post.slug} />
 
       <div className="container mx-auto px-4 py-8 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -239,6 +240,10 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
                   <span>约 {readingTime} 分钟</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4" />
+                  <span>{post.viewCount} 次浏览</span>
                 </div>
               </div>
 

@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
       excerpt: post.excerpt,
       coverImage: post.coverImage,
       published: post.published,
+      viewCount: post.viewCount ?? 0,
       authorId: post.authorId,
       author: { id: post.author.id, name: post.author.name, email: "" },
       categories: post.categories,

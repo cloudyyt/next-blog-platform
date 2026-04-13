@@ -34,6 +34,7 @@ model Post {
   excerpt     String?
   coverImage  String?
   published   Boolean    @default(false)
+  viewCount   Int        @default(0)
   authorId    String
   author      User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   createdAt   DateTime   @default(now())
@@ -42,8 +43,25 @@ model Post {
   categories Category[]
   tags       Tag[]
   comments   Comment[]
+  views      PostViewEvent[]
   
   @@map("posts")
+}
+
+model PostViewEvent {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  ipHash  String
+  uaHash  String?
+  referer String?
+  path    String?
+
+  @@index([postId, createdAt])
+  @@index([createdAt])
+  @@map("post_view_events")
 }
 
 // 分类模型

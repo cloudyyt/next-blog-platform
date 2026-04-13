@@ -66,6 +66,7 @@ async function getPostsFromDB(tagSlug?: string, categorySlug?: string) {
       excerpt: post.excerpt,
       coverImage: post.coverImage,
       published: post.published,
+      viewCount: post.viewCount ?? 0,
       authorId: post.authorId,
       author: {
         id: post.author.id,
@@ -82,6 +83,19 @@ async function getPostsFromDB(tagSlug?: string, categorySlug?: string) {
   } catch (error) {
     console.error("Failed to fetch posts:", error)
     return { posts: [], total: 0 }
+  }
+}
+
+async function getTotalViewsFromDB() {
+  try {
+    const result = await prisma.post.aggregate({
+      _sum: { viewCount: true },
+      where: { published: true },
+    })
+    return result._sum.viewCount ?? 0
+  } catch (error) {
+    console.error("Failed to fetch total views:", error)
+    return 0
   }
 }
 
@@ -141,10 +155,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const categorySlug = params.category
 
   // 并行获取所有数据
-  const [{ posts, total }, tags, categories] = await Promise.all([
+  const [{ posts, total }, tags, categories, totalViews] = await Promise.all([
     getPostsFromDB(tagSlug, categorySlug),
     getTagsFromDB(),
     getCategoriesFromDB(),
+    getTotalViewsFromDB(),
   ])
 
   return (
@@ -158,6 +173,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <BlogPageClient
         initialPosts={posts}
         totalPosts={total}
+        totalViews={totalViews}
         pageSize={PAGE_SIZE}
         tags={tags}
         categories={categories}

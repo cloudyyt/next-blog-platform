@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Calendar, User, Clock } from "lucide-react"
+import { Calendar, User, Clock, Eye } from "lucide-react"
 import { BlogPost } from "@/lib/types/blog"
 import { cn } from "@/lib/utils"
 
@@ -116,6 +116,10 @@ export function HeroCard({ post, className }: HeroCardProps) {
               <div className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4" />
                 <span>{estimateReadingTime(post.content)} 分钟</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Eye className="w-4 h-4" />
+                <span>{post.viewCount ?? 0}</span>
               </div>
             </div>
           </div>

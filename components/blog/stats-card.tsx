@@ -1,16 +1,17 @@
 "use client"
 
-import { FileText, Tag, Folder, Calendar } from "lucide-react"
+import { FileText, Tag, Folder, Calendar, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface StatsCardProps {
   postCount?: number
   tagCount?: number
   categoryCount?: number
+  totalViews?: number
   className?: string
 }
 
-export function StatsCard({ postCount, tagCount, categoryCount, className }: StatsCardProps) {
+export function StatsCard({ postCount, tagCount, categoryCount, totalViews, className }: StatsCardProps) {
   const stats = [
     {
       label: "文章",
@@ -30,6 +31,12 @@ export function StatsCard({ postCount, tagCount, categoryCount, className }: Sta
       icon: Folder,
       color: "text-purple-500",
     },
+    {
+      label: "浏览",
+      value: totalViews ?? 0,
+      icon: Eye,
+      color: "text-amber-500",
+    },
   ]
 
   return (
@@ -38,7 +45,7 @@ export function StatsCard({ postCount, tagCount, categoryCount, className }: Sta
         <Calendar className="w-5 h-5" />
         统计
       </h3>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (

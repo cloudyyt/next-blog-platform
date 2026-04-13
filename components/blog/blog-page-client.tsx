@@ -10,10 +10,12 @@ import { CategoryList } from "@/components/blog/category-list"
 import { SidebarAuthorCard } from "@/components/blog/sidebar-author-card"
 import { RecentPosts } from "@/components/blog/recent-posts"
 import { MobileFilterDrawer } from "@/components/blog/mobile-filter-drawer"
+import { StatsCard } from "@/components/blog/stats-card"
 
 interface BlogPageClientProps {
   initialPosts: BlogPost[]
   totalPosts: number
+  totalViews: number
   pageSize: number
   tags: Tag[]
   categories: Category[]
@@ -24,6 +26,7 @@ interface BlogPageClientProps {
 export function BlogPageClient({
   initialPosts,
   totalPosts,
+  totalViews,
   pageSize,
   tags,
   categories,
@@ -166,6 +169,12 @@ export function BlogPageClient({
         <aside className="hidden lg:block lg:col-span-4 space-y-6">
           <div className="sticky top-4 space-y-6">
             <SidebarAuthorCard totalPosts={totalPosts} />
+            <StatsCard
+              postCount={totalPosts}
+              tagCount={tags.length}
+              categoryCount={categories.length}
+              totalViews={totalViews}
+            />
             {recentPosts.length > 0 && (
               <RecentPosts posts={recentPosts} />
             )}
@@ -191,6 +200,12 @@ export function BlogPageClient({
         {recentPosts.length > 0 && (
           <RecentPosts posts={recentPosts} />
         )}
+        <StatsCard
+          postCount={totalPosts}
+          tagCount={tags.length}
+          categoryCount={categories.length}
+          totalViews={totalViews}
+        />
         {categories.length > 0 && (
           <CategoryList
             categories={categories}

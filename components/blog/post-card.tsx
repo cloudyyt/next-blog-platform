@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Calendar, User, Clock } from "lucide-react"
+import { Calendar, User, Clock, Eye } from "lucide-react"
 import { BlogPost } from "@/lib/types/blog"
 import { cn } from "@/lib/utils"
 
@@ -102,6 +102,10 @@ export function PostCard({ post, className }: PostCardProps) {
             <div className="flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" />
               <span>{readingTime} 分钟</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Eye className="w-3.5 h-3.5" />
+              <span>{post.viewCount ?? 0}</span>
             </div>
           </div>
         </div>

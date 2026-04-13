@@ -11,6 +11,7 @@ export interface BlogPost {
   excerpt: string | null
   coverImage: string | null
   published: boolean
+  viewCount?: number
   authorId: string
   author: {
     id: string

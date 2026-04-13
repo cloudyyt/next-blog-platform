@@ -97,6 +97,7 @@ export async function GET(request: Request) {
         excerpt: post.excerpt,
         coverImage: post.coverImage,
         published: post.published,
+        viewCount: post.viewCount ?? 0,
         authorId: post.authorId,
         author: {
           id: post.author.id,
