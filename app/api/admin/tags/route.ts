@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { verifyAdmin } from "@/lib/auth-middleware"
+import { slugifyName, withRandomSuffix } from "@/lib/slug-utils"
 
 // GET /api/admin/tags - 获取标签列表（支持分页）
 export async function GET(request: NextRequest) {
@@ -52,17 +53,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "标签名称不能为空" }, { status: 400 })
     }
 
-    // 生成slug
-    const slug = name
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
+    const trimmedName = name.trim()
+    const baseSlug = slugifyName(trimmedName)
+    const initialSlug = baseSlug || withRandomSuffix("")
+
+    let slug = initialSlug
+    for (let i = 0; i < 5; i++) {
+      const existing = await prisma.tag.findFirst({
+        where: { slug },
+        select: { id: true },
+      })
+      if (!existing) break
+      slug = withRandomSuffix(initialSlug)
+    }
 
     const tag = await prisma.tag.create({
       data: {
-        name: name.trim(),
+        name: trimmedName,
         slug,
       },
     })
@@ -70,7 +77,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(tag)
   } catch (error: any) {
     if (error.code === "P2002") {
-      return NextResponse.json({ message: "标签名称已存在" }, { status: 400 })
+      const targets = (error.meta?.target as string[] | undefined) || []
+      if (targets.includes("name")) {
+        return NextResponse.json({ message: "标签名称已存在" }, { status: 400 })
+      }
+      if (targets.includes("slug")) {
+        return NextResponse.json({ message: "标签标识(slug)已存在，请更换名称后重试" }, { status: 400 })
+      }
+      return NextResponse.json({ message: "标签已存在" }, { status: 400 })
     }
     console.error("Create tag error:", error)
     return NextResponse.json({ message: "创建标签失败" }, { status: 500 })
