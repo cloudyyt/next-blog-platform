@@ -6,11 +6,9 @@
     "node": "20.x"
   },
   "scripts": {
-    "dev": "next dev",
-    "dev:admin": "PORT=3001 ADMIN_PORT=true next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "start:admin": "PORT=3001 next start",
     "lint": "next lint",
     "postinstall": "prisma generate --no-engine",
     "prisma:generate": "prisma generate",
@@ -19,8 +17,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:seed": "tsx prisma/seed.ts",
-    "set-admin": "tsx scripts/set-admin.ts"
+    "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.19.0",

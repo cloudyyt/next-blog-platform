@@ -24,6 +24,14 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "Blog Platform",
   description: "A modern blog platform built with Next.js",
+  icons: {
+    icon: [
+      { url: "/icon", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-icon", type: "image/png" },
+    ],
+  },
 }
 
 export default function RootLayout({
