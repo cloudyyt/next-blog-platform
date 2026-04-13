@@ -41,6 +41,7 @@ export function PostCard({ post, className }: PostCardProps) {
               src={post.coverImage}
               alt={post.title}
               fill
+              unoptimized
               className="object-cover group-hover:brightness-105 transition-[filter] duration-200"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />

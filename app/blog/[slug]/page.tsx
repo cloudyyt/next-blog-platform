@@ -254,6 +254,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                     src={post.coverImage}
                     alt={post.title}
                     fill
+                    unoptimized
                     className="object-cover"
                     priority
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 800px"

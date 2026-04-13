@@ -47,6 +47,7 @@ export function HeroCard({ post, className }: HeroCardProps) {
                 src={post.coverImage}
                 alt={post.title}
                 fill
+                unoptimized
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
                 priority
                 sizes="(max-width: 768px) 100vw, 50vw"
