@@ -22,7 +22,6 @@ interface PostEditorProps {
     content: string
     excerpt: string
     coverImage: string
-    published: boolean
     categoryIds: string[]
     tagIds: string[]
   }
@@ -37,7 +36,6 @@ export function PostEditor({ mode, postId, initialData }: PostEditorProps) {
   const [content, setContent] = useState(initialData?.content || "")
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || "")
   const [coverImage, setCoverImage] = useState(initialData?.coverImage || "")
-  const [published, setPublished] = useState(initialData?.published || false)
   const [categoryIds, setCategoryIds] = useState<string[]>(
     initialData?.categoryIds || []
   )
@@ -225,24 +223,6 @@ export function PostEditor({ mode, postId, initialData }: PostEditorProps) {
               rows={3}
               className="w-full text-sm bg-background rounded-md border border-input px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-ring"
             />
-          </div>
-
-          {/* Published toggle */}
-          <div className="bg-card/80 backdrop-blur-sm rounded-lg border p-4">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">发布状态</Label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <span className="text-xs text-muted-foreground">
-                  {published ? "已发布" : "草稿"}
-                </span>
-                <input
-                  type="checkbox"
-                  checked={published}
-                  onChange={(e) => setPublished(e.target.checked)}
-                  className="h-4 w-4 rounded border-input"
-                />
-              </label>
-            </div>
           </div>
 
           {/* Categories */}

@@ -96,7 +96,6 @@ export default function EditPostPage() {
         content: post.content,
         excerpt: post.excerpt || "",
         coverImage: post.coverImage || "",
-        published: post.published,
         categoryIds: post.categories.map((c) => c.id),
         tagIds: post.tags.map((t) => t.id),
       }}
