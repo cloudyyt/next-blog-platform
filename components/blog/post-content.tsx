@@ -6,6 +6,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { MermaidDiagram } from "@/components/ui/mermaid-diagram"
 
 interface PostContentProps {
   content: string
@@ -24,6 +25,9 @@ export function PostContent({ content }: PostContentProps) {
         // 代码块
         code({ node, inline, className, children, ...props }: any) {
           const match = /language-(\w+)/.exec(className || "")
+          if (!inline && match?.[1] === "mermaid") {
+            return <MermaidDiagram chart={String(children)} />
+          }
           // 只在客户端渲染代码高亮，避免SSR问题
           if (!inline && match && mounted) {
             return (

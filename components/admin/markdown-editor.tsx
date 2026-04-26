@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism"
 import { cn } from "@/lib/utils"
+import { MermaidDiagram } from "@/components/ui/mermaid-diagram"
 import {
   Bold,
   Italic,
@@ -157,6 +158,9 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
                 components={{
                   code({ className, children, ...props }: any) {
                     const match = /language-(\w+)/.exec(className || "")
+                    if (match?.[1] === "mermaid") {
+                      return <MermaidDiagram chart={String(children)} />
+                    }
                     if (match) {
                       return (
                         <SyntaxHighlighter
