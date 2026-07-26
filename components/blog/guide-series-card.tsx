@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { BookOpen, Clock, Layers, Sparkles } from "lucide-react"
 import type { GuideHomeCardData } from "@/lib/types/guide"
+import { CoverImage } from "@/components/blog/cover-image"
 
 /**
  * Agent 指南在博客首页的"置顶 PostCard"
@@ -35,37 +36,38 @@ export function GuideSeriesCard({
         href="/agent-guide"
         className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-lg"
       >
-        {/* Cover：有图用图（与 PostCard 一致），无图 fallback 品牌渐变 */}
-        <div className="relative w-full aspect-video overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 flex items-center justify-center">
-          {coverImage ? (
-            <>
-              <img
-                src={coverImage}
-                alt={title}
-                className="absolute inset-0 w-full h-full object-cover"
-                onError={(e) => {
-                  // 加载失败隐藏，露出底层渐变
-                  ;(e.target as HTMLImageElement).style.display = "none"
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-            </>
-          ) : (
-            <>
-              {/* 装饰：大书图标 */}
-              <BookOpen className="absolute right-6 top-1/2 -translate-y-1/2 w-20 h-20 text-primary/15 group-hover:scale-110 transition-transform duration-500" />
-              <Sparkles className="absolute left-6 top-6 w-5 h-5 text-primary/30" />
-            </>
-          )}
-
-          {/* 与 PostCard categories overlay 同位置 */}
-          <div className="absolute bottom-2 left-2 flex flex-wrap gap-1.5">
-            <span className="text-xs px-2 py-0.5 rounded-full bg-white/90 text-gray-800 backdrop-blur-sm font-medium flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
-              {badge}
-            </span>
+        {/* Cover：有图用图（完整显示 + 模糊背景），无图 fallback 品牌渐变 */}
+        {coverImage ? (
+          <CoverImage
+            src={coverImage}
+            alt={title}
+            className="h-40"
+            overlay={
+              <>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                <div className="absolute bottom-2 left-2 flex flex-wrap gap-1.5">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-white/90 text-gray-800 backdrop-blur-sm font-medium flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    {badge}
+                  </span>
+                </div>
+              </>
+            }
+          />
+        ) : (
+          <div className="relative w-full h-40 overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 flex items-center justify-center">
+            {/* 装饰：大书图标 */}
+            <BookOpen className="absolute right-6 top-1/2 -translate-y-1/2 w-20 h-20 text-primary/15 group-hover:scale-110 transition-transform duration-500" />
+            <Sparkles className="absolute left-6 top-6 w-5 h-5 text-primary/30" />
+            {/* badge 标签 */}
+            <div className="absolute bottom-2 left-2 flex flex-wrap gap-1.5">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-white/90 text-gray-800 backdrop-blur-sm font-medium flex items-center gap-1">
+                <Sparkles className="w-3 h-3" />
+                {badge}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Content：与 PostCard 完全一致的结构 */}
         <div className="p-4 sm:p-5">

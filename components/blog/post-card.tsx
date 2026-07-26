@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Calendar, User, Clock, Eye } from "lucide-react"
 import { BlogPost } from "@/lib/types/blog"
 import { cn } from "@/lib/utils"
+import { CoverImage } from "@/components/blog/cover-image"
 
 interface PostCardProps {
   post: BlogPost
@@ -36,29 +37,29 @@ export function PostCard({ post, className }: PostCardProps) {
       >
         {/* 封面图片 + 分类 overlay */}
         {post.coverImage ? (
-          <div className="relative w-full aspect-video overflow-hidden">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              fill
-              unoptimized
-              className="object-cover group-hover:brightness-105 transition-[filter] duration-200"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-            {post.categories.length > 0 && (
-              <div className="absolute bottom-2 left-2 flex flex-wrap gap-1.5">
-                {post.categories.map((category) => (
-                  <span
-                    key={category.id}
-                    className="text-xs px-2 py-0.5 rounded-full bg-white/90 text-gray-800 backdrop-blur-sm font-medium"
-                  >
-                    {category.name}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
+          <CoverImage
+            src={post.coverImage}
+            alt={post.title}
+            className="h-40"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            overlay={
+              <>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                {post.categories.length > 0 && (
+                  <div className="absolute bottom-2 left-2 flex flex-wrap gap-1.5">
+                    {post.categories.map((category) => (
+                      <span
+                        key={category.id}
+                        className="text-xs px-2 py-0.5 rounded-full bg-white/90 text-gray-800 backdrop-blur-sm font-medium"
+                      >
+                        {category.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </>
+            }
+          />
         ) : (
           post.categories.length > 0 && (
             <div className="flex flex-wrap gap-2 p-4 pb-0">

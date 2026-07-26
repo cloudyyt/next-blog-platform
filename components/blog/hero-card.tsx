@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Calendar, User, Clock, Eye } from "lucide-react"
 import { BlogPost } from "@/lib/types/blog"
 import { cn } from "@/lib/utils"
+import { CoverImage } from "@/components/blog/cover-image"
 
 interface HeroCardProps {
   post: BlogPost
@@ -42,20 +43,18 @@ export function HeroCard({ post, className }: HeroCardProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* 图片区域 */}
           {post.coverImage ? (
-            <div className="relative aspect-video overflow-hidden">
-              <Image
-                src={post.coverImage}
-                alt={post.title}
-                fill
-                unoptimized
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/10 md:bg-gradient-to-l md:from-transparent md:to-black/5" />
-            </div>
+            <CoverImage
+              src={post.coverImage}
+              alt={post.title}
+              className="h-64 md:h-80"
+              priority
+              sizes="(max-width: 768px) 100vw, 50vw"
+              overlay={
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/10 md:bg-gradient-to-l md:from-transparent md:to-black/5" />
+              }
+            />
           ) : (
-            <div className="relative aspect-video bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 flex items-center justify-center">
+            <div className="relative h-64 md:h-80 bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 flex items-center justify-center">
               <span className="text-6xl font-bold text-primary/20 select-none">
                 {post.title.charAt(0)}
               </span>
