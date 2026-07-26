@@ -218,7 +218,7 @@ manifest/md 运行时消费方 6 处，全部改读 `lib/guide/data.ts`：
 
 ## 九、剩余工作：Stage D 部署
 
-服务器上线步骤（参考 [`本地构建部署到服务器（不带node_modules）.md`](./本地构建部署到服务器（不带node_modules）.md)）：
+服务器上线步骤（采用「本地构建 → 打包 → 上传 → 服务器装依赖 + pm2 重启」流程，适配小配置 ECS）：
 
 1. 服务器 `prisma migrate deploy`（应用 `add_guide_models` 迁移，建两张表）
 2. 跑一次 `pnpm db:seed:guide`（灌入初始内容；**注意 `--force` 慎用**，会覆盖已编辑数据）

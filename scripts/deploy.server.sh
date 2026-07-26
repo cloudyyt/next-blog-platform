@@ -37,6 +37,17 @@ export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 # 现在可以安全 set -e 了（PATH 已就绪，后续命令失败应该让脚本退出）
 set -euo pipefail
 
+# ─── 颜色 + 输出函数（必须在所有调用之前定义）───
+if [[ -t 1 ]]; then
+  RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
+else
+  RED=''; GREEN=''; YELLOW=''; BLUE=''; NC=''
+fi
+info()  { echo -e "${BLUE}ℹ${NC}  $1"; }
+ok()    { echo -e "${GREEN}✓${NC} $1"; }
+warn()  { echo -e "${YELLOW}⚠${NC}  $1"; }
+die()   { echo -e "${RED}✗${NC} $1"; exit 1; }
+
 # ─── 镜像源配置（关键！阿里云 ECS 访问国外源超时）───
 # 1. npm/pnpm 包源 → 淘宝 npmmirror（国内最快）
 # 2. Prisma 引擎二进制 → 淘宝 npmmirror binary 镜像
@@ -57,17 +68,6 @@ if command -v pnpm &>/dev/null; then
   fi
 fi
 ok "镜像源配置完成"
-
-# ─── 颜色（无 tty 时降级为纯文本）───
-if [[ -t 1 ]]; then
-  RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
-else
-  RED=''; GREEN=''; YELLOW=''; BLUE=''; NC=''
-fi
-info()  { echo -e "${BLUE}ℹ${NC}  $1"; }
-ok()    { echo -e "${GREEN}✓${NC} $1"; }
-warn()  { echo -e "${YELLOW}⚠${NC}  $1"; }
-die()   { echo -e "${RED}✗${NC} $1"; exit 1; }
 
 # ─── 接收环境变量配置 ───
 DEPLOY_PM2_NAME="${DEPLOY_PM2_NAME:-blog}"

@@ -50,3 +50,4 @@ next-env.d.ts
 # 部署配置（含服务器真实信息，勿提交）
 /scripts/deploy.config.sh
 
+/docs_memo
