@@ -175,17 +175,17 @@ export default function PostsPage() {
             </div>
           </div>
 
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>标题</TableHead>
-                  <TableHead>作者</TableHead>
-                  <TableHead>分类</TableHead>
-                  <TableHead>标签</TableHead>
-                  <TableHead>状态</TableHead>
-                  <TableHead>更新时间</TableHead>
-                  <TableHead className="text-right">操作</TableHead>
+                  <TableHead className="min-w-[180px]">标题</TableHead>
+                  <TableHead className="min-w-[80px] whitespace-nowrap">作者</TableHead>
+                  <TableHead className="whitespace-nowrap">分类</TableHead>
+                  <TableHead className="whitespace-nowrap">标签</TableHead>
+                  <TableHead className="min-w-[80px] whitespace-nowrap">状态</TableHead>
+                  <TableHead className="whitespace-nowrap">更新时间</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -198,7 +198,7 @@ export default function PostsPage() {
                 ) : (
                   filteredPosts.map((post) => (
                     <TableRow key={post.id} className="hover:bg-muted/30">
-                      <TableCell>
+                      <TableCell className="min-w-[180px]">
                         <div className="font-medium">{post.title}</div>
                         {post.excerpt && (
                           <div className="text-sm text-muted-foreground mt-1 line-clamp-1">
@@ -206,12 +206,12 @@ export default function PostsPage() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell>{post.author.name}</TableCell>
-                      <TableCell>
+                      <TableCell className="whitespace-nowrap">{post.author.name}</TableCell>
+                      <TableCell className="max-w-[160px]">
                         <div className="flex flex-wrap gap-1">
                           {post.categories.length > 0 ? (
                             post.categories.map((cat) => (
-                              <Badge key={cat.name} variant="secondary" className="text-xs">
+                              <Badge key={cat.name} variant="secondary" className="text-xs whitespace-nowrap">
                                 {cat.name}
                               </Badge>
                             ))
@@ -220,11 +220,11 @@ export default function PostsPage() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="max-w-[200px]">
                         <div className="flex flex-wrap gap-1">
                           {post.tags.length > 0 ? (
                             post.tags.map((tag) => (
-                              <Badge key={tag.name} variant="outline" className="text-xs">
+                              <Badge key={tag.name} variant="outline" className="text-xs whitespace-nowrap">
                                 {tag.name}
                               </Badge>
                             ))
@@ -233,12 +233,12 @@ export default function PostsPage() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant={post.published ? "default" : "secondary"}>
+                      <TableCell className="whitespace-nowrap">
+                        <Badge variant={post.published ? "default" : "secondary"} className="whitespace-nowrap">
                           {post.published ? "已发布" : "草稿"}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="whitespace-nowrap">
                         {new Date(post.updatedAt).toLocaleDateString("zh-CN")}
                       </TableCell>
                       <TableCell className="text-right">
