@@ -15,7 +15,48 @@
 #
 # 文档见 docs/0726-部署上线与数据同步.md
 
+# ⚠️ 注意：先不要 set -e，PATH 初始化里的 source 可能失败（nvm 没装等），
+# 如果带 -e 会秒退且无输出。先把 PATH 搞定再 set -euo pipefail。
+# ─── PATH 初始化（关键！非交互 ssh 拿不到完整 PATH）───
+# 通过 ssh root@host "bash script" 触发的是非交互式 shell，不加载 .bashrc，
+# 导致宝塔/nvm 装的 node/pnpm/pm2 找不到。这里手动补全 PATH。
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+{ [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; } || true
+{ [ -f "$HOME/.bashrc" ] && . "$HOME/.bashrc"; } || true
+{ [ -f "$HOME/.bash_profile" ] && . "$HOME/.bash_profile"; } || true
+
+# 宝塔把 Node 装在 /www/server/nodejs/<版本>/bin/，版本号会变（v20.20.2 等）
+# 动态扫描该目录，把所有版本子目录的 bin 都加进 PATH
+for bt_node_bin in /www/server/nodejs/*/bin; do
+  [ -d "$bt_node_bin" ] && export PATH="$bt_node_bin:$PATH"
+done
+
+# 其他常见路径兜底
+export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
+# 现在可以安全 set -e 了（PATH 已就绪，后续命令失败应该让脚本退出）
 set -euo pipefail
+
+# ─── 镜像源配置（关键！阿里云 ECS 访问国外源超时）───
+# 1. npm/pnpm 包源 → 淘宝 npmmirror（国内最快）
+# 2. Prisma 引擎二进制 → 淘宝 npmmirror binary 镜像
+# 没这两步，pnpm install 会 ETIMEDOUT，prisma generate 会卡在 Downloading 0%
+info "配置国内镜像源（npmmirror + Prisma engines）..."
+export PRISMA_ENGINES_MIRROR=https://registry.npmmirror.com/-/binary/prisma
+# 写进 ~/.bashrc 永久生效（已存在则不重复写）
+grep -q "PRISMA_ENGINES_MIRROR" ~/.bashrc 2>/dev/null || \
+  echo 'export PRISMA_ENGINES_MIRROR=https://registry.npmmirror.com/-/binary/prisma' >> ~/.bashrc
+# pnpm/npm registry（已切过则跳过）
+if command -v pnpm &>/dev/null; then
+  CURRENT_REG=$(pnpm config get registry 2>/dev/null || echo "")
+  if [[ "$CURRENT_REG" != *"npmmirror"* ]]; then
+    pnpm config set registry https://registry.npmmirror.com
+    ok "pnpm registry → npmmirror"
+  else
+    ok "pnpm registry 已是 npmmirror"
+  fi
+fi
+ok "镜像源配置完成"
 
 # ─── 颜色（无 tty 时降级为纯文本）───
 if [[ -t 1 ]]; then
