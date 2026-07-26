@@ -156,3 +156,114 @@ curl -s https://<域名>/admin/guide | grep -oE "cmr[a-z0-9]+|cms[a-z0-9]+" | so
 # 4. build 标记
 # 本地 pnpm build | grep "admin/guide" → ○ 是静态、ƒ 是动态
 ```
+
+---
+
+## 七、续：真凶是 Nginx proxy_cache（三重缓存叠加）
+
+> 加了 `force-dynamic` 重新部署后，**问题依旧**。继续深挖，发现是**三重缓存叠加**——这才是完整的真相，也是最有博文价值的部分。
+
+### 现象复盘
+
+加了 `force-dynamic`、清了 `.next/cache`、重启 pm2 后：
+- `curl http://localhost:3000/admin/guide`（直连 Next.js）→ ✅ `cms1...`（正确）
+- `curl https://www.zijieleo.cn/admin/guide`（经 Nginx）→ ❌ `cmrw...`（旧）+ `x-nextjs-cache: HIT`
+
+**同一个 Next.js 进程，直连正确、走域名错误**——必然是 Nginx 层缓存。
+
+### 关键诊断命令（一锤定音）
+
+```bash
+# 1. 带随机 query 绕过缓存
+curl "https://www.zijieleo.cn/admin/guide?nocache=$(date +%s)"
+# → 返回 cms1...（正确）= 缓存按 URL key
+
+# 2. 用域名 Host 打 localhost（隔离变量）
+curl -H "Host: www.zijieleo.cn" http://localhost:3000/admin/guide
+# → 返回 cms1...（正确）= Next.js 按 Host 缓存的假设被推翻
+
+# 3. 用 IP + HTTPS + 域名 Host（走 Nginx）
+curl -sk -H "Host: www.zijieleo.cn" https://127.0.0.1/admin/guide
+# → 返回 cmrw...（错误）+ x-nextjs-cache: HIT = 确认是 Nginx 层
+```
+
+第 3 步是决定性的：**localhost 直连正确，但经过 Nginx 就变旧**——缓存一定在 Nginx。
+
+### 找到缓存源
+
+```bash
+# 查 Nginx 全局配置（不只看站点配置！）
+nginx -T 2>/dev/null | grep -A2 "proxy_cache"
+
+# 输出：
+# /www/server/nginx/conf/proxy.conf:
+# proxy_cache_path /www/server/nginx/proxy_cache_dir ... keys_zone=cache_one ... inactive=1d
+# proxy_cache cache_one;
+```
+
+**宝塔的 `proxy.conf` 全局开启了 `proxy_cache cache_one`**——所有反代请求被缓存到 `/www/server/nginx/proxy_cache_dir`，1 天失效。
+
+### 完整因果链（三重缓存）
+
+```
+用户请求 /admin/guide
+  ↓
+Nginx proxy_cache（第 1 重，宝塔全局开）
+  命中 → 返回旧的缓存响应（含旧的 cmrw... id + 旧的 x-nextjs-cache: HIT header）
+  未命中 ↓
+Next.js ISR cache（第 2 重，.next/cache）
+  命中 → 返回缓存的 RSC payload
+  未命中 ↓
+Next.js 静态预渲染（第 3 重，build 时烤死）
+  → 用 build 时的 DB 数据渲染
+```
+
+三重缓存，每一重都可能返回旧数据。即使修了第 3 重（force-dynamic）、清了第 2 重（.next/cache），**第 1 重（Nginx）还在返回旧响应**。
+
+### `x-nextjs-cache: HIT` 的误导性
+
+这个 header 是 **Next.js 响应里自带的**，被 Nginx 连同整个响应（body + headers）一起缓存了。所以 Nginx 返回的 `x-nextjs-cache: HIT` 是**旧的 Next.js header**，不是 Nginx 自己加的——极其误导，让人以为是 Next.js ISR 缓存。
+
+### 修复
+
+**第 1 步（临时）**：清 Nginx 缓存目录
+```bash
+rm -rf /www/server/nginx/proxy_cache_dir/*
+nginx -s reload
+```
+
+**第 2 步（根治）**：站点配置关掉 proxy_cache（Next.js 不需要 Nginx 再缓存一层）
+
+在站点 Nginx 配置的 `location /` 里加一行：
+```nginx
+location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_cache off;          # ← 关掉宝塔全局的 proxy_cache
+    ...
+}
+```
+
+### 为什么 Next.js 应用不该开 Nginx proxy_cache
+
+| 维度 | Nginx proxy_cache | Next.js 自带缓存 |
+|------|------------------|----------------|
+| 机制 | 按 URL 缓存完整 HTTP 响应 | ISR（按路由缓存 RSC payload）+ 静态预渲染 |
+| 失效 | 时间过期（inactive=1d）或手动清 | revalidatePath/revalidateTag 精准失效 |
+| 问题 | admin 改了内容，Nginx 不知道，继续返回旧缓存 | Next.js 知道（revalidatePath 触发），能精准更新 |
+
+Next.js 有自己的、**精准的**缓存失效机制（`revalidatePath`）。Nginx 的 proxy_cache 是**粗糙的按时间失效**，会盖过 Next.js 的精准失效——导致"代码里调了 revalidatePath 但页面不更新"。所以 Next.js 应用必须 `proxy_cache off`。
+
+---
+
+## 八、博文素材价值标注
+
+这个排查过程适合写成技术博文，素材点：
+
+1. **三重缓存叠加的诡异现象**：同一个进程、同一个 DB，localhost 正确、域名错误——这种"幽灵 bug"很抓眼球
+2. **6 个错误假设逐一被推翻**：缓存/代码/Nginx 拦截/Router Cache/DB 双库/Postico 连错——展现工程师排查的真实弯路
+3. **`x-nextjs-cache: HIT` 的误导性**：看起来是 Next.js 缓存，实际是 Nginx 缓存的旧 header——深入到 HTTP 协议层
+4. **隔离变量法**：localhost vs 域名、IP+Host vs 域名、带 query vs 不带——系统化的二分排查
+5. **宝塔默认配置的坑**：proxy.conf 全局开 proxy_cache，本意给 PHP 加速，却坑了 Node 应用——运维视角的洞察
+
+**建议标题**：《一次诡异的 404：三重缓存如何让我排查到凌晨》或《Next.js 部署踩坑：当 Nginx proxy_cache 遇上 ISR》
+
