@@ -2,13 +2,13 @@
 #
 # 服务器端部署脚本 —— 由 deploy.local.sh 通过 ssh 触发，也可在服务器上手动跑
 #
-# 在服务器上的 <DEPLOY_DIR> 执行：解压 + 装依赖 + 建表 + 灌数据 + 重启
+# 在服务器上的 <DEPLOY_DIR> 执行：解压 + 装依赖 + migrate（幂等）+ 清缓存 + 重启
+#
+# 日常部署只更新代码，不碰业务数据（不跑 seed）。
+# 需要初始化/重置 Agent 指南数据时，用独立脚本：bash scripts/init-guide-data.sh
 #
 # 配置通过环境变量传入（由 deploy.local.sh 设置）：
 #   DEPLOY_PM2_NAME       pm2 进程名
-#   DEPLOY_SEED_GUIDE     是否灌 guide 数据（true/false）
-#   DEPLOY_SEED_FORCE     seed 是否用 --force（true/false）
-#   DEPLOY_MIGRATE        是否跑 migrate deploy（true/false）
 #
 # ⚠️ 本脚本设计为在服务器项目根目录（DEPLOY_DIR）下执行
 # ⚠️ 依赖服务器 .env 已正确配置（DB 指向线上、OSS 变量等）
@@ -69,11 +69,8 @@ if command -v pnpm &>/dev/null; then
 fi
 ok "镜像源配置完成"
 
-# ─── 接收环境变量配置 ───
+# ─── 接收环境变量配置（只有 pm2 名，无 DB 操作开关）───
 DEPLOY_PM2_NAME="${DEPLOY_PM2_NAME:-blog}"
-DEPLOY_SEED_GUIDE="${DEPLOY_SEED_GUIDE:-true}"
-DEPLOY_SEED_FORCE="${DEPLOY_SEED_FORCE:-false}"
-DEPLOY_MIGRATE="${DEPLOY_MIGRATE:-true}"
 
 # 脚本所在的目录就是项目根目录
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -129,41 +126,32 @@ pnpm install --prod --frozen-lockfile || {
 ok "依赖安装完成"
 echo ""
 
-# ─── 建表（可选）───
-if [[ "$DEPLOY_MIGRATE" == "true" ]]; then
-  info "应用数据库迁移（prisma migrate deploy）..."
-  # 尝试直接 deploy，遇 drift 报错时引导 baseline
-  if ! npx prisma migrate deploy 2>&1; then
-    echo ""
-    warn "migrate deploy 失败，可能是 DB 处于 drift 状态（早期用 db push 建的，无迁移历史表）。"
-    warn "这是已知坑，详见 docs/0726-部署上线与数据同步.md 第四节「坑 2」。"
-    echo ""
-    info "尝试 baseline 已有迁移（标记为已应用，不真正执行）..."
-    npx prisma migrate resolve --applied 20251230174814_init || true
-    npx prisma migrate resolve --applied 20260413205000_add_post_view_tracking || true
-    info "baseline 完成，重新 deploy..."
-    npx prisma migrate deploy
-  fi
-  ok "迁移应用完成"
+# ─── 应用数据库迁移（每次都跑，幂等：已应用的会跳过，无副作用）───
+info "应用数据库迁移（prisma migrate deploy）..."
+# 尝试直接 deploy，遇 drift 报错时引导 baseline
+if ! npx prisma migrate deploy 2>&1; then
   echo ""
-else
-  info "跳过 migrate（DEPLOY_MIGRATE=false）"
+  warn "migrate deploy 失败，可能是 DB 处于 drift 状态（早期用 db push 建的，无迁移历史表）。"
+  warn "这是已知坑，详见 docs/0726-部署上线与数据同步.md 第四节「坑 2」。"
+  echo ""
+  info "尝试 baseline 已有迁移（标记为已应用，不真正执行）..."
+  npx prisma migrate resolve --applied 20251230174814_init || true
+  npx prisma migrate resolve --applied 20260413205000_add_post_view_tracking || true
+  info "baseline 完成，重新 deploy..."
+  npx prisma migrate deploy
 fi
+ok "迁移应用完成"
+echo ""
 
-# ─── 灌 Agent 指南数据（可选）───
-if [[ "$DEPLOY_SEED_GUIDE" == "true" ]]; then
-  if [[ "$DEPLOY_SEED_FORCE" == "true" ]]; then
-    warn "用 --force 灌数据，会覆盖已存在的章节内容！"
-    info "运行 db:seed:guide --force..."
-    pnpm db:seed:guide --force
-  else
-    info "运行 db:seed:guide（幂等，只插新章，不覆盖）..."
-    pnpm db:seed:guide
-  fi
-  ok "Agent 指南数据灌入完成"
-  echo ""
-else
-  info "跳过 seed-guide（DEPLOY_SEED_GUIDE=false）"
+# 注意：日常部署不灌 guide 数据（避免覆盖 admin 编辑过的内容）。
+# 需要初始化/重置 Agent 指南数据时，用独立脚本：bash scripts/init-guide-data.sh
+
+# ─── 清 Next.js ISR 缓存（避免部署后页面显示旧内容）───
+# 之前踩过坑：部署新代码后，旧 ISR 缓存残留导致页面不更新。
+# 清掉 .next/cache 确保重启后所有页面重新渲染。
+if [[ -d .next/cache ]]; then
+  rm -rf .next/cache
+  ok "已清 .next/cache（ISR 缓存）"
 fi
 
 # ─── 重启服务 ───

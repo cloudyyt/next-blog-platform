@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# 本地部署脚本 —— 一键完成 Step 0-3（build + 打包 + 上传 + 触发服务器部署）
+# 本地部署脚本 —— 一键完成（build + 打包 + 上传 + 触发服务器部署）
 #
 # 用法：
 #   1. 首次：cp scripts/deploy.config.example.sh scripts/deploy.config.sh 并填值
@@ -10,7 +10,10 @@
 #   Step 0  本地 pnpm build
 #   Step 1  打包 release.tgz（含 .next / package.json / pnpm-lock.yaml / prisma / docs/agent-guide）
 #   Step 2  scp 上传到服务器
-#   Step 3  ssh 触发服务器端 deploy.server.sh（解压 + 装依赖 + 建表 + 灌数据 + 重启）
+#   Step 3  ssh 触发服务器端 deploy.server.sh（解压 + 装依赖 + migrate + 清缓存 + 重启）
+#
+# 日常部署只更新代码，不碰业务数据。
+# 需要初始化 Agent 指南数据时，用独立脚本：bash scripts/init-guide-data.sh
 #
 # 文档见 docs/0726-部署上线与数据同步.md
 
@@ -93,10 +96,9 @@ echo "────────────────────────�
 echo "  以下输出来自服务器，请关注是否有报错"
 echo "──────────────────────────────────────────────"
 
-# 把配置变量传给服务器脚本：ssh 的 VAR=val 写在 remote 命令字符串里才生效，
-# 不能写在本地（写在本地会被当成本地 shell 变量赋值，传不进 remote）
+# 把 pm2 名传给服务器脚本（ssh 的 VAR=val 写在 remote 命令字符串里才生效）
 ssh -p "$DEPLOY_SSH_PORT" "${DEPLOY_USER}@${DEPLOY_HOST}" \
-  "DEPLOY_PM2_NAME='${DEPLOY_PM2_NAME}' DEPLOY_SEED_GUIDE='${DEPLOY_SEED_GUIDE:-true}' DEPLOY_SEED_FORCE='${DEPLOY_SEED_FORCE:-false}' DEPLOY_MIGRATE='${DEPLOY_MIGRATE:-true}' bash ${DEPLOY_DIR}/deploy.server.sh"
+  "DEPLOY_PM2_NAME='${DEPLOY_PM2_NAME}' bash ${DEPLOY_DIR}/deploy.server.sh"
 
 echo ""
 ok "全部部署步骤完成"
