@@ -1,12 +1,15 @@
 "use client"
 
 /**
- * <CoverImage> —— 封面图通用组件（固定高度 + 完整显示 + 纯色底）
+ * <CoverImage> —— 封面图通用组件（固定高度 + cover 铺满）
  *
  * 设计：
  *   - 容器固定高度（由调用方传 className，如 h-40 / h-64）
- *   - 图片 object-contain 居中完整显示（不裁切）
- *   - 留白用 bg-muted 纯色底填充（与卡片背景融合，不突兀）
+ *   - 图片 object-cover 铺满容器（会裁切，但视觉整齐，不会出现"中间一小条"）
+ *   - 这是所有博客（掘金/知乎/公众号）的默认封面行为
+ *
+ * 配合 admin ImageUploader 的 16:9 预览框 → 所见即所得
+ * （admin 看到 cover 怎么裁，前台就怎么显示）
  *
  * 用法：
  *   <CoverImage src={url} alt="标题" className="h-40" />
@@ -40,14 +43,14 @@ export function CoverImage({
 }: CoverImageProps) {
   return (
     <div className={cn("relative w-full overflow-hidden bg-muted", className)}>
-      {/* 完整显示：object-contain 居中，不裁切。留白由容器 bg-muted 填充 */}
+      {/* cover 铺满：会裁切非标准比例图，但视觉整齐，不出现缩成一小条 */}
       <Image
         src={src}
         alt={alt}
         fill
         unoptimized
         priority={priority}
-        className="object-contain"
+        className="object-cover"
         sizes={sizes}
       />
       {/* 叠加层（渐变遮罩 / 分类标签等） */}

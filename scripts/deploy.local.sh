@@ -93,13 +93,10 @@ echo "────────────────────────�
 echo "  以下输出来自服务器，请关注是否有报错"
 echo "──────────────────────────────────────────────"
 
-# 把配置变量传给服务器脚本（通过环境变量）
+# 把配置变量传给服务器脚本：ssh 的 VAR=val 写在 remote 命令字符串里才生效，
+# 不能写在本地（写在本地会被当成本地 shell 变量赋值，传不进 remote）
 ssh -p "$DEPLOY_SSH_PORT" "${DEPLOY_USER}@${DEPLOY_HOST}" \
-  "bash ${DEPLOY_DIR}/deploy.server.sh" \
-  DEPLOY_PM2_NAME="$DEPLOY_PM2_NAME" \
-  DEPLOY_SEED_GUIDE="${DEPLOY_SEED_GUIDE:-true}" \
-  DEPLOY_SEED_FORCE="${DEPLOY_SEED_FORCE:-false}" \
-  DEPLOY_MIGRATE="${DEPLOY_MIGRATE:-true}"
+  "DEPLOY_PM2_NAME='${DEPLOY_PM2_NAME}' DEPLOY_SEED_GUIDE='${DEPLOY_SEED_GUIDE:-true}' DEPLOY_SEED_FORCE='${DEPLOY_SEED_FORCE:-false}' DEPLOY_MIGRATE='${DEPLOY_MIGRATE:-true}' bash ${DEPLOY_DIR}/deploy.server.sh"
 
 echo ""
 ok "全部部署步骤完成"
