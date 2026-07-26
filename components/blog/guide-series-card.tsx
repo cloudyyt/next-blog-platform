@@ -41,7 +41,6 @@ export function GuideSeriesCard({
           <CoverImage
             src={coverImage}
             alt={title}
-            className="h-40"
             overlay={
               <>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />

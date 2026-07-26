@@ -40,7 +40,6 @@ export function PostCard({ post, className }: PostCardProps) {
           <CoverImage
             src={post.coverImage}
             alt={post.title}
-            className="h-40"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             overlay={
               <>

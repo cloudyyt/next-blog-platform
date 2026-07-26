@@ -46,7 +46,6 @@ export function HeroCard({ post, className }: HeroCardProps) {
             <CoverImage
               src={post.coverImage}
               alt={post.title}
-              className="h-64 md:h-80"
               priority
               sizes="(max-width: 768px) 100vw, 50vw"
               overlay={
@@ -54,7 +53,7 @@ export function HeroCard({ post, className }: HeroCardProps) {
               }
             />
           ) : (
-            <div className="relative h-64 md:h-80 bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 flex items-center justify-center">
+            <div className="relative aspect-video bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 flex items-center justify-center">
               <span className="text-6xl font-bold text-primary/20 select-none">
                 {post.title.charAt(0)}
               </span>
