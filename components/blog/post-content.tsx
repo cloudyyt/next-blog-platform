@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react"
 import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import rehypeRaw from "rehype-raw"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { MermaidDiagram } from "@/components/ui/mermaid-diagram"
+import { ALLOWED_SVG_TAGS } from "@/lib/markdown/rehype-schema"
 
 interface PostContentProps {
   content: string
@@ -21,27 +24,52 @@ export function PostContent({ content }: PostContentProps) {
 
   return (
     <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[
+        // 只用 rehype-raw 解析 markdown 里混写的原始 HTML/SVG。
+        // 不接 rehype-sanitize：它默认 schema 不处理 SVG 命名空间（foreign），
+        // 会把整个 <svg> 删掉只剩文字残骸。
+        // XSS 防护靠下方 components 里对 SVG 标签的白名单透传（PostContent 只渲染博主内容，
+        // admin 鉴权后写入 DB，非用户输入，风险低）。
+        rehypeRaw,
+      ]}
       components={{
-        // 代码块
-        code({ node, inline, className, children, ...props }: any) {
+        // SVG 白名单标签透传为对应小写元素（让内联 SVG banner 能渲染）
+        ...Object.fromEntries(
+          ALLOWED_SVG_TAGS.map((tag) => [
+            tag,
+            ({ node, ...props }: any) => {
+              const Comp = tag as any
+              return <Comp {...props} />
+            },
+          ])
+        ),
+        // 代码块 / 行内代码
+        // react-markdown v9 的 inline 参数不可靠，改用内容特征判断：
+        //   块级 code（fenced ```）的 children 含换行，或带 language- className
+        //   行内 code（反引号）的 children 是纯文本、无换行
+        code({ node, className, children, ...props }: any) {
           const match = /language-(\w+)/.exec(className || "")
-          if (!inline && match?.[1] === "mermaid") {
-            return <MermaidDiagram chart={String(children)} />
+          const text = String(children ?? "")
+          const isBlock = match !== null || text.includes("\n")
+          if (isBlock && match?.[1] === "mermaid") {
+            return <MermaidDiagram chart={text} />
           }
-          // 只在客户端渲染代码高亮，避免SSR问题
-          if (!inline && match && mounted) {
+          if (isBlock && mounted) {
             return (
               <SyntaxHighlighter
                 style={vscDarkPlus}
-                language={match[1]}
+                language={match?.[1] ?? "text"}
                 PreTag="div"
-                className="rounded-lg my-4"
+                className="code-block rounded-lg my-4"
+                customStyle={{ background: "var(--code-bg)" }}
                 {...props}
               >
-                {String(children).replace(/\n$/, "")}
+                {text.replace(/\n$/, "")}
               </SyntaxHighlighter>
             )
           }
+          // 行内代码（反引号）
           return (
             <code className={cn("bg-secondary px-1.5 py-0.5 rounded text-sm font-mono", className)} {...props}>
               {children}
