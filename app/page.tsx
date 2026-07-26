@@ -8,16 +8,15 @@ import { redirect } from "next/navigation"
 export const dynamic = "force-dynamic"
 
 export default function HomePage() {
-  // 本地管理员端口：重定向到 /admin
+  // 本地管理员端口：重定向到 /admin（通过 PORT 或 ADMIN_PORT 环境变量识别）
   const isAdminPort =
-    !process.env.VERCEL &&
-    (process.env.PORT === "3001" || process.env.ADMIN_PORT === "true")
+    process.env.PORT === "3001" || process.env.ADMIN_PORT === "true"
 
   if (isAdminPort) {
     redirect("/admin")
   }
 
-  // 生产 / 预览（含 Vercel）：重定向到博客首页
+  // 其他情况：重定向到博客首页
   redirect("/blog")
 }
 

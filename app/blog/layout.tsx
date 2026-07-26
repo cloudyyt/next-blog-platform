@@ -51,7 +51,7 @@ export default function BlogLayout({
           <div className="container mx-auto px-4 py-4">
             <nav className="flex items-center justify-between">
               <a href="/blog" className="text-xl font-bold font-display">
-                大胖天的树洞
+                zijieLeo 的树洞
               </a>
               <div className="flex items-center gap-2 sm:gap-4">
                 <a
@@ -65,6 +65,13 @@ export default function BlogLayout({
                   className="text-sm sm:text-base hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hidden sm:inline-block"
                 >
                   关于
+                </a>
+                <a
+                  href="/agent-guide"
+                  className="text-sm sm:text-base hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 inline-flex items-center gap-1"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  指南
                 </a>
                 <Suspense fallback={<div className="w-36 sm:w-44 h-9" />}>
                   <SearchInput />
@@ -114,9 +121,9 @@ export default function BlogLayout({
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4" />
-                <span>&copy; {new Date().getFullYear()} 大胖天的树洞</span>
+                <span>&copy; {new Date().getFullYear()} zijieLeo 的树洞</span>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
                 <a
                   href="/blog/feed.xml"
                   className="hover:text-primary transition-colors duration-200 cursor-pointer inline-flex items-center gap-1"
@@ -125,6 +132,14 @@ export default function BlogLayout({
                 >
                   <Rss className="w-3.5 h-3.5" />
                   订阅更新（RSS）
+                </a>
+                <a
+                  href="https://beian.miit.gov.cn/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors duration-200 cursor-pointer"
+                >
+                  粤ICP备2025369007号
                 </a>
                 <a
                   href="/blog/sitemap.xml"

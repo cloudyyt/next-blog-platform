@@ -47,13 +47,13 @@ export async function GET(request: Request) {
 
     // 直接查询，如果失败则返回空列表
     try {
-      // 获取总数（添加 5 秒超时，适应 Vercel 冷启动）
+      // 获取总数（添加 5 秒超时保护）
       const total = await withTimeout(
         prisma.post.count({ where }),
         5000
       )
 
-      // 获取文章列表（添加 5 秒超时，适应 Vercel 冷启动）
+      // 获取文章列表（添加 5 秒超时保护）
       const posts = await withTimeout(
         prisma.post.findMany({
         where,

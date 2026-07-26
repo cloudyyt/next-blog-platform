@@ -22,7 +22,7 @@ const nunito = Nunito({
 })
 
 export const metadata: Metadata = {
-  title: "Blog Platform",
+  title: "zijieLeo的树洞",
   description: "A modern blog platform built with Next.js",
   icons: {
     icon: [
@@ -31,6 +31,12 @@ export const metadata: Metadata = {
     apple: [
       { url: "/apple-icon", type: "image/png" },
     ],
+  },
+  // RSS 自动发现：阅读器/浏览器插件会自动识别 /blog/feed.xml，无需在 UI 放入口
+  alternates: {
+    types: {
+      "application/rss+xml": "/blog/feed.xml",
+    },
   },
 }
 

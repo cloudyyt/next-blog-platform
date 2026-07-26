@@ -4,6 +4,7 @@
  */
 import { Suspense } from "react"
 import { prisma } from "@/lib/prisma"
+import { getGuideHomeCardData } from "@/lib/guide/data"
 import { BlogPageClient } from "@/components/blog/blog-page-client"
 import { Loading } from "@/components/ui/loading"
 
@@ -155,12 +156,14 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const categorySlug = params.category
 
   // 并行获取所有数据
-  const [{ posts, total }, tags, categories, totalViews] = await Promise.all([
-    getPostsFromDB(tagSlug, categorySlug),
-    getTagsFromDB(),
-    getCategoriesFromDB(),
-    getTotalViewsFromDB(),
-  ])
+  const [{ posts, total }, tags, categories, totalViews, guideCardData] =
+    await Promise.all([
+      getPostsFromDB(tagSlug, categorySlug),
+      getTagsFromDB(),
+      getCategoriesFromDB(),
+      getTotalViewsFromDB(),
+      getGuideHomeCardData(),
+    ])
 
   return (
     <Suspense
@@ -179,6 +182,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         categories={categories}
         tagSlug={tagSlug}
         categorySlug={categorySlug}
+        guideCardData={guideCardData}
       />
     </Suspense>
   )

@@ -1,5 +1,6 @@
 "use client"
 
+import { Github } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SITE_PROFILE } from "@/lib/site-profile"
 
@@ -24,7 +25,7 @@ export function SidebarAuthorCard({ totalPosts, className }: SidebarAuthorCardPr
             "bg-primary/10 text-primary text-lg font-bold font-display ring-1 ring-primary/15"
           )}
         >
-          大
+          Z
         </div>
         <div className="min-w-0">
           <h3 className="text-base font-semibold font-display truncate">
@@ -36,17 +37,18 @@ export function SidebarAuthorCard({ totalPosts, className }: SidebarAuthorCardPr
 
       <div className="mt-4 flex items-center gap-2">
         <a
-          href={SITE_PROFILE.links.rss}
+          href={SITE_PROFILE.links.github}
           target="_blank"
           rel="noopener noreferrer"
           className={cn(
-            "flex-1 text-center text-sm px-3 py-2 rounded-lg",
+            "flex-1 inline-flex items-center justify-center gap-1.5 text-sm px-3 py-2 rounded-lg",
             "bg-primary text-primary-foreground shadow-sm",
             "hover:bg-primary/90 transition-colors duration-200 cursor-pointer",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           )}
         >
-          订阅更新（RSS）
+          <Github className="w-4 h-4" />
+          Star on GitHub
         </a>
         <a
           href={SITE_PROFILE.links.randomPost}

@@ -39,7 +39,7 @@ export async function GET() {
       return NextResponse.json({
         message: "数据库表未初始化",
         missingTables,
-        instruction: "数据库连接正常，但表未创建。请在 Vercel 项目设置中运行: pnpm prisma db push"
+        instruction: "数据库连接正常，但表未创建。请在服务器上运行: npx prisma migrate deploy"
       }, { status: 400 })
     }
     
@@ -60,7 +60,7 @@ export async function GET() {
           "数据库服务器无法访问",
           "网络连接问题"
         ],
-        instruction: "请检查 Vercel 项目设置中的 DATABASE_URL 环境变量"
+        instruction: "请检查服务器的 DATABASE_URL / PRISMA_DATABASE_URL 环境变量"
       }, { status: 504 }) // Gateway Timeout
     }
     
@@ -112,15 +112,14 @@ export async function POST() {
     }
     
     // 使用 Prisma Migrate 的编程 API
-    // 注意：这需要 Prisma Migrate，如果使用 db push，需要通过 CLI
-    // 这里我们提供一个提示，实际需要通过 Vercel CLI 或手动执行
-    
+    // 注意：这需要 Prisma Migrate，本项目走「手写 SQL + migrate deploy」流程
+
     return NextResponse.json({
       message: "数据库表未完全初始化",
       existingTables,
       missingTables: requiredTables.filter(t => !tableNames.includes(t)),
-      instruction: "请在 Vercel 项目设置中运行: pnpm prisma db push",
-      note: "或者访问 Vercel 控制台的 Functions 标签，手动执行数据库迁移"
+      instruction: "请在服务器上运行: npx prisma migrate deploy",
+      note: "本地可先跑 db:push 调试；生产务必用 migrate deploy"
     }, { status: 400 })
   } catch (error: any) {
     console.error("Init DB POST error:", error)

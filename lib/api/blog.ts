@@ -38,7 +38,7 @@ export async function getPosts(params?: {
   if (params?.tag) query.set('tag', params.tag)
   if (params?.category) query.set('category', params.category)
   
-  // 添加超时处理，增加到 8 秒以适应 Vercel 冷启动
+  // 添加超时处理（8 秒）
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), 8000) // 8秒超时
   

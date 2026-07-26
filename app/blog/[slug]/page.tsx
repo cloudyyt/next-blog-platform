@@ -152,7 +152,7 @@ export async function generateMetadata({
       title,
       description,
       url,
-      siteName: "大胖天的树洞",
+      siteName: "zijieLeo 的树洞",
       type: "article",
       publishedTime: post.createdAt,
       modifiedTime: post.updatedAt,

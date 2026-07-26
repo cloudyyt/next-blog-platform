@@ -32,7 +32,7 @@ export async function GET() {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>大胖天的树洞</title>
+    <title>zijieLeo 的树洞</title>
     <link>${SITE_URL}/blog</link>
     <description>个人博客 - 技术分享与生活记录</description>
     <language>zh-CN</language>

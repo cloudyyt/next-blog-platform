@@ -99,7 +99,7 @@ function BlogContent() {
                 /api/admin/init-db
               </a>
               <p className="text-xs text-muted-foreground mt-2">
-                或者使用 Vercel CLI 运行: pnpm prisma db push
+                或者在服务器上运行: npx prisma migrate deploy
               </p>
             </div>
           )}

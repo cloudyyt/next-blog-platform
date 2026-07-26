@@ -4,7 +4,9 @@ import { useState } from "react"
 import { ChevronDown, Loader2 } from "lucide-react"
 import { PostCard } from "@/components/blog/post-card"
 import { HeroCard } from "@/components/blog/hero-card"
+import { GuideSeriesCard } from "@/components/blog/guide-series-card"
 import { BlogPost } from "@/lib/types/blog"
+import type { GuideHomeCardData } from "@/lib/types/guide"
 import { cn } from "@/lib/utils"
 
 interface LoadMoreButtonProps {
@@ -13,6 +15,10 @@ interface LoadMoreButtonProps {
   pageSize: number
   tagSlug?: string
   categorySlug?: string
+  /** 是否在 HeroCard 之后、PostCard 列表之前显示 Agent 指南"置顶卡片" */
+  showGuideEntry?: boolean
+  /** Agent 指南置顶卡片的数据（由 server 查 DB 传入） */
+  guideCardData?: GuideHomeCardData
 }
 
 export function LoadMoreButton({
@@ -21,6 +27,8 @@ export function LoadMoreButton({
   pageSize,
   tagSlug,
   categorySlug,
+  showGuideEntry = false,
+  guideCardData,
 }: LoadMoreButtonProps) {
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts)
   const [page, setPage] = useState(1)
@@ -65,8 +73,17 @@ export function LoadMoreButton({
 
   return (
     <>
+      {/* Agent 指南置顶卡片：在最顶（仅默认视图且有数据时显示） */}
+      {showGuideEntry && guideCardData && (
+        <GuideSeriesCard data={guideCardData} />
+      )}
+
       {/* Hero post */}
-      {heroPost && <HeroCard post={heroPost} />}
+      {heroPost && (
+        <div className="mt-6">
+          <HeroCard post={heroPost} />
+        </div>
+      )}
 
       {/* Remaining posts */}
       {restPosts.length > 0 && (
