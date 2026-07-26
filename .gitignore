@@ -28,19 +28,25 @@ yarn-error.log*
 .env*.local
 .env
 
-# vercel
-.vercel
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 
 # prisma
-/prisma/migrations
+# ⚠️ migrations 必须提交！部署时服务器要靠它建表。
+# 只忽略本地 SQLite 开发库
 /dev.db
 /dev.db-journal
 
 /.cursor
+/.zcode
+/.claude/settings.local.json
 
 /.pnpm-store/*
+
+# 构建产物
+/release.tgz
+
+# 部署配置（含服务器真实信息，勿提交）
+/scripts/deploy.config.sh
 
