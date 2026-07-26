@@ -21,7 +21,8 @@ model User {
   
   posts     Post[]
   comments  Comment[]
-  
+  guideChapters GuideChapter[]
+
   @@map("users")
 }
 
@@ -106,5 +107,49 @@ model Comment {
   updatedAt DateTime @updatedAt
   
   @@map("comments")
+}
+
+// Agent 指南章节（独立于 Post 的内容类型）
+model GuideChapter {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String                          // markdown 正文
+  description String?
+  group       String                          // intro|foundation|core|system|appendix
+  difficulty  String                          // 入门|进阶|实战
+  order       Int      @default(10)           // 分组内排序权重
+  readingTime Int?                            // 留空则前端按正文估算
+  comingSoon  Boolean  @default(false)
+  published   Boolean  @default(false)
+  ogImage     String?
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([group, order])
+  @@index([published])
+  @@map("guide_chapters")
+}
+
+// Agent 指南系列配置（singleton，整站一份）
+model GuideSeriesConfig {
+  id            String   @id @default("singleton") // 固定 id，配合 upsert 实现单例
+  title         String
+  subtitle      String?
+  coverImage    String?
+  badge         String   @default("连载中")
+  cta           String?
+  valueCard1    String?
+  valueCard2    String?
+  valueCard4    String?
+  ogTitle       String?
+  ogDescription String?
+  ogImage       String?
+  groups        Json                            // GuideGroupMeta[]（5 阶段 label/hint/icon/order）
+  updatedAt     DateTime @updatedAt
+
+  @@map("guide_series_config")
 }
 

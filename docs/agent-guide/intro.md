@@ -1,0 +1,111 @@
+# 卷首 · 这份指南怎么读
+
+> 写给所有"会写前端、但被 Agent / LLM 这堆名词劝退"的工程师。
+> 这不是一份教程，是一份**地图**——在你迷路时拿出来看一眼。
+
+---
+
+## 先说句实在话
+
+我是个前端工程师，写了好几年 TypeScript。
+
+2024 年我开始接触 Agent 开发，过程非常狼狈：打开一篇教程，前两段就出现 `Token`、`Function Calling`、`RAG`、`Embedding`、`ReAct`、`MCP`——每一个词我都"好像知道是什么"，但连起来就完全听不懂。更糟的是，我按教程调通了第一个 API，以为入门了，结果第二天同一个 prompt 跑出完全不一样的结果，我以为是 bug，debug 到凌晨三点。
+
+后来我才明白：**不是我没学会，是我用错了思维模型。** 前端那套"输入决定输出、测试要确定性、能复现才算 bug"的本能，在 Agent 世界里处处碰壁。
+
+这份指南就是我把自己踩过的坑、绕过的弯路，整理成一张**地图**。它不教你怎么调 API（那个教程满大街都是），它教你**怎么建立对 Agent 世界的完整认知**——让你在被术语淹没时，知道自己在哪、要去哪、下一步该学什么。
+
+如果你也曾被 Agent 的术语劝退，**这不是你的问题，是缺一张地图。**
+
+---
+
+## 这份指南是什么
+
+一个**从前端工程师视角**出发的 Agent 开发入门地图。它假设你会写 TypeScript，知道 HTTP 请求是什么，但**对 LLM、Token、Agent 这些词一头雾水**。
+
+它会用前端工程师熟悉的概念作为脚手架，帮你建立对 Agent 世界的完整认知，并最终能独立写出一个能跑的 Agent 应用。
+
+<figure>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" role="img" aria-label="前端工程师转型 Agent 开发路线图">
+    <defs>
+      <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#3b82f6"/>
+        <stop offset="1" stop-color="#10b981"/>
+      </linearGradient>
+      <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#475569"/>
+      </marker>
+    </defs>
+    <rect width="800" height="280" rx="16" fill="#0f172a"/>
+    <text x="400" y="40" text-anchor="middle" font-family="ui-sans-serif,system-ui,sans-serif" font-size="18" font-weight="700" fill="#e2e8f0">前端工程师 → Agent 开发 · 转型地图</text>
+    <rect x="30" y="90" width="150" height="70" rx="10" fill="#1e293b" stroke="#64748b"/>
+    <text x="105" y="120" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="14" font-weight="600" fill="#94a3b8">你的起点</text>
+    <text x="105" y="142" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#cbd5e1">TypeScript</text>
+    <text x="105" y="158" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#cbd5e1">React / HTTP</text>
+    <line x1="185" y1="125" x2="225" y2="125" stroke="#475569" stroke-width="2" marker-end="url(#arr)"/>
+    <rect x="230" y="80" width="340" height="90" rx="10" fill="#1e293b" stroke="url(#g1)" stroke-width="2"/>
+    <text x="400" y="108" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="14" font-weight="700" fill="#60a5fa">认知迁移（这份指南）</text>
+    <text x="400" y="130" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="11" fill="#cbd5e1">术语地基 → 概率性思维 → 跑通 API</text>
+    <text x="400" y="148" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="11" fill="#cbd5e1">工具调用 → RAG → Agent 循环</text>
+    <text x="400" y="162" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="11" fill="#94a3b8">（用前端类比建立直觉，而非死记名词）</text>
+    <line x1="575" y1="125" x2="615" y2="125" stroke="#475569" stroke-width="2" marker-end="url(#arr)"/>
+    <rect x="620" y="90" width="150" height="70" rx="10" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+    <text x="695" y="120" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="14" font-weight="600" fill="#34d399">你的终点</text>
+    <text x="695" y="142" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#cbd5e1">独立设计</text>
+    <text x="695" y="158" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#cbd5e1">能跑的 Agent</text>
+    <text x="400" y="220" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#64748b">关键不是学更多 API，而是换一套思维模型</text>
+    <text x="400" y="242" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="11" fill="#475569">（本地图覆盖 5 大阶段 · 9 个 Phase · 0 行玄学）</text>
+  </svg>
+  <figcaption>转型不是"再学一个框架"，而是"换一套认知操作系统"</figcaption>
+</figure>
+
+---
+
+## 适合谁读
+
+- 写了 2 年以上前端，**对 AI 充满好奇但无从下手**
+- 看过一些 Agent 文章，但被术语劝退
+- 想从"调 API"进化到"做产品"
+- 不喜欢玄学，喜欢**用工程师的方式理解世界**
+
+> **不适合谁**：如果你想找"30 分钟搭一个 ChatGPT"的速成教程，这份指南会让你觉得太啰嗦——它讲的是"为什么"，不是"复制粘贴"。
+
+---
+
+## 三种读法
+
+| 读法 | 适合 | 路线 |
+|------|------|------|
+| **速通**（1 周） | 先建立全景，知道有哪些坑 | Phase 0 → Phase 1 → Phase 2 跑通一个 API |
+| **精读**（1 月） | 想真正掌握，能独立做项目 | 从卷首按顺序读到 Phase 5 |
+| **查阅**（随时） | 已经入门，遇到问题回查 | 直接跳到对应章节或附录术语表 |
+
+**所有章节都支持跳读**，不强求顺序。每章顶部都有"前置知识"和"本章你将解决什么"，跳读时不会迷路。
+
+---
+
+## 一个重要的心态
+
+> Agent 开发不是玄学，但也不是"前端 + 一点 Prompt"。
+> 它需要你**主动改写一些根深蒂固的本能**——比如"测试要确定性"、"输入决定输出"。
+>
+> 这些本能不是错的，但在 Agent 世界里会让你处处碰壁。
+> 这份指南会在恰当的时候提醒你：**这里要切换思维**。
+
+我会在每一章里诚实地告诉你：哪些地方我踩过坑、哪些"常识"在新世界里是反的、哪些看起来高深的东西其实只是没讲清楚。**不装、不玄、不藏。**
+
+准备好了，从 **Phase 0 · 术语地基** 开始。
+
+---
+
+## 配套资源（持续更新）
+
+- **代码示例仓库**：（待补充）
+- **推荐阅读清单**：见 Phase 6 附录
+- **问题反馈**：直接在博客文章下评论，或提 Issue
+
+---
+
+## 下一步
+
+进入 [Phase 0 · 术语地基](/agent-guide/phase-0-terminology)，先把 11 个核心词搞懂——不是死记，是建立"它们之间什么关系"的直觉。
