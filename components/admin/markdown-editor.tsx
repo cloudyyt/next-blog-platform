@@ -13,15 +13,20 @@ import {
   Heading2,
   Heading3,
   Link,
-  Image,
   Code,
   List,
   ListOrdered,
   Quote,
   Eye,
   PenLine,
+  Loader2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ContentImageUploadButton } from "@/components/admin/content-image-upload-button"
+import {
+  useContentImageUpload,
+  getImageFromDataTransfer,
+} from "@/lib/hooks/use-content-image-upload"
 
 interface MarkdownEditorProps {
   value: string
@@ -35,7 +40,6 @@ const toolbarActions = [
   { icon: Heading2, label: "标题2", prefix: "## ", suffix: "", block: true },
   { icon: Heading3, label: "标题3", prefix: "### ", suffix: "", block: true },
   { icon: Link, label: "链接", prefix: "[", suffix: "](url)", block: false },
-  { icon: Image, label: "图片", prefix: "![", suffix: "](url)", block: false },
   { icon: Code, label: "代码块", prefix: "```\n", suffix: "\n```", block: true },
   { icon: ListOrdered, label: "有序列表", prefix: "1. ", suffix: "", block: true },
   { icon: List, label: "无序列表", prefix: "- ", suffix: "", block: true },
@@ -81,6 +85,66 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
     })
   }
 
+  /**
+   * 在光标处插入任意文本（供 ContentImageUploadButton 插入图片 markdown 用）。
+   * 图片视为 block：如需要自动在前面补换行。
+   */
+  const insertText = (text: string) => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const beforeText = value.substring(0, start)
+    const afterText = value.substring(end)
+
+    const needNewlineBefore =
+      beforeText.length > 0 && !beforeText.endsWith("\n")
+    const inserted = (needNewlineBefore ? "\n" : "") + text
+    onChange(beforeText + inserted + afterText)
+
+    requestAnimationFrame(() => {
+      textarea.focus()
+      const newCursorPos = start + inserted.length
+      textarea.setSelectionRange(newCursorPos, newCursorPos)
+    })
+  }
+
+  // 正文插图上传（按钮 / 粘贴 / 拖拽三处共用同一份逻辑）
+  const { upload: uploadImage, uploading: imageUploading } =
+    useContentImageUpload({ onInsert: insertText })
+
+  // 拖拽视觉反馈
+  const [dragging, setDragging] = useState(false)
+
+  // 粘贴：剪贴板里有图就上传，否则放行（让文字正常粘贴）
+  const handlePaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const file = getImageFromDataTransfer(e.clipboardData)
+    if (file) {
+      e.preventDefault() // 阻止把图片当文件名粘贴
+      await uploadImage(file)
+    }
+  }
+
+  // 拖拽：dragOver 必须阻止默认行为，drop 才会触发。
+  // 用泛型 element 类型，让 handlers 既能绑到外层 div 也能绑到 textarea
+  const handleDragOver = (e: React.DragEvent<HTMLElement>) => {
+    if (Array.from(e.dataTransfer.types).includes("Files")) {
+      e.preventDefault()
+      setDragging(true)
+    }
+  }
+  const handleDragLeave = () => setDragging(false)
+  const handleDrop = async (e: React.DragEvent<HTMLElement>) => {
+    const file = getImageFromDataTransfer(e.dataTransfer)
+    if (file) {
+      e.preventDefault() // 阻止浏览器打开图片
+      setDragging(false)
+      await uploadImage(file)
+    } else {
+      setDragging(false)
+    }
+  }
+
   return (
     <div className="border rounded-lg overflow-hidden bg-card/80 backdrop-blur-sm">
       {/* Toolbar */}
@@ -121,6 +185,9 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
             <action.icon className="h-4 w-4" />
           </Button>
         ))}
+
+        {/* 正文插图：上传到 OSS 并插入 markdown */}
+        <ContentImageUploadButton onInsert={insertText} />
       </div>
 
       {/* Editor + Preview panels */}
@@ -128,18 +195,38 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
         {/* Left panel: textarea */}
         <div
           className={cn(
-            "md:w-1/2 flex flex-col",
+            "md:w-1/2 flex flex-col relative",
             mobileTab !== "editor" && "hidden md:flex"
           )}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
         >
           <textarea
             ref={textareaRef}
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onPaste={handlePaste}
             className="flex-1 min-h-[500px] p-4 font-mono text-sm bg-transparent resize-none focus:outline-none placeholder:text-muted-foreground"
             placeholder="在此输入 Markdown 内容..."
             spellCheck={false}
           />
+
+          {/* 拖拽/上传中遮罩 */}
+          {(dragging || imageUploading) && (
+            <div className="absolute inset-0 z-10 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-2 pointer-events-none border-2 border-dashed border-primary/50 m-2 rounded-md">
+              {imageUploading ? (
+                <>
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="text-sm text-muted-foreground">正在上传图片…</span>
+                </>
+              ) : (
+                <span className="text-sm font-medium text-primary">
+                  松开鼠标即可上传图片
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Divider */}

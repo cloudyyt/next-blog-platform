@@ -10,6 +10,7 @@ import { ArrowLeft, Save, Send, LinkIcon } from "lucide-react"
 import { MarkdownEditor } from "@/components/admin/markdown-editor"
 import { CategorySelector } from "@/components/admin/category-selector"
 import { TagSelector } from "@/components/admin/tag-selector"
+import { ImageUploader } from "@/components/ui/image-uploader"
 import { authFetch } from "@/lib/admin-fetch"
 import { generateSlug } from "@/lib/slugify"
 
@@ -204,12 +205,14 @@ export function PostEditor({ mode, postId, initialData }: PostEditorProps) {
 
           {/* Cover image */}
           <div className="bg-card/80 backdrop-blur-sm rounded-lg border p-4 space-y-3">
-            <Label className="text-sm font-medium">封面图片 URL</Label>
-            <Input
-              value={coverImage}
-              onChange={(e) => setCoverImage(e.target.value)}
-              placeholder="https://example.com/image.jpg"
-              className="h-8 text-sm"
+            <Label className="text-sm font-medium">封面图片</Label>
+            <ImageUploader
+              folder="cover/post"
+              shape="square"
+              aspect={16 / 9}
+              value={coverImage || undefined}
+              onChange={(url) => setCoverImage(url)}
+              hint="上传图片到 OSS（也可粘贴外部 URL 时用浏览器复制图片地址后选文件替换）"
             />
           </div>
 
