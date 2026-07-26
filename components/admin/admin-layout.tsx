@@ -14,6 +14,7 @@ import {
   FolderTree,
   Users,
   MessageSquare,
+  BookOpen,
   LogOut,
   Menu,
   X,
@@ -23,6 +24,7 @@ import { toast } from "sonner"
 const navigation = [
   { name: "仪表盘", href: "/admin", icon: LayoutDashboard },
   { name: "文章管理", href: "/admin/posts", icon: FileText },
+  { name: "Agent 指南", href: "/admin/guide", icon: BookOpen },
   { name: "评论管理", href: "/admin/comments", icon: MessageSquare },
   { name: "分类管理", href: "/admin/categories", icon: FolderTree },
   { name: "标签管理", href: "/admin/tags", icon: Tag },
