@@ -44,7 +44,14 @@ export function VisualThemeSelector() {
               )}
             >
               <div className="flex flex-col">
-                <span className="font-medium">{themeConfig.name}</span>
+                <span className="font-medium">
+                  {themeConfig.name}
+                  {themeId === "cyber-neon" && (
+                    <span className="ml-1 text-[10px] text-muted-foreground">
+                      · 仅夜间
+                    </span>
+                  )}
+                </span>
                 <span className="text-xs text-muted-foreground">
                   {themeConfig.description}
                 </span>

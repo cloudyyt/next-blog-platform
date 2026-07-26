@@ -110,6 +110,17 @@
   --tw-prose-td-borders: var(--border);
 }
 
+/* 阅读舒适度：正文行高放松到 1.8（中英混排 + 代码块都更舒展），
+   段落间距适度加大，全局生效（博客文章 + Agent 指南） */
+.prose p,
+.prose li {
+  line-height: 1.8;
+}
+.prose p {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
 /* 覆盖 typography 默认颜色，使用主题色 */
 .prose h1,
 .prose h2,
@@ -141,11 +152,12 @@
 }
 
 .prose pre {
-  @apply bg-[#1e1e1e] rounded-lg;
+  background: var(--code-bg);
+  @apply rounded-lg;
 }
 
 .prose pre code {
-  @apply text-gray-100;
+  color: var(--code-fg);
 }
 
 .prose blockquote {
@@ -171,7 +183,29 @@
 
 /* 确保代码块在暗色模式下也正常显示 */
 .dark .prose pre {
-  @apply bg-[#1e1e1e];
+  background: var(--code-bg);
+}
+
+/* 代码块变量：统一代码面配色（纳入主题体系，取代散落的硬编码 #1e1e1e）。
+   代码块恒为深色 IDE 面（与页面明暗解耦），后续要让它随主题变化只需覆盖这两个变量。 */
+:root {
+  --code-bg: #1e1e1e;
+  --code-fg: #d4d4d4;
+}
+
+/* 代码块锐利度修复：
+   全局 body 套了 antialiased（灰度抗锯齿），对"深底浅字"的代码块会让浅色文字
+   发灰发虚（清风竹韵白天模式尤其明显——同屏正文是深字浅底看着清晰，代码却糊）。
+   对代码块强制子像素渲染 + 兜底禁用任何毛玻璃，保证所有主题/明暗组合下都清晰。
+   对博客文章 + Agent 指南同时生效。 */
+.prose pre,
+.prose pre code,
+.prose code[class*="language-"],
+.prose .code-block {
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 /* ============================================

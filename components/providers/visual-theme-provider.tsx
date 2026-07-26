@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTheme } from "next-themes"
 import { VisualTheme, defaultVisualTheme, detectDevicePerformance, visualThemes } from "@/lib/themes"
 
 interface VisualThemeContextType {
@@ -33,6 +34,9 @@ export function VisualThemeProvider({
   const [performance, setPerformance] = React.useState<"high" | "medium" | "low">("medium")
   const [mounted, setMounted] = React.useState(false)
 
+  // next-themes 明暗模式（cyber-neon 恒深色，需联动锁夜间）
+  const { setTheme: setColorMode } = useTheme()
+
   // 初始化：从 localStorage 读取主题，检测性能
   React.useEffect(() => {
     setMounted(true)
@@ -60,6 +64,15 @@ export function VisualThemeProvider({
       document.documentElement.setAttribute("data-visual-theme", theme)
     }
   }, [theme, mounted])
+
+  // cyber-neon 视觉背景恒为深色（其 light/dark 两套变量都是深色 UI），
+  // 强制锁夜间，避免出现「白天模式却全黑」的假开关。tranquil-ink 明暗自由。
+  React.useEffect(() => {
+    if (!mounted) return
+    if (theme === "cyber-neon") {
+      setColorMode("dark")
+    }
+  }, [theme, mounted, setColorMode])
 
   // 判断是否使用简化效果
   const useSimplified = React.useMemo(() => {
