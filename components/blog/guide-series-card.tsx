@@ -36,7 +36,7 @@ export function GuideSeriesCard({
         className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-lg"
       >
         {/* Cover：有图用图（与 PostCard 一致），无图 fallback 品牌渐变 */}
-        <div className="relative w-full h-40 overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 flex items-center justify-center">
+        <div className="relative w-full aspect-video overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 flex items-center justify-center">
           {coverImage ? (
             <>
               <img

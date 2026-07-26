@@ -42,7 +42,7 @@ export function HeroCard({ post, className }: HeroCardProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* 图片区域 */}
           {post.coverImage ? (
-            <div className="relative h-64 md:h-80 overflow-hidden">
+            <div className="relative aspect-video overflow-hidden">
               <Image
                 src={post.coverImage}
                 alt={post.title}
@@ -55,7 +55,7 @@ export function HeroCard({ post, className }: HeroCardProps) {
               <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/10 md:bg-gradient-to-l md:from-transparent md:to-black/5" />
             </div>
           ) : (
-            <div className="relative h-64 md:h-80 bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 flex items-center justify-center">
+            <div className="relative aspect-video bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 flex items-center justify-center">
               <span className="text-6xl font-bold text-primary/20 select-none">
                 {post.title.charAt(0)}
               </span>

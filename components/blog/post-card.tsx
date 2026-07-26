@@ -36,7 +36,7 @@ export function PostCard({ post, className }: PostCardProps) {
       >
         {/* 封面图片 + 分类 overlay */}
         {post.coverImage ? (
-          <div className="relative w-full h-40 overflow-hidden">
+          <div className="relative w-full aspect-video overflow-hidden">
             <Image
               src={post.coverImage}
               alt={post.title}

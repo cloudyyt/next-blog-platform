@@ -26,7 +26,7 @@ export function AuthorCard({ author, className }: AuthorCardProps) {
               src={author.avatar}
               alt={author.name || "作者"}
               fill
-              className="object-cover"
+              className="object-cover object-top"
             />
           </div>
         )}

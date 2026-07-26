@@ -247,19 +247,19 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                 </div>
               </div>
 
-              {/* Cover image */}
+              {/* Cover image —— 完整显示不裁切（w-full h-auto），高度随图自适应 */}
               {post.coverImage && (
-                <div className="relative w-full h-64 sm:h-96 rounded-lg overflow-hidden">
+                <div className="w-full rounded-lg overflow-hidden bg-muted">
                   <Image
                     src={post.coverImage}
                     alt={post.title}
-                    fill
+                    width={1200}
+                    height={630}
                     unoptimized
-                    className="object-cover"
+                    className="w-full h-auto"
                     priority
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 800px"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 </div>
               )}
             </header>
