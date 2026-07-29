@@ -39,6 +39,14 @@ export interface ImageUploaderProps {
   aspect?: number
   /** 上传目录：avatar / cover-post / cover-guide（API 侧文件夹名用斜杠） */
   folder: "avatar" | "cover/post" | "cover/guide"
+  /**
+   * 自定义上传端点。默认走 /api/admin/upload（admin 权限，附 folder）。
+   * 设为自定义端点（如 /api/auth/upload-avatar）时按该端点逻辑上传，
+   * 此时 folder 不参与请求体（由端点自行决定）。端点需返回 { url, ... }。
+   */
+  endpoint?: string
+  /** 上传成功后的完整响应回调（拿到端点返回的额外字段，如 user） */
+  onUploaded?: (data: { url: string; [key: string]: unknown }) => void
   /** 顶部标签文案 */
   label?: string
   /** 提示文案（显示在标签下） */
@@ -53,6 +61,8 @@ export function ImageUploader({
   size = 96,
   aspect = 16 / 9,
   folder,
+  endpoint,
+  onUploaded,
   label,
   hint,
   className,
@@ -98,14 +108,17 @@ export function ImageUploader({
     try {
       const fd = new FormData()
       fd.append("file", pendingFile)
-      fd.append("folder", folder)
+      const target = endpoint || "/api/admin/upload"
+      // 仅通用 admin upload 需要 folder；自定义端点自行处理目录
+      if (!endpoint) fd.append("folder", folder)
       // 不要设 Content-Type，让浏览器自动加 multipart boundary；authFetch 会补 Authorization
-      const res = await authFetch("/api/admin/upload", { method: "POST", body: fd })
+      const res = await authFetch(target, { method: "POST", body: fd })
       const data = await res.json()
       if (!res.ok) {
         throw new Error(data.message || "上传失败")
       }
       onChange(data.url)
+      onUploaded?.(data)
       setPendingFile(null)
       toast.success("图片已上传")
     } catch (err: any) {

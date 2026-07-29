@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import { useAuth } from "@/components/auth/auth-provider"
 import { Button } from "@/components/ui/button"
+import { UserAvatar } from "@/components/ui/user-avatar"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -79,11 +80,6 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     return null
   }
 
-  // Get initials for avatar
-  const initials = user?.name
-    ? user.name.slice(0, 2).toUpperCase()
-    : "AD"
-
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile top bar */}
@@ -155,9 +151,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             {/* User area */}
             <div className="p-4 border-t">
               <div className="flex items-center gap-3 mb-3">
-                <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary shrink-0">
-                  {initials}
-                </div>
+                <UserAvatar src={user?.avatar ?? null} name={user?.name} size={36} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">
                     {user?.name}

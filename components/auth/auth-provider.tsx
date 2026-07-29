@@ -15,6 +15,8 @@ interface AuthContextType {
   completeLogin: (data: LoginResponse) => void
   register: (name: string, password: string) => Promise<void>
   logout: () => void
+  /** 更新当前用户信息（改头像/bio 后调用），同步 state + localStorage */
+  updateUser: (user: User) => void
   isAuthenticated: boolean
 }
 
@@ -123,6 +125,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(null)
   }
 
+  const updateUser = (nextUser: User) => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("user", JSON.stringify(nextUser))
+      } catch (error) {
+        console.warn("Failed to save to localStorage:", error)
+      }
+    }
+    setUser(nextUser)
+  }
+
   const value = React.useMemo(
     () => ({
       user,
@@ -131,6 +144,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       completeLogin,
       register,
       logout,
+      updateUser,
       isAuthenticated: !!user,
     }),
     [user, loading]

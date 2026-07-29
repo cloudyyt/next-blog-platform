@@ -24,6 +24,8 @@ interface BlogPageClientProps {
   categorySlug?: string
   /** Agent 指南置顶卡片数据（默认视图显示） */
   guideCardData?: GuideHomeCardData
+  /** 博主头像 URL（侧边栏作者卡用） */
+  authorAvatar?: string | null
 }
 
 export function BlogPageClient({
@@ -36,6 +38,7 @@ export function BlogPageClient({
   tagSlug,
   categorySlug,
   guideCardData,
+  authorAvatar,
 }: BlogPageClientProps) {
   const searchParams = useSearchParams()
   const searchQuery = searchParams.get("q") || ""
@@ -174,7 +177,7 @@ export function BlogPageClient({
         {/* 桌面端侧边栏 */}
         <aside className="hidden lg:block lg:col-span-4 space-y-6">
           <div className="sticky top-4 space-y-6">
-            <SidebarAuthorCard totalPosts={totalPosts} />
+            <SidebarAuthorCard totalPosts={totalPosts} avatar={authorAvatar} />
             <StatsCard
               postCount={totalPosts}
               tagCount={tags.length}

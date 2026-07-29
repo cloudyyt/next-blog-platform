@@ -146,6 +146,20 @@ async function getCategoriesFromDB() {
   }
 }
 
+/** 取博主头像（role=admin 的第一个用户），用于侧边栏作者卡 */
+async function getAuthorAvatar(): Promise<string | null> {
+  try {
+    const author = await prisma.user.findFirst({
+      where: { role: "admin" },
+      select: { avatar: true },
+    })
+    return author?.avatar ?? null
+  } catch (error) {
+    console.error("Failed to fetch author avatar:", error)
+    return null
+  }
+}
+
 interface BlogPageProps {
   searchParams: Promise<{ tag?: string; category?: string }>
 }
@@ -156,13 +170,14 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const categorySlug = params.category
 
   // 并行获取所有数据
-  const [{ posts, total }, tags, categories, totalViews, guideCardData] =
+  const [{ posts, total }, tags, categories, totalViews, guideCardData, authorAvatar] =
     await Promise.all([
       getPostsFromDB(tagSlug, categorySlug),
       getTagsFromDB(),
       getCategoriesFromDB(),
       getTotalViewsFromDB(),
       getGuideHomeCardData(),
+      getAuthorAvatar(),
     ])
 
   return (
@@ -183,6 +198,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         tagSlug={tagSlug}
         categorySlug={categorySlug}
         guideCardData={guideCardData}
+        authorAvatar={authorAvatar}
       />
     </Suspense>
   )

@@ -17,6 +17,7 @@ export interface BlogPost {
     id: string
     name: string | null
     email: string
+    avatar?: string | null
   }
   categories: Array<{
     id: string

@@ -2,14 +2,17 @@
 
 import { Github } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { UserAvatar } from "@/components/ui/user-avatar"
 import { SITE_PROFILE } from "@/lib/site-profile"
 
 interface SidebarAuthorCardProps {
   totalPosts: number
+  /** 博主头像 URL（无则首字母占位）。来自 /api/blog/config 的 author.avatar */
+  avatar?: string | null
   className?: string
 }
 
-export function SidebarAuthorCard({ totalPosts, className }: SidebarAuthorCardProps) {
+export function SidebarAuthorCard({ totalPosts, avatar, className }: SidebarAuthorCardProps) {
   return (
     <div
       className={cn(
@@ -18,15 +21,12 @@ export function SidebarAuthorCard({ totalPosts, className }: SidebarAuthorCardPr
       )}
     >
       <div className="flex items-center gap-4">
-        {/* Avatar placeholder */}
-        <div
-          className={cn(
-            "flex items-center justify-center w-12 h-12 rounded-full flex-shrink-0",
-            "bg-primary/10 text-primary text-lg font-bold font-display ring-1 ring-primary/15"
-          )}
-        >
-          Z
-        </div>
+        <UserAvatar
+          src={avatar}
+          name={SITE_PROFILE.author.name}
+          size={48}
+          className="font-display text-lg"
+        />
         <div className="min-w-0">
           <h3 className="text-base font-semibold font-display truncate">
             {SITE_PROFILE.author.name}

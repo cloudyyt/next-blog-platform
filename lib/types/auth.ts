@@ -5,6 +5,8 @@
 export interface User {
   id: string
   name: string
+  avatar: string | null
+  bio: string | null
   role: string
   createdAt: string
 }

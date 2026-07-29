@@ -40,11 +40,14 @@ import {
 } from "@/components/ui/select"
 import { AdminPageSkeleton } from "@/components/admin/admin-page-skeleton"
 import { Pagination } from "@/components/admin/admin-pagination"
+import { UserAvatar } from "@/components/ui/user-avatar"
 import { authFetch } from "@/lib/admin-fetch"
 
 interface User {
   id: string
   name: string
+  avatar?: string | null
+  bio?: string | null
   role: string
   createdAt: string
   _count?: {
@@ -196,7 +199,12 @@ export default function UsersPage() {
                 ) : (
                   filteredUsers.map((user) => (
                     <TableRow key={user.id} className="hover:bg-muted/30">
-                      <TableCell className="font-medium">{user.name}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2.5">
+                          <UserAvatar src={user.avatar ?? null} name={user.name} size={32} />
+                          <span className="font-medium">{user.name}</span>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <Badge variant={user.role === "admin" ? "default" : "secondary"}>
                           {user.role === "admin" ? "管理员" : "用户"}

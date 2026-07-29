@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { UserAvatar } from "@/components/ui/user-avatar"
 import { useAuth } from "@/components/auth/auth-provider"
 import { Comment } from "@/lib/types/comment"
 import { toast } from "sonner"
@@ -75,17 +76,20 @@ export function CommentItem({ comment, postId, onReplySuccess }: CommentItemProp
   return (
     <div className="rounded-lg border bg-card p-4">
       <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="font-medium">{comment.author.name}</span>
-            <span className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(comment.createdAt), {
-                addSuffix: true,
-                locale: zhCN,
-              })}
-            </span>
+        <div className="flex-1 flex items-start gap-3">
+          <UserAvatar src={comment.author.avatar} name={comment.author.name} size={36} />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="font-medium">{comment.author.name}</span>
+              <span className="text-xs text-muted-foreground">
+                {formatDistanceToNow(new Date(comment.createdAt), {
+                  addSuffix: true,
+                  locale: zhCN,
+                })}
+              </span>
+            </div>
+            <p className="text-sm whitespace-pre-wrap">{comment.content}</p>
           </div>
-          <p className="text-sm whitespace-pre-wrap">{comment.content}</p>
         </div>
       </div>
 
@@ -149,16 +153,21 @@ export function CommentItem({ comment, postId, onReplySuccess }: CommentItemProp
         <div className="mt-4 space-y-3 pl-4 border-l-2">
           {comment.replies.map((reply) => (
             <div key={reply.id} className="rounded-md bg-muted/50 p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-medium text-sm">{reply.author.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  {formatDistanceToNow(new Date(reply.createdAt), {
-                    addSuffix: true,
-                    locale: zhCN,
-                  })}
-                </span>
+              <div className="flex items-start gap-2.5">
+                <UserAvatar src={reply.author.avatar} name={reply.author.name} size={28} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-medium text-sm">{reply.author.name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(reply.createdAt), {
+                        addSuffix: true,
+                        locale: zhCN,
+                      })}
+                    </span>
+                  </div>
+                  <p className="text-sm whitespace-pre-wrap">{reply.content}</p>
+                </div>
               </div>
-              <p className="text-sm whitespace-pre-wrap">{reply.content}</p>
             </div>
           ))}
         </div>

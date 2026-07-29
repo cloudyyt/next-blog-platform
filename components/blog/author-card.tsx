@@ -1,7 +1,7 @@
 "use client"
 
-import Image from "next/image"
 import { AuthorInfo } from "@/lib/types/blog"
+import { UserAvatar } from "@/components/ui/user-avatar"
 import { Github, Twitter, Globe, Mail } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -20,16 +20,12 @@ export function AuthorCard({ author, className }: AuthorCardProps) {
     >
       {/* 头像和基本信息 */}
       <div className="flex flex-col items-center text-center space-y-3">
-        {author.avatar && (
-          <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-primary/20">
-            <Image
-              src={author.avatar}
-              alt={author.name || "作者"}
-              fill
-              className="object-cover object-top"
-            />
-          </div>
-        )}
+        <UserAvatar
+          src={author.avatar}
+          name={author.name}
+          size={80}
+          className="text-xl border-2 border-primary/20"
+        />
         <div>
           <h3 className="text-xl font-bold">{author.name || "匿名"}</h3>
           {author.bio && (

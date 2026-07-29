@@ -10,6 +10,7 @@ export interface Comment {
   author: {
     id: string
     name: string
+    avatar: string | null
   }
   parentId: string | null
   replies?: Comment[]
