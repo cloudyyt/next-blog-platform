@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://blog.example.com"
+const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
 
 export async function GET() {
   try {
