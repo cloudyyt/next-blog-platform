@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useContext } from "react"
+import { Suspense, useContext, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { VisualThemeSelector } from "@/components/ui/visual-theme-selector"
@@ -15,6 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { UserAvatar } from "@/components/ui/user-avatar"
+import { ProfileDialog } from "@/components/blog/profile-dialog"
 import { User, LogOut, Rss, BookOpen } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -29,11 +31,16 @@ export default function BlogLayout({
   const { user, isAuthenticated, logout, loading } = useAuth()
   const visualThemeContext = useContext(VisualThemeContext)
   const visualTheme = visualThemeContext?.theme ?? "cyber-neon"
+  const [profileOpen, setProfileOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
     toast.success("已退出登录")
     router.push("/blog")
+  }
+
+  const handleOpenProfile = () => {
+    setProfileOpen(true)
   }
 
   return (
@@ -79,16 +86,23 @@ export default function BlogLayout({
                 {isAuthenticated ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="gap-2">
-                        <User className="w-4 h-4" />
-                        <span className="hidden sm:inline">{user?.name}</span>
-                      </Button>
+                      <button className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer">
+                        <UserAvatar
+                          src={user?.avatar ?? null}
+                          name={user?.name}
+                          size={32}
+                        />
+                      </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <div className="px-2 py-1.5 text-sm text-muted-foreground">
                         {user?.name}
                       </div>
                       <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleOpenProfile}>
+                        <User className="w-4 h-4 mr-2" />
+                        个人资料
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                         <LogOut className="w-4 h-4 mr-2" />
                         退出登录
@@ -109,7 +123,12 @@ export default function BlogLayout({
             </nav>
           </div>
         </header>
-        
+
+        {/* 个人资料模态框（由 header 头像下拉触发）*/}
+        {isAuthenticated && (
+          <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
+        )}
+
         {/* 可滚动的主内容区 */}
         <main className="relative z-10 flex-1 overflow-y-auto">
           {children}
