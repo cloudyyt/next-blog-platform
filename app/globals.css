@@ -509,4 +509,11 @@
     animation: none !important;
     opacity: 0.5 !important;
   }
+  /* framer-motion 入场动画降级：直接显示终态，避免位移/缩放 */
+  [style*="opacity"],
+  [style*="transform"] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }

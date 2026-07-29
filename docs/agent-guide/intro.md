@@ -1,7 +1,7 @@
 # 卷首 · 这份指南怎么读
 
 > 写给所有"会写前端、但被 Agent / LLM 这堆名词劝退"的工程师。
-> 这不是一份教程，是一份**地图**——在你迷路时拿出来看一眼。
+> 这不是教程，是一份**地图**——在你迷路时拿出来看一眼。
 
 ---
 
@@ -17,6 +17,8 @@
 
 如果你也曾被 Agent 的术语劝退，**这不是你的问题，是缺一张地图。**
 
+> 💡 完整的**可交互转型地图**（含每个阶段的进度状态、可点击直达对应章节）在 [指南首页](/agent-guide)。本篇专注讲清楚"为什么"和"心态"。
+
 ---
 
 ## 这份指南是什么
@@ -25,39 +27,13 @@
 
 它会用前端工程师熟悉的概念作为脚手架，帮你建立对 Agent 世界的完整认知，并最终能独立写出一个能跑的 Agent 应用。
 
-<figure>
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" role="img" aria-label="前端工程师转型 Agent 开发路线图">
-    <defs>
-      <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#3b82f6"/>
-        <stop offset="1" stop-color="#10b981"/>
-      </linearGradient>
-      <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
-        <path d="M0,0 L0,6 L9,3 z" fill="#475569"/>
-      </marker>
-    </defs>
-    <rect width="800" height="280" rx="16" fill="#0f172a"/>
-    <text x="400" y="40" text-anchor="middle" font-family="ui-sans-serif,system-ui,sans-serif" font-size="18" font-weight="700" fill="#e2e8f0">前端工程师 → Agent 开发 · 转型地图</text>
-    <rect x="30" y="90" width="150" height="70" rx="10" fill="#1e293b" stroke="#64748b"/>
-    <text x="105" y="120" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="14" font-weight="600" fill="#94a3b8">你的起点</text>
-    <text x="105" y="142" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#cbd5e1">TypeScript</text>
-    <text x="105" y="158" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#cbd5e1">React / HTTP</text>
-    <line x1="185" y1="125" x2="225" y2="125" stroke="#475569" stroke-width="2" marker-end="url(#arr)"/>
-    <rect x="230" y="80" width="340" height="90" rx="10" fill="#1e293b" stroke="url(#g1)" stroke-width="2"/>
-    <text x="400" y="108" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="14" font-weight="700" fill="#60a5fa">认知迁移（这份指南）</text>
-    <text x="400" y="130" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="11" fill="#cbd5e1">术语地基 → 概率性思维 → 跑通 API</text>
-    <text x="400" y="148" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="11" fill="#cbd5e1">工具调用 → RAG → Agent 循环</text>
-    <text x="400" y="162" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="11" fill="#94a3b8">（用前端类比建立直觉，而非死记名词）</text>
-    <line x1="575" y1="125" x2="615" y2="125" stroke="#475569" stroke-width="2" marker-end="url(#arr)"/>
-    <rect x="620" y="90" width="150" height="70" rx="10" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
-    <text x="695" y="120" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="14" font-weight="600" fill="#34d399">你的终点</text>
-    <text x="695" y="142" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#cbd5e1">独立设计</text>
-    <text x="695" y="158" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#cbd5e1">能跑的 Agent</text>
-    <text x="400" y="220" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#64748b">关键不是学更多 API，而是换一套思维模型</text>
-    <text x="400" y="242" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="11" fill="#475569">（本地图覆盖 5 大阶段 · 9 个 Phase · 0 行玄学）</text>
-  </svg>
-  <figcaption>转型不是"再学一个框架"，而是"换一套认知操作系统"</figcaption>
-</figure>
+整张地图贯穿三个动作：
+
+1. **建术语地基** —— 先把 Token / Embedding / Function Calling 这些词翻译成"前端能听懂的话"
+2. **换思维模型** —— 概率性输出、非确定性测试、上下文工程，这些是和前端最大的认知断层
+3. **跑通最小闭环** —— 从一次 API 调用，到工具调用、RAG，再到完整的 Agent 循环
+
+关键不是"再学一个框架"，而是"换一套认知操作系统"。
 
 ---
 
