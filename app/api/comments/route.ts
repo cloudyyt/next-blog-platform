@@ -29,6 +29,7 @@ export async function GET(request: Request) {
           select: {
             id: true,
             name: true,
+            avatar: true,
           },
         },
         replies: {
@@ -146,6 +147,7 @@ export async function POST(request: Request) {
           select: {
             id: true,
             name: true,
+            avatar: true,
           },
         },
       },

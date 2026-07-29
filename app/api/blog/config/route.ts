@@ -20,6 +20,8 @@ export async function GET() {
         select: {
           id: true,
           name: true,
+          avatar: true,
+          bio: true,
         },
       }),
       null,
@@ -32,6 +34,8 @@ export async function GET() {
         select: {
           id: true,
           name: true,
+          avatar: true,
+          bio: true,
         },
       }),
       null,
@@ -47,6 +51,8 @@ export async function GET() {
           id: "1",
           name: "博主",
           email: "",
+          avatar: null,
+          bio: null,
           postCount: 0,
         },
       })
@@ -70,6 +76,8 @@ export async function GET() {
         id: fallbackAuthor.id,
         name: fallbackAuthor.name,
         email: "", // User 模型中没有 email，保持兼容
+        avatar: fallbackAuthor.avatar,
+        bio: fallbackAuthor.bio,
         postCount,
       },
     })

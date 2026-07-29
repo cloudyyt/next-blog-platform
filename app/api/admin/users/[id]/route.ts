@@ -11,13 +11,15 @@ export async function PUT(
   if (error) return error
 
   try {
-    const { role } = await request.json()
+    const body = await request.json()
+    const { role, bio, avatar } = body || {}
 
-    if (!role || !["user", "admin"].includes(role)) {
+    // role 校验（若传了 role）
+    if (role !== undefined && (!role || !["user", "admin"].includes(role))) {
       return NextResponse.json({ message: "无效的角色" }, { status: 400 })
     }
 
-    // 防止删除最后一个管理员
+    // 防止降级最后一个管理员
     if (role === "user" && params.id === adminUser?.userId) {
       const adminCount = await prisma.user.count({
         where: { role: "admin" },
@@ -30,12 +32,32 @@ export async function PUT(
       }
     }
 
+    // bio 校验（若传了 bio）
+    if (bio !== undefined) {
+      if (typeof bio !== "string" || bio.trim().length > 200) {
+        return NextResponse.json({ message: "简介不能超过 200 字" }, { status: 400 })
+      }
+    }
+
+    // avatar 校验（若传了 avatar，只接受字符串或 null）
+    if (avatar !== undefined && avatar !== null && typeof avatar !== "string") {
+      return NextResponse.json({ message: "头像格式错误" }, { status: 400 })
+    }
+
+    // 仅更新实际传入的字段
+    const data: Record<string, unknown> = {}
+    if (role !== undefined) data.role = role
+    if (bio !== undefined) data.bio = bio.trim() || null
+    if (avatar !== undefined) data.avatar = avatar || null
+
     const user = await prisma.user.update({
       where: { id: params.id },
-      data: { role },
+      data,
       select: {
         id: true,
         name: true,
+        avatar: true,
+        bio: true,
         role: true,
         createdAt: true,
       },

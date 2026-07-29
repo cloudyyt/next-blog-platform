@@ -13,12 +13,14 @@ datasource db {
 // 用户模型
 model User {
   id        String   @id @default(cuid())
-  name      String   @unique // 昵称，唯一
+  name      String   @unique // 昵称，唯一（不可改）
   password  String
+  avatar    String?  // 头像 OSS URL（可选，无则前端用首字母占位）
+  bio       String?  // 个人简介（可选）
   role      String   @default("user") // user, admin
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   posts     Post[]
   comments  Comment[]
   guideChapters GuideChapter[]

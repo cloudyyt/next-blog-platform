@@ -29,6 +29,8 @@ export async function GET(request: Request) {
       select: {
         id: true,
         name: true,
+        avatar: true,
+        bio: true,
         role: true,
         createdAt: true,
       },

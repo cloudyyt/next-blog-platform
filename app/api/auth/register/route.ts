@@ -64,6 +64,8 @@ export async function POST(request: Request) {
       user: {
         id: user.id,
         name: user.name,
+        avatar: user.avatar,
+        bio: user.bio,
         role: user.role,
         createdAt: user.createdAt.toISOString(),
       },
