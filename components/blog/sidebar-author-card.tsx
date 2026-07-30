@@ -48,7 +48,7 @@ export function SidebarAuthorCard({ totalPosts, avatar, className }: SidebarAuth
           )}
         >
           <Github className="w-4 h-4" />
-          Star on GitHub
+          给个 Star 支持一下
         </a>
         <a
           href={SITE_PROFILE.links.randomPost}

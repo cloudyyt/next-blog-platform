@@ -1,8 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowLeft, ArrowUp, Share2, Link as LinkIcon, Check } from "lucide-react"
+import { ArrowUp, Share2, Link as LinkIcon, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -12,7 +11,6 @@ interface PostDetailClientProps {
 }
 
 export function PostDetailClient({ title, slug }: PostDetailClientProps) {
-  const router = useRouter()
   const [copied, setCopied] = useState(false)
 
   const [showBackToTop, setShowBackToTop] = useState(false)
@@ -123,15 +121,7 @@ export function PostDetailClient({ title, slug }: PostDetailClientProps) {
 
       {/* Toolbar */}
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between flex-wrap gap-2 pt-4">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            返回
-          </Button>
+        <div className="flex items-center justify-end flex-wrap gap-2 pt-4">
           <div className="flex items-center gap-2">
             <Button
               variant="outline"

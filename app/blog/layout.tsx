@@ -1,7 +1,7 @@
 "use client"
 
 import { Suspense, useContext, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { VisualThemeSelector } from "@/components/ui/visual-theme-selector"
 import { ThemeBackground } from "@/components/ui/theme-background"
@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { UserAvatar } from "@/components/ui/user-avatar"
 import { ProfileDialog } from "@/components/blog/profile-dialog"
-import { User, LogOut, Rss, BookOpen } from "lucide-react"
+import { User, LogOut, Rss, BookOpen, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { SearchInput } from "@/components/blog/search-input"
@@ -28,10 +28,13 @@ export default function BlogLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const { user, isAuthenticated, logout, loading } = useAuth()
   const visualThemeContext = useContext(VisualThemeContext)
   const visualTheme = visualThemeContext?.theme ?? "cyber-neon"
   const [profileOpen, setProfileOpen] = useState(false)
+  // 非博客列表首页（博文详情/about 等）时，header 左侧显示「返回博客」
+  const showBackToBlog = pathname !== "/blog" && pathname?.startsWith("/blog")
 
   const handleLogout = () => {
     logout()
@@ -57,9 +60,23 @@ export default function BlogLayout({
         <header className="border-b backdrop-blur-sm bg-background/80 z-50 flex-shrink-0">
           <div className="container mx-auto px-4 py-4">
             <nav className="flex items-center justify-between">
-              <a href="/blog" className="text-xl font-bold font-display">
-                zijieLeo 的树洞
-              </a>
+              <div className="flex items-center gap-3">
+                {showBackToBlog && (
+                  <>
+                    <a
+                      href="/blog"
+                      className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      <span className="hidden sm:inline">返回博客</span>
+                    </a>
+                    <div className="h-5 w-px bg-border" />
+                  </>
+                )}
+                <a href="/blog" className="text-xl font-bold font-display">
+                  zijieLeo 的树洞
+                </a>
+              </div>
               <div className="flex items-center gap-2 sm:gap-4">
                 <a
                   href="/blog"
