@@ -67,6 +67,7 @@ async function getPostsFromDB(tagSlug?: string, categorySlug?: string) {
       excerpt: post.excerpt,
       coverImage: post.coverImage,
       published: post.published,
+      encrypted: post.encrypted,
       viewCount: post.viewCount ?? 0,
       authorId: post.authorId,
       author: {

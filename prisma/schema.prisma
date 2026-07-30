@@ -37,6 +37,7 @@ model Post {
   excerpt     String?
   coverImage  String?
   published   Boolean    @default(false)
+  encrypted   Boolean    @default(false) // 加密文章：详情页需输入密码(env DAILY_SECRET)才可阅读
   viewCount   Int        @default(0)
   authorId    String
   author      User       @relation(fields: [authorId], references: [id], onDelete: Cascade)

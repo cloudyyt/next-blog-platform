@@ -20,7 +20,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Edit, Trash2, Eye } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Eye, Lock, LockOpen } from "lucide-react"
 import { toast } from "sonner"
 import {
   AlertDialog,
@@ -42,6 +42,7 @@ interface Post {
   slug: string
   excerpt: string | null
   published: boolean
+  encrypted: boolean
   createdAt: string
   updatedAt: string
   author: {
@@ -98,6 +99,26 @@ export default function PostsPage() {
       if (response.ok) {
         toast.success(post.published ? "已取消发布" : "已发布")
         setPage(1)
+        fetchPosts()
+      } else {
+        const error = await response.json()
+        toast.error(error.message || "操作失败")
+      }
+    } catch (error) {
+      toast.error("操作失败")
+    }
+  }
+
+  const handleToggleEncrypt = async (post: Post) => {
+    try {
+      const response = await authFetch(`/api/admin/posts/${post.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ encrypted: !post.encrypted }),
+      })
+
+      if (response.ok) {
+        toast.success(post.encrypted ? "已取消加密" : "加密成功")
         fetchPosts()
       } else {
         const error = await response.json()
@@ -234,9 +255,17 @@ export default function PostsPage() {
                         </div>
                       </TableCell>
                       <TableCell className="whitespace-nowrap">
-                        <Badge variant={post.published ? "default" : "secondary"} className="whitespace-nowrap">
-                          {post.published ? "已发布" : "草稿"}
-                        </Badge>
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant={post.published ? "default" : "secondary"} className="whitespace-nowrap">
+                            {post.published ? "已发布" : "草稿"}
+                          </Badge>
+                          {post.encrypted && (
+                            <Badge variant="outline" className="whitespace-nowrap gap-1 text-amber-600 dark:text-amber-400 border-amber-500/40">
+                              <Lock className="h-3 w-3" />
+                              加密
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="whitespace-nowrap">
                         {new Date(post.updatedAt).toLocaleDateString("zh-CN")}
@@ -269,6 +298,25 @@ export default function PostsPage() {
                             title={post.published ? "取消发布" : "发布"}
                           >
                             {post.published ? "下架" : "发布"}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleToggleEncrypt(post)}
+                            title={post.encrypted ? "取消加密" : "加密"}
+                            className={post.encrypted ? "text-amber-600 dark:text-amber-400" : ""}
+                          >
+                            {post.encrypted ? (
+                              <>
+                                <LockOpen className="h-4 w-4" />
+                                解密
+                              </>
+                            ) : (
+                              <>
+                                <Lock className="h-4 w-4" />
+                                加密
+                              </>
+                            )}
                           </Button>
                           <Button
                             variant="ghost"

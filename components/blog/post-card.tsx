@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Calendar, User, Clock, Eye } from "lucide-react"
+import { Calendar, User, Clock, Eye, Lock } from "lucide-react"
 import { BlogPost } from "@/lib/types/blog"
 import { cn } from "@/lib/utils"
 import { CoverImage } from "@/components/blog/cover-image"
@@ -80,8 +80,11 @@ export function PostCard({ post, className }: PostCardProps) {
         {/* 内容 */}
         <div className="p-4 sm:p-5">
           {/* 标题 */}
-          <h2 className="text-lg sm:text-xl font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">
-            {post.title}
+          <h2 className="text-lg sm:text-xl font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2 flex items-start gap-1.5">
+            <span className="line-clamp-2">{post.title}</span>
+            {post.encrypted && (
+              <Lock className="h-3.5 w-3.5 mt-1 shrink-0 text-amber-500 dark:text-amber-400" aria-label="加密文章" />
+            )}
           </h2>
 
           {/* 摘要 */}

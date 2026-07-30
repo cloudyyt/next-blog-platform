@@ -9,6 +9,7 @@ import Link from "next/link"
 import { Calendar, User, Clock, Eye } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { PostContent } from "@/components/blog/post-content"
+import { PostUnlock } from "@/components/blog/post-unlock"
 import { TableOfContents } from "@/components/blog/table-of-contents"
 import { RelatedPosts } from "@/components/blog/related-posts"
 import { CommentSection } from "@/components/blog/comment-section"
@@ -53,6 +54,7 @@ async function getPostBySlug(slug: string) {
     excerpt: post.excerpt,
     coverImage: post.coverImage,
     published: post.published,
+    encrypted: post.encrypted,
     viewCount: post.viewCount ?? 0,
     authorId: post.authorId,
     author: {
@@ -264,10 +266,14 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
               )}
             </header>
 
-            {/* Post body */}
-            <div className="prose prose-lg max-w-none">
-              <PostContent content={post.content} />
-            </div>
+            {/* Post body —— 加密文章拦截，需输入密码解锁 */}
+            {post.encrypted ? (
+              <PostUnlock slug={post.slug} title={post.title} />
+            ) : (
+              <div className="prose prose-lg max-w-none">
+                <PostContent content={post.content} />
+              </div>
+            )}
 
             {/* Footer / Tags */}
             <footer className="space-y-6 pt-8 border-t">
@@ -290,16 +296,19 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
 
             </footer>
 
-            {/* Comments */}
-            <div id="comments" className="mt-8 pt-8 border-t scroll-mt-20">
-              <CommentSection postId={post.id} />
-            </div>
+            {/* Comments —— 加密文章未解锁前不展示评论 */}
+            {!post.encrypted && (
+              <div id="comments" className="mt-8 pt-8 border-t scroll-mt-20">
+                <CommentSection postId={post.id} />
+              </div>
+            )}
           </article>
 
           {/* ---- Sidebar ---- */}
           <aside className="lg:col-span-4 space-y-6">
             <div className="sticky top-4 space-y-6">
-              <TableOfContents content={post.content} />
+              {/* 加密文章不显示目录（避免泄露正文结构） */}
+              {!post.encrypted && <TableOfContents content={post.content} />}
               {relatedPosts.length > 0 && <RelatedPosts posts={relatedPosts} />}
             </div>
           </aside>

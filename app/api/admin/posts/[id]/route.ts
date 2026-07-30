@@ -55,6 +55,7 @@ export async function PUT(
       excerpt,
       coverImage,
       published,
+      encrypted,
       categoryIds,
       tagIds,
       ...updateData
@@ -71,6 +72,7 @@ export async function PUT(
           coverImage: coverImage ? String(coverImage).trim() : null,
         }),
         ...(published !== undefined && { published }),
+        ...(encrypted !== undefined && { encrypted: !!encrypted }),
         ...(Array.isArray(categoryIds) && {
           categories: {
             set: categoryIds.filter(Boolean).map((id: string) => ({ id })),
