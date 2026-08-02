@@ -46,8 +46,8 @@ export function SearchInput() {
           "flex items-center rounded-lg border transition-all duration-200",
           "h-9",
           focused
-            ? "border-primary/50 ring-2 ring-primary/20 bg-background/90 w-48 sm:w-56"
-            : "border-border/40 bg-background/30 w-36 sm:w-44",
+            ? "border-primary/50 ring-2 ring-primary/20 bg-background/90 w-40 sm:w-56"
+            : "border-border/40 bg-background/30 w-28 sm:w-44",
         )}
       >
         <Search className="w-3.5 h-3.5 ml-3 text-muted-foreground flex-shrink-0" />

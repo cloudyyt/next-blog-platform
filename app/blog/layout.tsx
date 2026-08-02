@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { UserAvatar } from "@/components/ui/user-avatar"
 import { ProfileDialog } from "@/components/blog/profile-dialog"
-import { User, LogOut, Rss, BookOpen, ArrowLeft } from "lucide-react"
+import { User, LogOut, BookOpen, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { SearchInput } from "@/components/blog/search-input"
@@ -73,11 +73,11 @@ export default function BlogLayout({
                     <div className="h-5 w-px bg-border" />
                   </>
                 )}
-                <a href="/blog" className="text-xl font-bold font-display">
+                <a href="/blog" className="text-lg sm:text-xl font-bold font-display">
                   zijieLeo 的树洞
                 </a>
               </div>
-              <div className="flex items-center gap-2 sm:gap-4">
+              <div className="flex items-center gap-1 sm:gap-4">
                 <a
                   href="/blog"
                   className="text-sm sm:text-base hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -96,9 +96,9 @@ export default function BlogLayout({
                   className="text-sm sm:text-base hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 inline-flex items-center gap-1"
                 >
                   <BookOpen className="w-3.5 h-3.5" />
-                  指南
+                  <span className="hidden sm:inline">指南</span>
                 </a>
-                <Suspense fallback={<div className="w-36 sm:w-44 h-9" />}>
+                <Suspense fallback={<div className="w-28 sm:w-44 h-9" />}>
                   <SearchInput />
                 </Suspense>
                 {isAuthenticated ? (
@@ -135,7 +135,10 @@ export default function BlogLayout({
                     登录
                   </a>
                 )}
-                <VisualThemeSelector />
+                {/* 视觉主题选择器在移动端隐藏，节省 header 空间（暗黑切换保留） */}
+                <div className="hidden sm:block">
+                  <VisualThemeSelector />
+                </div>
                 <ThemeToggle />
               </div>
             </nav>
@@ -154,39 +157,20 @@ export default function BlogLayout({
 
         {/* Footer */}
         <footer className="relative z-10 border-t border-border/40 bg-background/60 backdrop-blur-sm flex-shrink-0">
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4" />
-                <span>&copy; {new Date().getFullYear()} zijieLeo 的树洞</span>
-              </div>
-              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-                <a
-                  href="/blog/feed.xml"
-                  className="hover:text-primary transition-colors duration-200 cursor-pointer inline-flex items-center gap-1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Rss className="w-3.5 h-3.5" />
-                  订阅更新（RSS）
-                </a>
-                <a
-                  href="https://beian.miit.gov.cn/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors duration-200 cursor-pointer"
-                >
-                  粤ICP备2025369007号
-                </a>
-                <a
-                  href="/blog/sitemap.xml"
-                  className="hover:text-primary transition-colors duration-200 cursor-pointer"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Sitemap
-                </a>
-              </div>
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1">
+                <BookOpen className="w-3 h-3" />
+                &copy; {new Date().getFullYear()} zijieLeo 的树洞
+              </span>
+              <a
+                href="https://beian.miit.gov.cn/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-primary transition-colors duration-200 cursor-pointer"
+              >
+                粤ICP备2025369007号
+              </a>
             </div>
           </div>
         </footer>
