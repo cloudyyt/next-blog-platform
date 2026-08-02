@@ -35,7 +35,7 @@ export function PostCard({ post, className }: PostCardProps) {
         href={`/blog/${post.slug}`}
         className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-lg"
       >
-        {/* 封面图片 + 分类 overlay */}
+        {/* 封面区：有图显示图片，无图用渐变占位，保持卡片结构一致（避免布局跳跃） */}
         {post.coverImage ? (
           <CoverImage
             src={post.coverImage}
@@ -61,20 +61,24 @@ export function PostCard({ post, className }: PostCardProps) {
             }
           />
         ) : (
-          post.categories.length > 0 && (
-            <div className="flex flex-wrap gap-2 p-4 pb-0">
-              {post.categories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={`/blog?category=${category.slug}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
-                >
-                  {category.name}
-                </Link>
-              ))}
-            </div>
-          )
+          /* 无封面：占位封面区，同高 h-40，主题渐变 + 分类标签，与有封面结构统一 */
+          <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            {post.categories.length > 0 && (
+              <div className="absolute bottom-2 left-2 flex flex-wrap gap-1.5">
+                {post.categories.map((category) => (
+                  <Link
+                    key={category.id}
+                    href={`/blog?category=${category.slug}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-xs px-2 py-0.5 rounded-full bg-white/90 text-gray-800 backdrop-blur-sm font-medium hover:bg-white transition-colors duration-200 cursor-pointer"
+                  >
+                    {category.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
         {/* 内容 */}
