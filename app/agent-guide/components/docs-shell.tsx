@@ -56,7 +56,7 @@ export function DocsShell({
               </aside>
 
               {/* 主内容区 */}
-              <main className="flex-1 min-w-0 overflow-y-auto pb-8">
+              <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden pb-8">
                 {children}
               </main>
             </div>

@@ -154,6 +154,7 @@
 .prose pre {
   background: var(--code-bg);
   @apply rounded-lg;
+  overflow-x: auto;
 }
 
 .prose pre code {
