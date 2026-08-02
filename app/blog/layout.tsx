@@ -84,12 +84,13 @@ export default function BlogLayout({
                 >
                   首页
                 </a>
-                <a
+                {/* 关于页入口暂时隐藏：当前内容待 admin 化后重做（见 docs_memo/0731-关于页admin化需求.md）*/}
+                {/* <a
                   href="/blog/about"
                   className="text-sm sm:text-base hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hidden sm:inline-block"
                 >
                   关于
-                </a>
+                </a> */}
                 <a
                   href="/agent-guide"
                   className="text-sm sm:text-base hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 inline-flex items-center gap-1"
