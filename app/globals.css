@@ -76,6 +76,10 @@
 }
 
 @layer utilities {
+  .font-kai {
+    font-family: var(--font-kai);
+  }
+
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -192,6 +196,15 @@
 :root {
   --code-bg: #1e1e1e;
   --code-fg: #d4d4d4;
+  /*
+    楷体/书法字体栈（用于碎碎念等手记气质场景）。
+    按平台给最优 fallback：macOS 楷体、Windows 楷体、iOS 楷书，
+    最终回退到衬线（避免回到无衬线系统字体显得古板）。
+    纯系统字体，零体积、零延迟。
+  */
+  --font-kai: "Kaiti SC", "Kaiti TC", "STKaiti", "KaiTi", "楷体",
+              "LXGW WenKai", "楷体-简", "楷体-繁",
+              var(--font-fraunces), ui-serif, serif;
 }
 
 /* 代码块锐利度修复：
