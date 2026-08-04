@@ -156,3 +156,28 @@ model GuideSeriesConfig {
   @@map("guide_series_config")
 }
 
+// 碎碎念（关于页时间线，短句/情绪记录）
+// 个人单站，不记作者。
+model Thought {
+  id        String   @id @default(cuid())
+  content   String
+  weather   String?  // WeatherKey（rain/cloud/sunny/...），渲染层映射图标
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, createdAt(sort: Desc)])
+  @@map("thoughts")
+}
+
+// 关于页配置（singleton，整站一份）
+// 头像/名字仍走 User 表，这里只管关于页专属文案。
+model AboutConfig {
+  id        String   @id @default("singleton")
+  tagline   String?  // 作者一句话
+  intro     String?  // 关于我文案（纯文本，按空行分段）
+  updatedAt DateTime @updatedAt
+
+  @@map("about_config")
+}
+
