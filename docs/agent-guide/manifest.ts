@@ -1,183 +1,121 @@
 /**
- * Agent 开发指南 · 章节元信息
+ * 《Agent 认知地图》· 章节元信息
  *
  * 这里是章节顺序、标题、描述的唯一真相。
  * 新增章节只需：1) 加一条记录  2) 在同目录创建对应 md 文件
  *
- * 分组逻辑：用 `group` 字段把章节归到 5 个学习阶段，
- * 这样 sidebar 显示"大类 → 章节"两层，不会出现分组标题与章节标题重复。
+ * 本书 v2（2026-09 完全重做）：定位 = 转岗前的认知速览。
+ * 风格铁律：每章 ≤ 8 分钟，图表/表格/卡片为主体，拒绝大段文字解说。
+ * 旧版长文（术语地基/心智迁移/Python 速通等）已归档 _archive/。
  */
 
 export type Difficulty = "入门" | "进阶" | "实战"
 
-export type ChapterGroup = "intro" | "foundation" | "core" | "system" | "appendix"
+export type ChapterGroup = "map" | "terms" | "principles" | "industry" | "action"
 
 export interface GroupMeta {
-  /** 用于 sidebar 分组标题与总览页大标题 */
   label: string
-  /** 一句话说明该阶段定位 */
   hint: string
 }
 
-/** 五大学习阶段的元信息（顺序就是显示顺序） */
 export const GROUPS: Record<ChapterGroup, GroupMeta> = {
-  intro: { label: "起步", hint: "搭建认知地基，知道接下来要学什么" },
-  foundation: { label: "基础", hint: "动手前的工具与思维准备" },
-  core: { label: "核心能力", hint: "Agent 开发的三大支柱：工具调用 / Prompt / RAG" },
-  system: { label: "系统化", hint: "从单次调用到自主系统，再到工程上线" },
-  appendix: { label: "参考", hint: "速查与延伸阅读" },
+  map: { label: "全景地图", hint: "3 分钟知道 Agent 世界长什么样" },
+  terms: { label: "术语速查", hint: "卡片式，一词一卡" },
+  principles: { label: "原理直觉", hint: "图解，不讲数学" },
+  industry: { label: "岗位与生态", hint: "国内真实图景" },
+  action: { label: "行动路线", hint: "转岗怎么做" },
 }
 
-/** sidebar / 总览页使用的"分组顺序" */
 export const GROUP_ORDER: ChapterGroup[] = [
-  "intro",
-  "foundation",
-  "core",
-  "system",
-  "appendix",
+  "map",
+  "terms",
+  "principles",
+  "industry",
+  "action",
 ]
 
 export interface ChapterMeta {
-  /** URL slug，对应 docs/agent-guide/${slug}.md 文件名 */
   slug: string
-  /** 章节标题（不含 Phase 前缀重复信息，由 sidebar 自动展示） */
   title: string
-  /** 所属学习阶段，用于 sidebar 分组 */
   group: ChapterGroup
-  /** 难度徽章 */
   difficulty: Difficulty
-  /** 一句话描述，用于 sidebar tooltip 与总览页 */
   description: string
-  /** 预计阅读时长（分钟） */
   readingTime?: number
-  /** 标记为"即将上线"，sidebar 灰显不可点 */
   comingSoon?: boolean
 }
 
 export const chapters: ChapterMeta[] = [
-  // ─── 起步 ────────────────────────────────────────────
+  // ─── 全景地图 ────────────────────────────────────────
   {
-    slug: "intro",
-    title: "这份指南怎么读",
-    group: "intro",
+    slug: "world-map",
+    title: "一张图看懂 Agent 世界",
+    group: "map",
     difficulty: "入门",
-    description: "阅读路线建议、适用人群、配套资源",
+    description: "平台 / 框架 / 编排 / 模型四层地图，所有名词各归其位",
     readingTime: 5,
   },
+
+  // ─── 术语速查 ────────────────────────────────────────
   {
-    slug: "phase-0-terminology",
-    title: "Phase 0 · 术语地基",
-    group: "intro",
+    slug: "terms-core",
+    title: "核心术语卡：模型与对话",
+    group: "terms",
     difficulty: "入门",
-    description: "11 个核心术语的严格定义 + 前端类比",
-    readingTime: 25,
+    description: "LLM / Token / 上下文 / Prompt / 温度 / 推理模型——一词一卡：定义、前端类比、误区",
+    readingTime: 6,
+  },
+  {
+    slug: "terms-agent",
+    title: "核心术语卡：Agent 与 RAG",
+    group: "terms",
+    difficulty: "入门",
+    description: "Function Calling / Agent / ReAct / Embedding / 向量数据库 / RAG / 微调 / MCP",
+    readingTime: 6,
   },
 
-  // ─── 基础 ────────────────────────────────────────────
+  // ─── 原理直觉 ────────────────────────────────────────
   {
-    slug: "phase-1-mindset",
-    title: "Phase 1 · 心智模型迁移",
-    group: "foundation",
+    slug: "llm-in-3min",
+    title: "LLM 原理 3 分钟",
+    group: "principles",
     difficulty: "入门",
-    description: "为什么 LLM 是概率函数、为什么 Prompt 不是咒语",
-    readingTime: 20,
+    description: "token → 概率 → 续写，一张流程图 + 温度旋钮，幻觉为什么必然",
+    readingTime: 4,
   },
   {
-    slug: "phase-2-python",
-    title: "Phase 2 · Python 速通",
-    group: "foundation",
+    slug: "context-bill",
+    title: "上下文与账单",
+    group: "principles",
     difficulty: "入门",
-    description: "前端工程师版：TS → Python 速查 + uv 生态",
-    readingTime: 30,
-  },
-  {
-    slug: "phase-3-first-agent",
-    title: "Phase 3 · 接入 Qwen 跑通第一个调用",
-    group: "foundation",
-    difficulty: "入门",
-    description: "阿里云百炼 API Key、OpenAI 兼容协议、流式响应",
-    comingSoon: true,
+    description: "窗口是工作记忆不是硬盘；token 怎么算钱；为什么 RAG 的目标是「少塞准塞」",
+    readingTime: 5,
   },
 
-  // ─── 核心能力 ────────────────────────────────────────
+  // ─── 岗位与生态 ──────────────────────────────────────
   {
-    slug: "phase-4-tool-use",
-    title: "Phase 4 · 工具调用四层栈",
-    group: "core",
-    difficulty: "进阶",
-    description: "Function Calling / Skill / MCP / A2A 决策树",
-    comingSoon: true,
-  },
-  {
-    slug: "phase-5-prompt-engineering",
-    title: "Phase 5 · Prompt 工程",
-    group: "core",
-    difficulty: "进阶",
-    description: "接口设计思维、三种范式、Promptfoo 评测",
-    comingSoon: true,
-  },
-  {
-    slug: "phase-6-rag",
-    title: "Phase 6 · RAG 与企业知识库",
-    group: "core",
-    difficulty: "进阶",
-    description: "切块/Rerank/混合检索、阿里云向量数据库选型",
-    comingSoon: true,
-  },
-
-  // ─── 系统化 ──────────────────────────────────────────
-  {
-    slug: "phase-7-frameworks",
-    title: "Phase 7 · Agent 框架与编排",
-    group: "system",
-    difficulty: "实战",
-    description: "LangChain、ReAct、Memory、多 Agent 协作",
-    comingSoon: true,
-  },
-  {
-    slug: "phase-8-engineering",
-    title: "Phase 8 · 工程化上线",
-    group: "system",
-    difficulty: "实战",
-    description: "阿里云 ECS 部署、Promptfoo、Langfuse、合规备案",
-    comingSoon: true,
-  },
-
-  // ─── 参考 ────────────────────────────────────────────
-  {
-    slug: "appendix-glossary",
-    title: "完整术语表",
-    group: "appendix",
+    slug: "job-map",
+    title: "国内岗位地图",
+    group: "industry",
     difficulty: "入门",
-    description: "按字母排序的可搜索术语速查",
-    comingSoon: true,
+    description: "三条岗位线对比、日常工作时间分布、JD 真相表、面试考什么",
+    readingTime: 7,
+  },
+  {
+    slug: "eco-map",
+    title: "生态一页纸",
+    group: "industry",
+    difficulty: "入门",
+    description: "模型厂商 / 框架 / 平台 / 协议的坐标系，选型不再纠结",
+    readingTime: 5,
+  },
+
+  // ─── 行动路线 ────────────────────────────────────────
+  {
+    slug: "roadmap-90d",
+    title: "前端转岗 90 天路线",
+    group: "action",
+    difficulty: "入门",
+    description: "能力对照表 + 三阶段计划 + 简历项目怎么讲——直接照着执行",
+    readingTime: 6,
   },
 ]
-
-/** 根据 slug 获取章节，找不到返回 undefined */
-export function getChapter(slug: string): ChapterMeta | undefined {
-  return chapters.find((c) => c.slug === slug)
-}
-
-/** 获取所有非 comingSoon 的章节 slug（用于 generateStaticParams） */
-export function getPublishedSlugs(): string[] {
-  return chapters.filter((c) => !c.comingSoon).map((c) => c.slug)
-}
-
-/**
- * 按 group 分组（替代原来的 phase 分组）。
- * 用于 sidebar 与总览页，避免分组标题与章节标题重复。
- */
-export function getChaptersGrouped(): Array<{
-  group: ChapterGroup
-  label: string
-  hint: string
-  items: ChapterMeta[]
-}> {
-  return GROUP_ORDER.map((g) => ({
-    group: g,
-    label: GROUPS[g].label,
-    hint: GROUPS[g].hint,
-    items: chapters.filter((c) => c.group === g),
-  })).filter((g) => g.items.length > 0)
-}

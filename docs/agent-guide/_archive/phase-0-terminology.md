@@ -314,7 +314,7 @@ ${article}
 
 ---
 
-### 5. Embedding（嵌入向量）· 扩展（→ 深入见 Phase 5 · RAG）
+### 5. Embedding（嵌入向量）· 扩展（→ 深入见《Agent 实战》Dify 篇 / LangChain 篇）
 
 **严格定义**：把任意长度的文本（或图像、音频）通过一个专门模型，映射成一个**固定长度的浮点数向量**（通常是 768、1536 或 3072 维）。这个向量的核心特性是：**语义相近的文本，向量也相近**。于是"语义相似度"就被转化为"向量距离"（余弦相似度等），变成了可计算问题。
 
@@ -339,7 +339,7 @@ cosineSimilarity(vec1, vec3)  // ≈ 0.12  语义几乎无关
 
 ---
 
-### 6. RAG（Retrieval-Augmented Generation，检索增强生成）· 扩展（→ 深入见 Phase 5 · RAG）
+### 6. RAG（Retrieval-Augmented Generation，检索增强生成）· 扩展（→ 深入见《Agent 实战》Dify 篇 / LangChain 篇）
 
 **严格定义**：一种架构模式，在 LLM 生成回答**之前**，先从一个外部知识库（通常是向量数据库）中**检索**出与用户问题最相关的文档片段，然后把这些片段**注入到 Prompt** 中，让 LLM 基于检索到的资料作答。
 
@@ -471,7 +471,7 @@ flowchart TB
 
 ---
 
-### 9. ReAct（Reasoning + Acting）· 扩展（→ 深入见 Phase 6 · Agent 框架）
+### 9. ReAct（Reasoning + Acting）· 扩展（→ 深入见《Agent 实战》LangGraph 篇）
 
 **严格定义**：目前**最主流的 Agent 推理范式**，由 Yao et al. 2022 提出。它要求 LLM 在每一步**显式输出三段**：
 - **Thought**（思考）：我现在想到什么
@@ -499,7 +499,7 @@ Final Answer: 杭州明天 26 度，多云转小雨，建议带伞。
 
 ---
 
-### 10. MCP（Model Context Protocol，模型上下文协议）· 扩展（→ 深入见 Phase 4 · 工具调用四层栈）
+### 10. MCP（Model Context Protocol，模型上下文协议）· 扩展（→ 深入见《Agent 实战》MCP 章）
 
 **严格定义**：由 Anthropic 在 2024 年开源的**标准化协议**，规定了 LLM 应用（Client）与外部工具/数据源（Server）之间如何发现、描述、调用彼此的能力。你可以把它理解为"AI 时代的 USB-C 接口"——任何 Agent 只要说 MCP 协议，就能直接接任何 MCP Server 提供的工具，不用每接一个工具就改一次代码。
 

@@ -512,6 +512,6 @@ Run 5: ...
 
 ## 下一步
 
-思想地基打完了。接下来进入 **Phase 2 · Python 速通（前端工程师版）**——因为后续实战章节的代码示例以 Python 为主（Python 是 LLM 生态的主战语言），同时保留 TypeScript 版本作为对照。
+思想地基打完了。认知类章节（岗位图景、原理直觉）可以按需选读；语言准备见附录《Python 速通》。
 
-如果你已经熟悉 Python，可以**跳过 Phase 2**，直接到 Phase 3 接入阿里云 Qwen。
+要开始动手，进入姊妹篇**《Agent 实战：从 Dify 到 LangGraph》**——从 Dify 平台起步，一路写到 LangChain / LangGraph 代码。

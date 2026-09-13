@@ -539,6 +539,6 @@ uv run python chatbot.py
 
 ## 下一步
 
-Python 工具链就位了。接下来进入 **Phase 3 · 接入阿里云 Qwen，跑通第一个调用**——用百炼平台的 API Key + OpenAI 兼容协议，把这里的 Chatbot 升级成"能上网部署的版本"。
+语言准备就位了。接下来进入姊妹篇《Agent 实战：从 Dify 到 LangGraph》——从 Dify 平台起步，一路写到 LangChain / LangGraph 代码。
 
-如果你 Python 已经很熟，可以直接跳过本章进入 Phase 3——但本章的"为什么 LLM 生态以 Python 为主"和"TS 工程师的独特优势"这两段，建议至少看一眼，对理解后续章节的代码示例有帮助。
+如果你 Python 已经很熟，可以快速略过本章——但"为什么 LLM 生态以 Python 为主"和"TS 工程师的独特优势"这两段，建议至少看一眼，对理解《Agent 实战》的代码示例有帮助。
