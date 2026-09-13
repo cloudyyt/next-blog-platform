@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { useSearchParams } from "next/navigation"
 import { BlogPost, Tag, Category } from "@/lib/types/blog"
-import type { GuideHomeCardData } from "@/lib/types/guide"
 import { BlogHero } from "@/components/blog/blog-hero"
 import { LoadMoreButton } from "@/components/blog/load-more-button"
 import { PostCard } from "@/components/blog/post-card"
@@ -23,7 +22,6 @@ interface BlogPageClientProps {
   tagSlug?: string
   categorySlug?: string
   /** Agent 指南置顶卡片数据（默认视图显示） */
-  guideCardData?: GuideHomeCardData
   /** 博主头像 URL（侧边栏作者卡用） */
   authorAvatar?: string | null
 }
@@ -37,7 +35,6 @@ export function BlogPageClient({
   categories,
   tagSlug,
   categorySlug,
-  guideCardData,
   authorAvatar,
 }: BlogPageClientProps) {
   const searchParams = useSearchParams()
@@ -164,9 +161,7 @@ export function BlogPageClient({
               pageSize={pageSize}
               tagSlug={tagSlug}
               categorySlug={categorySlug}
-              showGuideEntry={!tagSlug && !categorySlug && !searchQuery}
-              guideCardData={guideCardData}
-            />
+                          />
           ) : (
             <div className="text-center py-12 rounded-xl border bg-card/80 backdrop-blur-sm">
               <p className="text-muted-foreground">暂无文章</p>

@@ -32,7 +32,7 @@ import type { Thought, WeatherKey } from "@/lib/types/about"
  * - 加载更多 → fetch GET /api/blog/thoughts（仅 published，分页）。
  *
  * 动画：framer-motion whileInView 纯淡入，自动尊重 prefers-reduced-motion
- * （与 app/agent-guide/components/chapter-trail.tsx 同模式）。
+ * （与 app/guides/components/chapter-trail.tsx 同模式）。
  */
 
 const WEATHER_ICONS: Record<WeatherKey, LucideIcon> = {
