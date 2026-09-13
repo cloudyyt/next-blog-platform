@@ -6,6 +6,6 @@ import { getGuideGroups } from "@/lib/guide/data"
  * server component：查 5 大阶段定义传给编辑器
  */
 export default async function NewGuideChapterPage() {
-  const groups = await getGuideGroups()
+  const groups = await getGuideGroups("agent-guide")
   return <GuideChapterEditor mode="create" groups={groups} />
 }

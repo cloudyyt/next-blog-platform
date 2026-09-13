@@ -15,7 +15,14 @@ import { VisualThemeContext } from "@/components/providers/visual-theme-provider
  * 注意：文档站有自己的 layout，不复用 blog layout，
  * 但视觉上保持同一套主题系统。
  */
-export function DocsHeader({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
+export function DocsHeader({
+  onOpenSidebar,
+  brandHref,
+}: {
+  onOpenSidebar?: () => void
+  /** 品牌「zijieLeo Docs」点击目标（缺省回书架） */
+  brandHref?: string
+}) {
   const visualThemeContext = useContext(VisualThemeContext)
   const visualTheme = visualThemeContext?.theme ?? "cyber-neon"
 
@@ -50,7 +57,7 @@ export function DocsHeader({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
             <div className="h-5 w-px bg-border" />
 
             <Link
-              href="/agent-guide"
+              href={brandHref ?? "/guides"}
               className="flex items-center gap-2 text-base sm:text-lg font-bold font-display hover:text-primary transition-colors"
             >
               <BookOpen className="w-5 h-5 text-primary" />

@@ -91,11 +91,11 @@ export default function BlogLayout({
                   关于
                 </a>
                 <a
-                  href="/agent-guide"
+                  href="/guides"
                   className="text-sm sm:text-base hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 inline-flex items-center gap-1"
                 >
                   <BookOpen className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">指南</span>
+                  <span className="hidden sm:inline">书架</span>
                 </a>
                 <Suspense fallback={<div className="w-28 sm:w-44 h-9" />}>
                   <SearchInput />

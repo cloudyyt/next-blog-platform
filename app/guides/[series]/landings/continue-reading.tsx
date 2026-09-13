@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowRight, BookOpen } from "lucide-react"
-import { useGuideProgress } from "./use-guide-progress"
+import { useGuideProgress } from "@/app/guides/components/use-guide-progress"
 
 /**
  * 「继续阅读」引导条
@@ -18,12 +18,16 @@ export function ContinueReading({
   allPublishedSlugs,
   /** slug → title 映射，用于显示「下一篇」标题 */
   slugTitleMap,
+  basePath,
+  storagePrefix,
 }: {
   allPublishedSlugs: string[]
   slugTitleMap: Record<string, string>
+  basePath: string
+  storagePrefix: string
 }) {
   const { hasProgress, nextUnreadSlug, visitedCount, progressPct } =
-    useGuideProgress(allPublishedSlugs)
+    useGuideProgress(allPublishedSlugs, storagePrefix)
 
   const nextTitle = nextUnreadSlug ? slugTitleMap[nextUnreadSlug] : null
 
@@ -38,7 +42,7 @@ export function ContinueReading({
           className="mb-10"
         >
           <Link
-            href={`/agent-guide/${nextUnreadSlug}`}
+            href={`${basePath}/${nextUnreadSlug}`}
             className="group flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 px-4 py-3 transition-colors cursor-pointer"
           >
             <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 text-primary shrink-0">

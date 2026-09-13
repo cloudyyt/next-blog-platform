@@ -20,7 +20,7 @@ export default async function GuideChaptersPage() {
       include: { author: { select: { id: true, name: true } } },
       orderBy: [{ group: "asc" }, { order: "asc" }],
     }),
-    getGuideGroups(),
+    getGuideGroups("agent-guide"),
   ])
 
   // timestamps Date → string、group/difficulty string → 联合类型，匹配 GuideChapter

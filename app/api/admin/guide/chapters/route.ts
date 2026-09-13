@@ -3,10 +3,10 @@ import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/prisma"
 import { verifyAdmin } from "@/lib/auth-middleware"
 
-/** 触发前端 /agent-guide 与 /blog 的增量重生成（DB 内容变更后即时生效） */
+/** 触发前端 /guides 与 /blog 的增量重生成（DB 内容变更后即时生效） */
 function revalidateGuidePaths() {
-  revalidatePath("/agent-guide", "page")
-  revalidatePath("/agent-guide/[slug]", "page")
+  revalidatePath("/guides/[series]", "page")
+  revalidatePath("/guides/[series]/[slug]", "page")
   revalidatePath("/blog", "page")
 }
 

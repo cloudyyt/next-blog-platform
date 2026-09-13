@@ -228,7 +228,7 @@ export function GuideChapterEditor({
             <div className="bg-card/80 backdrop-blur-sm rounded-lg border p-4">
               <Label className="text-sm font-medium mb-2 block">预览</Label>
               <Link
-                href={`/agent-guide/${initial.slug}`}
+                href={`/guides/agent-guide/${initial.slug}`}
                 target="_blank"
                 className="text-xs text-primary hover:underline cursor-pointer"
               >

@@ -4,19 +4,20 @@ import { prisma } from "@/lib/prisma"
 import { verifyAdmin } from "@/lib/auth-middleware"
 
 function revalidateGuidePaths() {
-  revalidatePath("/agent-guide", "page")
-  revalidatePath("/agent-guide/[slug]", "page")
+  revalidatePath("/guides/[series]", "page")
+  revalidatePath("/guides/[series]/[slug]", "page")
   revalidatePath("/blog", "page")
 }
 
-// GET /api/admin/guide/series-config — 读取系列配置
+// GET /api/admin/guide/series-config?series=xxx — 读取系列配置（多行，id=系列 key）
 export async function GET(request: NextRequest) {
   const { error } = await verifyAdmin(request)
   if (error) return error
 
   try {
+    const series = new URL(request.url).searchParams.get("series") || "agent-guide"
     const config = await prisma.guideSeriesConfig.findUnique({
-      where: { id: "singleton" },
+      where: { id: series },
     })
     if (!config) {
       return NextResponse.json({ message: "系列配置不存在" }, { status: 404 })
@@ -36,6 +37,7 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
     const {
+      series,
       title,
       subtitle,
       coverImage,
@@ -69,10 +71,13 @@ export async function PUT(request: NextRequest) {
       groups: Array.isArray(groups) ? groups : [],
     }
 
+    // 多系列：id = 系列 key（由 body.series 指定，缺省 agent-guide）
+    const seriesKey =
+      typeof series === "string" && series ? series : "agent-guide"
     const config = await prisma.guideSeriesConfig.upsert({
-      where: { id: "singleton" },
+      where: { id: seriesKey },
       update: data,
-      create: { id: "singleton", ...data },
+      create: { id: seriesKey, ...data },
     })
 
     revalidateGuidePaths()

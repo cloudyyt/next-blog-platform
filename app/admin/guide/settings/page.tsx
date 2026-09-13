@@ -7,7 +7,7 @@ import type { GuideSeriesConfig } from "@/lib/types/guide"
  * server component：从 GuideSeriesConfig singleton 读取作为初始值
  */
 export default async function GuideSettingsPage() {
-  const config = await getGuideSeriesConfig()
+  const config = await getGuideSeriesConfig("agent-guide")
 
   // singleton 理论上总存在（seed 已建）；缺失时给安全默认值，不阻塞编辑
   const initial: GuideSeriesConfig = config ?? {

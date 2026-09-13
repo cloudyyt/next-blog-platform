@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   Circle,
   ChevronRight,
-  Lock,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { SidebarChapter, SidebarGroup } from "@/lib/types/guide"
@@ -17,38 +16,41 @@ import type { SidebarChapter, SidebarGroup } from "@/lib/types/guide"
  *
  * 数据：由 server layout 查 DB 后通过 props 传入（方案 A），不在此处 import 数据源。
  *
- * 三状态视觉（刻意拉开层次）：
- * - 当前：primary 绿 + 加粗 + bg-primary/5 + 左侧竖条
+ * 状态视觉（刻意拉开层次）：
+ * - 当前：primary + 加粗 + bg-primary/5 + 左侧竖条
  * - 已读：foreground/80 深色文字 + 灰色 ✓（不抢当前章节风）
  * - 未读：muted-foreground 浅色文字 + 空心圆
- * - comingSoon（WIP）：极淡灰，可隐藏
+ * - comingSoon：与未读章节同款样式（目录全展示原则——标题大大方方展示，
+ *   无锁图标、无「建设中/未解锁」字样，内容连载中由章节页内轻提示承接）
  */
-const VISITED_KEY = "agent-guide:visited"
-const ACCORDION_KEY = "agent-guide:accordion"
-const SHOW_WIP_KEY = "agent-guide:show-wip"
-
 export function DocsSidebar({
   data,
   onNavigate,
+  basePath,
+  storagePrefix,
 }: {
   data: SidebarGroup[]
   onNavigate?: () => void
+  /** 章节链接前缀（多系列后按系列传入；缺省为旧指南） */
+  basePath?: string
+  /** localStorage key 前缀（隔离不同系列的阅读进度/手风琴状态） */
+  storagePrefix?: string
 }) {
   const pathname = usePathname()
   const currentSlug = pathname?.split("/").pop() ?? ""
   const groups = data
+  const base = basePath ?? "/agent-guide"
+  const VISITED_KEY = `${storagePrefix ?? "agent-guide"}:visited`
+  const ACCORDION_KEY = `${storagePrefix ?? "agent-guide"}:accordion`
 
   const [visited, setVisited] = useState<Set<string>>(new Set())
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
-  const [showWip, setShowWip] = useState(false)
 
   // 初始加载
   useEffect(() => {
     try {
       const visitedRaw = localStorage.getItem(VISITED_KEY)
       if (visitedRaw) setVisited(new Set(JSON.parse(visitedRaw)))
-      const showWipRaw = localStorage.getItem(SHOW_WIP_KEY)
-      if (showWipRaw === "true") setShowWip(true)
     } catch {
       /* ignore */
     }
@@ -106,16 +108,6 @@ export function DocsSidebar({
     })
   }
 
-  const toggleShowWip = () => {
-    const next = !showWip
-    setShowWip(next)
-    try {
-      localStorage.setItem(SHOW_WIP_KEY, String(next))
-    } catch {
-      /* ignore */
-    }
-  }
-
   const publishedTotal = groups.reduce(
     (sum, g) => sum + g.items.filter((c) => !c.comingSoon).length,
     0
@@ -130,11 +122,6 @@ export function DocsSidebar({
     publishedTotal > 0
       ? Math.round((visitedCount / publishedTotal) * 100)
       : 0
-
-  const totalWip = groups.reduce(
-    (sum, g) => sum + g.items.filter((c) => c.comingSoon).length,
-    0
-  )
 
   return (
     <nav className="space-y-5">
@@ -159,14 +146,8 @@ export function DocsSidebar({
       {/* 分组 accordion */}
       {groups.map((group) => {
         const isExpanded = expanded[group.key] ?? true
-        // 默认隐藏 WIP 章节（受 showWip 控制）
-        const visibleItems = showWip
-          ? group.items
-          : group.items.filter((c) => !c.comingSoon)
-
-        // 如果该组在隐藏 WIP 模式下没章节可显示，跳过整个分组
-        if (visibleItems.length === 0) return null
-
+        // 目录全展示：comingSoon 也直接可见（无隐藏开关）
+        const visibleItems = group.items
         const published = group.items.filter((c) => !c.comingSoon).length
 
         return (
@@ -191,7 +172,6 @@ export function DocsSidebar({
               </span>
               <span className="text-[10px] text-muted-foreground/50 tabular-nums">
                 {published}
-                {showWip && totalWip > 0 ? ` / ${group.items.length}` : ""}
               </span>
             </button>
 
@@ -205,6 +185,7 @@ export function DocsSidebar({
                     active={currentSlug === ch.slug}
                     visited={visited.has(ch.slug)}
                     onNavigate={onNavigate}
+                    basePath={base}
                   />
                 ))}
               </ul>
@@ -213,19 +194,6 @@ export function DocsSidebar({
         )
       })}
 
-      {/* 显示/隐藏 WIP toggle */}
-      {totalWip > 0 && (
-        <div className="px-3 pt-2 border-t border-border/40">
-          <button
-            type="button"
-            onClick={toggleShowWip}
-            className="text-[11px] text-muted-foreground/60 hover:text-muted-foreground transition-colors cursor-pointer inline-flex items-center gap-1"
-          >
-            <Lock className="w-2.5 h-2.5" />
-            {showWip ? "隐藏未完成章节" : `显示 ${totalWip} 个未完成章节`}
-          </button>
-        </div>
-      )}
     </nav>
   )
 }
@@ -235,31 +203,18 @@ function ChapterLink({
   active,
   visited,
   onNavigate,
+  basePath = "/agent-guide",
 }: {
   chapter: SidebarChapter
   active: boolean
   visited: boolean
   onNavigate?: () => void
+  basePath?: string
 }) {
-  // comingSoon：极淡灰显
-  if (chapter.comingSoon) {
-    return (
-      <li>
-        <div
-          className="flex items-center gap-2 pl-4 pr-2 -ml-px py-1.5 text-sm text-muted-foreground/35 cursor-not-allowed border-l border-transparent"
-          title="章节准备中"
-        >
-          <Lock className="w-3 h-3 flex-shrink-0" />
-          <span className="truncate">{chapter.title}</span>
-        </div>
-      </li>
-    )
-  }
-
   return (
     <li>
       <Link
-        href={`/agent-guide/${chapter.slug}`}
+        href={`${basePath}/${chapter.slug}`}
         onClick={onNavigate}
         className={cn(
           "group relative flex items-center gap-2 pl-4 pr-2 -ml-px py-1.5 text-sm border-l border-transparent transition-colors",

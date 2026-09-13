@@ -26,6 +26,9 @@ const nextConfig = {
   async redirects() {
     return [
       { source: '/', destination: '/blog', permanent: false },
+      // 电子书路由统一到 /guides/[series]（保 SEO，旧链接 301）
+      { source: '/agent-guide', destination: '/guides/agent-guide', permanent: true },
+      { source: '/agent-guide/:slug', destination: '/guides/agent-guide/:slug', permanent: true },
     ]
   },
 }

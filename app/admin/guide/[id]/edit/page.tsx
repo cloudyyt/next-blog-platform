@@ -20,7 +20,7 @@ export default async function EditGuideChapterPage({
       where: { id },
       include: { author: { select: { id: true, name: true } } },
     }),
-    getGuideGroups(),
+    getGuideGroups("agent-guide"),
   ])
 
   if (!chapter) {

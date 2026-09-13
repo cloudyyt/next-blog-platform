@@ -4,7 +4,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { CheckCircle2, Circle, Clock, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { OverviewChapter } from "@/lib/types/guide"
+import type { OverviewChapter, GroupKey } from "@/lib/types/guide"
 import { useGuideProgress } from "./use-guide-progress"
 
 /**
@@ -29,12 +29,21 @@ export function ChapterTrail({
   groupKey,
   /** 全局所有已发布章节 slug（用于计算「第一个未读」是哪一篇） */
   allPublishedSlugs,
+  /** 章节链接前缀（多系列后按系列传入；缺省为旧指南） */
+  basePath = "/agent-guide",
+  /** localStorage key 前缀（隔离不同系列的阅读进度） */
+  storagePrefix = "agent-guide",
 }: {
   chapters: OverviewChapter[]
-  groupKey: string
+  groupKey: GroupKey
   allPublishedSlugs: string[]
+  basePath?: string
+  storagePrefix?: string
 }) {
-  const { visited, mounted, nextUnreadSlug } = useGuideProgress(allPublishedSlugs)
+  const { visited, mounted, nextUnreadSlug } = useGuideProgress(
+    allPublishedSlugs,
+    storagePrefix,
+  )
 
   return (
     <ul className="relative space-y-0">
@@ -58,7 +67,7 @@ export function ChapterTrail({
             className="relative"
           >
             <Link
-              href={`/agent-guide/${chapter.slug}`}
+              href={`${basePath}/${chapter.slug}`}
               className="group flex items-center gap-3 py-3 pl-5 rounded-lg cursor-pointer hover:bg-accent/30 transition-colors"
             >
               {/* 节点：已读✓ / 未读空心 / 下一个高亮 */}
@@ -85,9 +94,7 @@ export function ChapterTrail({
                 <div
                   className={cn(
                     "text-sm font-medium truncate transition-colors",
-                    isNext
-                      ? "text-primary"
-                      : "group-hover:text-primary",
+                    isNext ? "text-primary" : "group-hover:text-primary",
                   )}
                 >
                   {chapter.title}

@@ -227,7 +227,7 @@ function ChapterRow({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push(`/agent-guide/${chapter.slug}`)}
+          onClick={() => router.push(`/guides/agent-guide/${chapter.slug}`)}
           title="在前端查看"
           disabled={!chapter.published}
         >

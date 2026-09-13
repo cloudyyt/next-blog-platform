@@ -16,15 +16,18 @@ import type { GuideChapterSummary } from "@/lib/types/guide"
 export function DocsPager({
   prev,
   next,
+  basePath = "/agent-guide",
 }: {
   prev: GuideChapterSummary | null
   next: GuideChapterSummary | null
+  /** 章节链接前缀（多系列后按系列传入；缺省为旧指南） */
+  basePath?: string
 }) {
   return (
     <nav className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-12 pt-8 border-t border-border/60">
       {prev ? (
         <Link
-          href={`/agent-guide/${prev.slug}`}
+          href={`${basePath}/${prev.slug}`}
           className={cn(
             "group flex flex-col gap-1 p-4 rounded-lg border border-border/60",
             "hover:border-primary/40 hover:bg-accent/30 transition-all cursor-pointer"
@@ -44,7 +47,7 @@ export function DocsPager({
 
       {next ? (
         <Link
-          href={`/agent-guide/${next.slug}`}
+          href={`${basePath}/${next.slug}`}
           className={cn(
             "group flex flex-col gap-1 p-4 rounded-lg border border-border/60 sm:text-right",
             "hover:border-primary/40 hover:bg-accent/30 transition-all cursor-pointer"

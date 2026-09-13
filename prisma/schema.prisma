@@ -112,14 +112,15 @@ model Comment {
   @@map("comments")
 }
 
-// Agent 指南章节（独立于 Post 的内容类型）
+// 电子书章节（独立于 Post 的内容类型；多系列，series = 书 key）
 model GuideChapter {
   id          String   @id @default(cuid())
+  series      String   @default("agent-guide") // 所属书：agent-guide | agent-stack | ...
   title       String
-  slug        String   @unique
+  slug        String                            // 系列内唯一
   content     String                          // markdown 正文
   description String?
-  group       String                          // intro|foundation|core|system|appendix
+  group       String                          // 篇 key（每本书自定义，如 intro|foundation 或 dify|langchain）
   difficulty  String                          // 入门|进阶|实战
   order       Int      @default(10)           // 分组内排序权重
   readingTime Int?                            // 留空则前端按正文估算
@@ -131,14 +132,15 @@ model GuideChapter {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@index([group, order])
-  @@index([published])
+  @@unique([series, slug])
+  @@index([series, group, order])
+  @@index([series, published])
   @@map("guide_chapters")
 }
 
-// Agent 指南系列配置（singleton，整站一份）
+// 电子书系列配置（多行，id = 系列 key，整站可扩展多本书）
 model GuideSeriesConfig {
-  id            String   @id @default("singleton") // 固定 id，配合 upsert 实现单例
+  id            String   @id                    // 系列 key（agent-guide / agent-stack / ...）
   title         String
   subtitle      String?
   coverImage    String?
@@ -150,7 +152,7 @@ model GuideSeriesConfig {
   ogTitle       String?
   ogDescription String?
   ogImage       String?
-  groups        Json                            // GuideGroupMeta[]（5 阶段 label/hint/icon/order）
+  groups        Json                            // GuideGroupMeta[]（各书自定义篇结构 label/hint/icon/order）
   updatedAt     DateTime @updatedAt
 
   @@map("guide_series_config")

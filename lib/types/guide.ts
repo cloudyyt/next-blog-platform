@@ -1,23 +1,24 @@
 /**
- * Agent 指南相关类型定义
+ * 电子书（多系列）相关类型定义
  *
- * 设计原则：
- * - 章节级和系列级配置完全分离（D2 方案）
+ * 多系列架构（见 docs_memo/0901）：
+ * - series = 书 key（agent-guide / agent-stack / ...），注册表见 lib/guide/series.ts
+ * - GroupKey 放开为 string：每本书自定义篇结构
  * - 所有前端展示的字段都对应一个 admin 配置入口（原则 2.3）
- * - 现阶段用 type 定义，DB 接入后从 prisma 生成
  */
 
 // ─── 章节级（每章一份） ────────────────────────────
 
-/** 学习阶段 key（5 个固定值，不允许 admin 增减） */
-export type GroupKey = "intro" | "foundation" | "core" | "system" | "appendix"
+/** 篇 key（放开为 string，每本书自定义：如 intro|foundation 或 dify|langchain） */
+export type GroupKey = string
 
 /** 难度（3 个固定值） */
 export type Difficulty = "入门" | "进阶" | "实战"
 
-/** 单个章节 */
+/** 单个章节（完整，章节页用） */
 export interface GuideChapter {
   id: string
+  series: string
   title: string
   slug: string
   content: string                  // markdown 正文
@@ -50,12 +51,12 @@ export interface GuideChapterInput {
   ogImage: string | null
 }
 
-// ─── 系列级（singleton，整站一份） ─────────────────
+// ─── 系列级（每本书一份，GuideSeriesConfig 多行） ────
 
-/** 单个学习阶段的元信息 */
+/** 单个篇（分组）的元信息 */
 export interface GuideGroupMeta {
   key: GroupKey
-  label: string                    // 显示名（"起步"/"基础"/...）
+  label: string                    // 显示名（"起步"/"Dify 篇"...）
   hint: string                     // 一句话说明
   icon: string                     // lucide 图标名（"Compass" / "Layers" / ...）
   order: number                    // 显示顺序
@@ -63,7 +64,7 @@ export interface GuideGroupMeta {
 
 /** 系列配置 */
 export interface GuideSeriesConfig {
-  title: string                    // "前端工程师转型 Agent 开发指南"
+  title: string                    // "Agent 认知地图" / "Agent 实战：从 Dify 到 LangGraph"
   subtitle: string | null          // Hero / PostCard 副标题
   coverImage: string | null        // 系列封面 URL（首页 PostCard 用）
   badge: string                    // 默认 "连载中"
@@ -75,13 +76,14 @@ export interface GuideSeriesConfig {
   ogTitle: string | null
   ogDescription: string | null
   ogImage: string | null
-  groups: GuideGroupMeta[]         // 5 个阶段的完整定义
+  groups: GuideGroupMeta[]         // 各书自定义篇结构
 }
 
 // ─── 默认值常量（UI fallback / mock 用） ───────────
 
 export const DIFFICULTY_LABELS: Difficulty[] = ["入门", "进阶", "实战"]
 
+/** 旧书（agent-guide）的 5 阶段兜底（config 缺失时用） */
 export const DEFAULT_GROUP_KEY_ORDER: GroupKey[] = [
   "intro",
   "foundation",
@@ -149,8 +151,9 @@ export interface GuideGroupView<T> {
 export type SidebarGroup = GuideGroupView<SidebarChapter>
 export type OverviewGroup = GuideGroupView<OverviewChapter>
 
-/** 首页 GuideSeriesCard 用的数据（由 server 查 DB 后透传给 client 组件） */
+/** 首页/书架 GuideSeriesCard 用的数据（由 server 查 DB 后透传给 client 组件） */
 export interface GuideHomeCardData {
+  series: string                   // 系列 key（路由/进度前缀用）
   config: {
     title: string
     subtitle: string | null
@@ -160,5 +163,5 @@ export interface GuideHomeCardData {
   } | null
   publishedCount: number
   totalCount: number
-  latestPhaseRange: string
+  rangeLabel: string
 }

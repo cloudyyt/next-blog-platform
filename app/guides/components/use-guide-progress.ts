@@ -12,19 +12,20 @@ import { useEffect, useState } from "react"
  */
 export const VISITED_KEY = "agent-guide:visited"
 
-export function useGuideProgress(allSlugs: string[]) {
+export function useGuideProgress(allSlugs: string[], storagePrefix = "agent-guide") {
   const [visited, setVisited] = useState<Set<string>>(new Set())
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(VISITED_KEY)
+      const raw = localStorage.getItem(`${storagePrefix}:visited`)
       if (raw) setVisited(new Set(JSON.parse(raw)))
     } catch {
       /* ignore */
     }
     setMounted(true)
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storagePrefix])
 
   // 仅统计已发布章节中的已读
   const publishedSlugs = allSlugs

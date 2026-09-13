@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma"
 import { verifyAdmin } from "@/lib/auth-middleware"
 
 function revalidateGuidePaths() {
-  revalidatePath("/agent-guide", "page")
-  revalidatePath("/agent-guide/[slug]", "page")
+  revalidatePath("/guides/[series]", "page")
+  revalidatePath("/guides/[series]/[slug]", "page")
   revalidatePath("/blog", "page")
 }
 

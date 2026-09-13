@@ -1,16 +1,16 @@
 /**
- * Agent 指南 server-only 数据层
+ * 电子书（多系列）server-only 数据层
  *
- * 所有 /agent-guide 前端消费方 + admin 系列配置读取都走这里。
+ * 所有 /guides/* 前端消费方 + admin 系列配置读取都走这里。
  * 用 React cache() 在同一请求内去重（layout / page / 章节页共享查询）。
  *
- * 数据源：prisma（GuideChapter + GuideSeriesConfig）。
- * 废弃了 lib/docs.ts 的 fs 读取 + docs/agent-guide/manifest.ts 同步导入。
+ * 多系列：所有查询按 series 维度隔离（series key 见 lib/guide/series.ts 注册表）。
+ * 数据源：prisma（GuideChapter.series + GuideSeriesConfig 多行）。
+ * 内容更新流：docs/{series}/manifest.ts + md → prisma/seed-guide.ts（md 是唯一真相）。
  */
 import { cache } from "react"
 import { prisma } from "@/lib/prisma"
 import type {
-  GroupKey,
   GuideChapterSummary,
   GuideGroupMeta,
   GuideGroupView,
@@ -19,46 +19,58 @@ import type {
   SidebarChapter,
   SidebarGroup,
 } from "@/lib/types/guide"
-import { DEFAULT_GROUP_KEY_ORDER } from "@/lib/types/guide"
+import { getSeriesMeta } from "@/lib/guide/series"
 
-/** series config 缺失 / groups JSON 脏数据时的兜底（5 阶段固定定义） */
-const FALLBACK_GROUPS: GuideGroupMeta[] = [
-  { key: "intro", label: "起步", hint: "搭建认知地基", icon: "Compass", order: 1 },
-  { key: "foundation", label: "基础", hint: "工具与思维准备", icon: "Layers", order: 2 },
-  { key: "core", label: "核心能力", hint: "工具调用 / Prompt / RAG", icon: "Sparkles", order: 3 },
-  { key: "system", label: "系统化", hint: "从单次调用到工程上线", icon: "BookOpen", order: 4 },
-  { key: "appendix", label: "参考", hint: "速查与延伸阅读", icon: "BookOpen", order: 5 },
-]
-
-/** 把 prisma 的 groups(JsonValue) 安全断言为 GuideGroupMeta[]，脏数据 fallback */
-function parseGroups(raw: unknown): GuideGroupMeta[] {
-  if (!Array.isArray(raw)) return FALLBACK_GROUPS
-  const validKeys = new Set(DEFAULT_GROUP_KEY_ORDER)
+/** 把 prisma 的 groups(JsonValue) 安全断言为 GuideGroupMeta[]。
+ *  形状校验（key/label 必须是字符串），不再限定固定 key 集合与数量——每本书自定义篇结构。
+ *  脏数据时由调用方用注册表 fallback。 */
+function parseGroups(raw: unknown): GuideGroupMeta[] | null {
+  if (!Array.isArray(raw)) return null
   const parsed = raw
-    .filter((g): g is GuideGroupMeta =>
-      !!g &&
-      typeof g === "object" &&
-      typeof (g as GuideGroupMeta).key === "string" &&
-      validKeys.has((g as GuideGroupMeta).key as GroupKey) &&
-      typeof (g as GuideGroupMeta).label === "string"
+    .filter(
+      (g): g is GuideGroupMeta =>
+        !!g &&
+        typeof g === "object" &&
+        typeof (g as GuideGroupMeta).key === "string" &&
+        typeof (g as GuideGroupMeta).label === "string",
     )
     .map((g) => ({
       key: g.key,
       label: g.label,
-      hint: g.hint ?? "",
-      icon: g.icon ?? "BookOpen",
-      order: typeof g.order === "number" ? g.order : DEFAULT_GROUP_KEY_ORDER.indexOf(g.key) + 1,
+      hint: typeof g.hint === "string" ? g.hint : "",
+      icon: typeof g.icon === "string" ? g.icon : "BookOpen",
+      order: typeof g.order === "number" ? g.order : 99,
     }))
-  return parsed.length === 5 ? parsed : FALLBACK_GROUPS
+  return parsed.length > 0 ? parsed : null
 }
 
+/** 系列的篇结构（config 优先，缺失/脏数据用注册表 fallback） */
+export const getGuideGroups = cache(async (series: string): Promise<GuideGroupMeta[]> => {
+  const meta = getSeriesMeta(series)
+  if (!meta) return []
+  const row = await prisma.guideSeriesConfig.findUnique({
+    where: { id: series },
+    select: { groups: true },
+  })
+  return parseGroups(row?.groups) ?? meta.fallbackGroups
+})
+
+/** 系列配置（多行，id = series key），缺失返回 null（调用方用注册表 fallback） */
+export const getGuideSeriesConfig = cache(async (series: string) => {
+  const row = await prisma.guideSeriesConfig.findUnique({
+    where: { id: series },
+  })
+  if (!row) return null
+  return { ...row, groups: parseGroups(row.groups) ?? getSeriesMeta(series)?.fallbackGroups ?? [] }
+})
+
 /**
- * 把扁平章节按 group 聚合，并补上 series config 的 label/hint/icon/order。
- * 章节顺序依赖传入数组（DB 查询已按 group+order 排序），此处不再排序。
+ * 把扁平章节按 group 聚合，并补上篇结构的 label/hint/icon/order。
+ * 章节顺序依赖传入数组（DB 查询已排序），此处只按 group.order 排分组。
  */
 function mergeIntoGroups<T extends { group: string }>(
   chapters: T[],
-  groupMetas: GuideGroupMeta[]
+  groupMetas: GuideGroupMeta[],
 ): GuideGroupView<T>[] {
   return [...groupMetas]
     .sort((a, b) => a.order - b.order)
@@ -72,29 +84,14 @@ function mergeIntoGroups<T extends { group: string }>(
     }))
 }
 
-/** 系列配置（singleton），脏数据/缺失时返回 null（调用方用默认值 fallback） */
-export const getGuideSeriesConfig = cache(async () => {
-  const row = await prisma.guideSeriesConfig.findUnique({
-    where: { id: "singleton" },
-  })
-  if (!row) return null
-  return { ...row, groups: parseGroups(row.groups) }
-})
-
-/** 取分组定义（series config 缺失时用 FALLBACK_GROUPS） */
-export const getGuideGroups = cache(async (): Promise<GuideGroupMeta[]> => {
-  const config = await getGuideSeriesConfig()
-  return config?.groups ?? FALLBACK_GROUPS
-})
-
 /**
- * sidebar 数据：slim 版（不含正文/description），含 comingSoon（灰显）。
- * 传给客户端 DocsSidebar，最小化 client bundle。
+ * sidebar 数据：slim 版（不含正文/description）。
+ * 含 comingSoon（目录全展示原则：弱化样式直接可见，无隐藏开关）。
  */
-export const getGuideSidebarData = cache(async (): Promise<SidebarGroup[]> => {
+export const getGuideSidebarData = cache(async (series: string): Promise<SidebarGroup[]> => {
   const [chapters, groups] = await Promise.all([
     prisma.guideChapter.findMany({
-      where: { published: true },
+      where: { series, published: true },
       select: {
         slug: true,
         title: true,
@@ -106,13 +103,13 @@ export const getGuideSidebarData = cache(async (): Promise<SidebarGroup[]> => {
       },
       orderBy: [{ group: "asc" }, { order: "asc" }],
     }),
-    getGuideGroups(),
+    getGuideGroups(series),
   ])
 
   const slim: SidebarChapter[] = chapters.map((c) => ({
     slug: c.slug,
     title: c.title,
-    group: c.group as GroupKey,
+    group: c.group,
     difficulty: c.difficulty as SidebarChapter["difficulty"],
     readingTime: c.readingTime,
     comingSoon: c.comingSoon,
@@ -122,131 +119,167 @@ export const getGuideSidebarData = cache(async (): Promise<SidebarGroup[]> => {
 })
 
 /**
- * 总览页数据：含 description，按 group 聚合（含 comingSoon，由页面决定是否展示）。
- * 同时返回 series config（Hero 文案用）。
+ * 总览页数据：含 description，按篇聚合（全章节含 comingSoon，由页面统一展示）。
+ * 同时返回系列 config（Hero 文案用）。
  */
-export const getGuideOverviewData = cache(async (): Promise<{
-  groups: OverviewGroup[]
-  config: Awaited<ReturnType<typeof getGuideSeriesConfig>>
-}> => {
-  const [chapters, config] = await Promise.all([
-    prisma.guideChapter.findMany({
-      where: { published: true },
-      select: {
-        slug: true,
-        title: true,
-        group: true,
-        difficulty: true,
-        readingTime: true,
-        comingSoon: true,
-        description: true,
-        order: true,
-      },
-      orderBy: [{ group: "asc" }, { order: "asc" }],
-    }),
-    getGuideSeriesConfig(),
-  ])
+export const getGuideOverviewData = cache(
+  async (
+    series: string,
+  ): Promise<{
+    groups: OverviewGroup[]
+    config: Awaited<ReturnType<typeof getGuideSeriesConfig>>
+  }> => {
+    const [chapters, config] = await Promise.all([
+      prisma.guideChapter.findMany({
+        where: { series, published: true },
+        select: {
+          slug: true,
+          title: true,
+          group: true,
+          difficulty: true,
+          readingTime: true,
+          comingSoon: true,
+          description: true,
+          order: true,
+        },
+        orderBy: [{ group: "asc" }, { order: "asc" }],
+      }),
+      getGuideSeriesConfig(series),
+    ])
 
-  const items: OverviewChapter[] = chapters.map((c) => ({
-    slug: c.slug,
-    title: c.title,
-    group: c.group as GroupKey,
-    difficulty: c.difficulty as OverviewChapter["difficulty"],
-    readingTime: c.readingTime,
-    comingSoon: c.comingSoon,
-    description: c.description,
-  }))
+    const items: OverviewChapter[] = chapters.map((c) => ({
+      slug: c.slug,
+      title: c.title,
+      group: c.group,
+      difficulty: c.difficulty as OverviewChapter["difficulty"],
+      readingTime: c.readingTime,
+      comingSoon: c.comingSoon,
+      description: c.description,
+    }))
 
-  return {
-    groups: mergeIntoGroups<OverviewChapter>(items, config?.groups ?? FALLBACK_GROUPS),
-    config,
-  }
-})
+    return {
+      groups: mergeIntoGroups<OverviewChapter>(items, config?.groups ?? []),
+      config,
+    }
+  },
+)
 
-/** 单章详情（章节页用）。comingSoon / 未发布 → null（前端 404） */
-export const getGuideChapterFull = cache(async (slug: string) => {
+/**
+ * 单章详情（章节页用）。published=false → null（前端 404）。
+ * comingSoon 章节可路由（目录全展示原则），页面据 comingSoon/空正文渲染「建设中」态。
+ */
+export const getGuideChapterFull = cache(async (series: string, slug: string) => {
   const chapter = await prisma.guideChapter.findUnique({
-    where: { slug },
+    where: { series_slug: { series, slug } },
     include: { author: { select: { id: true, name: true } } },
   })
-  if (!chapter || !chapter.published || chapter.comingSoon) return null
+  if (!chapter || !chapter.published) return null
   return chapter
 })
 
-/** 上一章 / 下一章（仅 published & !comingSoon，按 group+order 排序） */
-export const getGuideAdjacentChapters = cache(
-  async (slug: string): Promise<{ prev: GuideChapterSummary | null; next: GuideChapterSummary | null }> => {
-    const published = await prisma.guideChapter.findMany({
-      where: { published: true, comingSoon: false },
-      select: { slug: true, title: true },
-      orderBy: [{ group: "asc" }, { order: "asc" }],
-    })
-    const idx = published.findIndex((c) => c.slug === slug)
-    if (idx === -1) return { prev: null, next: null }
-    return {
-      prev: idx > 0 ? published[idx - 1] : null,
-      next: idx < published.length - 1 ? published[idx + 1] : null,
-    }
-  }
+/** 章节的正确教学序（按篇 order + 章内 order 扁平化），pager 与顺序消费方共用 */
+export const getGuideOrderedChapters = cache(
+  async (series: string): Promise<GuideChapterSummary[]> => {
+    const [chapters, groups] = await Promise.all([
+      prisma.guideChapter.findMany({
+        where: { series, published: true },
+        select: { slug: true, title: true, group: true, order: true },
+      }),
+      getGuideGroups(series),
+    ])
+    const groupOrder = new Map(groups.map((g, i) => [g.key, g.order * 1000 + i]))
+    return chapters
+      .sort(
+        (a, b) =>
+          (groupOrder.get(a.group) ?? 9999) - (groupOrder.get(b.group) ?? 9999) ||
+          a.order - b.order,
+      )
+      .map(({ slug, title }) => ({ slug, title }))
+  },
 )
 
-/** generateStaticParams 用：已发布且非 comingSoon 的 slug */
-export async function getGuidePublishedSlugs(): Promise<string[]> {
+/** 上一章 / 下一章（按篇 order + 章内 order 的正确教学序） */
+export const getGuideAdjacentChapters = cache(
+  async (
+    series: string,
+    slug: string,
+  ): Promise<{ prev: GuideChapterSummary | null; next: GuideChapterSummary | null }> => {
+    const ordered = await getGuideOrderedChapters(series)
+    const idx = ordered.findIndex((c) => c.slug === slug)
+    if (idx === -1) return { prev: null, next: null }
+    return {
+      prev: idx > 0 ? ordered[idx - 1] : null,
+      next: idx < ordered.length - 1 ? ordered[idx + 1] : null,
+    }
+  },
+)
+
+/** generateStaticParams 用：可路由 slug（published 即可，含 comingSoon 建设中页） */
+export async function getGuideRoutableSlugs(series: string): Promise<string[]> {
   const rows = await prisma.guideChapter.findMany({
-    where: { published: true, comingSoon: false },
+    where: { series, published: true },
     select: { slug: true },
   })
   return rows.map((r) => r.slug)
 }
 
-/** 首页 GuideSeriesCard 数据：系列 config + 统计 + 范围标签 */
-export const getGuideHomeCardData = cache(async () => {
-  const [config, chapters] = await Promise.all([
-    getGuideSeriesConfig(),
-    prisma.guideChapter.findMany({
-      where: { published: true },
-      select: { slug: true, group: true, comingSoon: true },
-    }),
-  ])
-  const published = chapters.filter((c) => !c.comingSoon)
-  const publishedCount = published.length
-  const totalCount = chapters.length
-  return {
-    config,
-    publishedCount,
-    totalCount,
-    latestPhaseRange: computePhaseRange(published),
-  }
-})
-
-/** 推导"Phase X–Y"或分组范围标签（移植自 guide-series-card.tsx） */
-function computePhaseRange(
-  published: { slug: string; group: string }[]
-): string {
-  const phaseNums = published
-    .map((c) => {
-      const m = c.slug.match(/phase-(\d+)/)
-      return m ? parseInt(m[1], 10) : null
-    })
-    .filter((n): n is number => n !== null)
-    .sort((a, b) => a - b)
-
-  if (phaseNums.length >= 2)
-    return `Phase ${phaseNums[0]}–${phaseNums[phaseNums.length - 1]}`
-  if (phaseNums.length === 1) return `Phase ${phaseNums[0]}`
-
-  // 无 phase-X slug 时用分组名
-  const groupKeys = new Set(published.map((c) => c.group))
-  const ordered = DEFAULT_GROUP_KEY_ORDER.filter((g) => groupKeys.has(g))
-  const groups = FALLBACK_GROUPS
-  if (ordered.length >= 2) {
-    return `${groups.find((g) => g.key === ordered[0])?.label}–${
-      groups.find((g) => g.key === ordered[ordered.length - 1])?.label
-    }`
-  }
-  if (ordered.length === 1) return groups.find((g) => g.key === ordered[0])?.label ?? ""
-  return ""
+/** 可读章节 slug（排除 comingSoon）——阅读进度/「从这里继续」用 */
+export async function getGuideReadableSlugs(series: string): Promise<string[]> {
+  const rows = await prisma.guideChapter.findMany({
+    where: { series, published: true, comingSoon: false },
+    select: { slug: true },
+  })
+  return rows.map((r) => r.slug)
 }
+
+/**
+ * 首页/书架卡片数据：全部注册系列（按注册表顺序）。
+ * rangeLabel = 已发布章节覆盖的篇范围（如「全局观–Dify 篇」）。
+ */
+export const getAllSeriesHomeCardData = cache(async () => {
+  const { GUIDE_SERIES } = await import("@/lib/guide/series")
+  const results = await Promise.all(
+    GUIDE_SERIES.map(async (meta) => {
+      const [config, chapters, groups] = await Promise.all([
+        getGuideSeriesConfig(meta.key),
+        prisma.guideChapter.findMany({
+          where: { series: meta.key, published: true },
+          select: { slug: true, group: true, comingSoon: true },
+        }),
+        getGuideGroups(meta.key),
+      ])
+      const published = chapters.filter((c) => !c.comingSoon)
+      const groupLabel = new Map(groups.map((g) => [g.key, g.label]))
+      const orderedGroups = [...groups].sort((a, b) => a.order - b.order)
+      const presentKeys = new Set(published.map((c) => c.group))
+      const presentOrdered = orderedGroups.filter((g) => presentKeys.has(g.key))
+      const rangeLabel =
+        presentOrdered.length >= 2
+          ? `${groupLabel.get(presentOrdered[0].key)}–${groupLabel.get(
+              presentOrdered[presentOrdered.length - 1].key,
+            )}`
+          : presentOrdered.length === 1
+            ? (groupLabel.get(presentOrdered[0].key) ?? "")
+            : ""
+      return {
+        series: meta.key,
+        config: config
+          ? {
+              title: config.title,
+              subtitle: config.subtitle,
+              coverImage: config.coverImage,
+              badge: config.badge,
+              cta: config.cta,
+            }
+          : null,
+        publishedCount: published.length,
+        totalCount: chapters.length,
+        rangeLabel,
+      }
+    }),
+  )
+  return results
+})
 
 /**
  * 估算阅读时长（中文友好：去 markdown 标记后按 ~400 字/分钟）。
