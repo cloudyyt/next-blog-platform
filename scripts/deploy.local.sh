@@ -8,7 +8,7 @@
 #
 # 流程：
 #   Step 0  本地 pnpm build
-#   Step 1  打包 release.tgz（含 .next / package.json / pnpm-lock.yaml / prisma / docs/agent-guide）
+#   Step 1  打包 release.tgz（含 .next / package.json / pnpm-lock.yaml / prisma / docs 电子书内容）
 #   Step 2  scp 上传到服务器
 #   Step 3  ssh 触发服务器端 deploy.server.sh（解压 + 装依赖 + migrate + 清缓存 + 重启）
 #
@@ -64,8 +64,8 @@ echo ""
 
 # ─── Step 1: 打包 ───
 info "Step 1/3  打包 release.tgz..."
-# 关键：必须带 docs/agent-guide，否则服务器 seed-guide 读不到内容
-PACK_FILES=".next package.json pnpm-lock.yaml prisma docs/agent-guide"
+# 关键：必须带 docs/（电子书内容：各书 manifest + md），否则服务器 seed-guide 读不到内容
+PACK_FILES=".next package.json pnpm-lock.yaml prisma docs"
 # 检查必要文件都在
 for f in $PACK_FILES; do
   [[ -e "$f" ]] || die "缺少必要文件/目录：$f"
