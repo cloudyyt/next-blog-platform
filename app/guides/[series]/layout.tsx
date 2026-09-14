@@ -32,7 +32,8 @@ export async function generateMetadata({
 
   return {
     title: {
-      default: title,
+      // 带品牌后缀，避免浏览器标签标题与页面 H1 完全相同（观感重复）
+      default: `${title} · zijieLeo Docs`,
       template: `%s · ${title}`,
     },
     description,

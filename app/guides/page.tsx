@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import {
   Compass,
@@ -46,6 +47,11 @@ const ACCENTS: Record<string, { icon: string; tint: string; ring: string }> = {
     tint: "bg-primary/10",
     ring: "hover:border-primary/40",
   },
+}
+
+export const metadata: Metadata = {
+  title: "书架 · zijieLeo Docs",
+  description: "zijieLeo 的电子书架：有空就来读两章。",
 }
 
 export default async function GuidesPage() {

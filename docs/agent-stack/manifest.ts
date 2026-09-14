@@ -61,7 +61,6 @@ export const chapters: ChapterMeta[] = [
     description:
       "从裸调 API 到多 Agent 系统：平台 / 框架 / 编排三层定位，LangChain · LlamaIndex · Dify · Coze · CrewAI 全景选型，Agent 岗 JD 到底在考什么。",
     readingTime: 15,
-    comingSoon: true,
   },
   {
     slug: "llm-basics",
@@ -71,7 +70,6 @@ export const chapters: ChapterMeta[] = [
     description:
       "实战锚点 · cooking-app：chat completions、流式、原生 Function Calling 的 JSON 形态；system/user 角色、结构化输出、few-shot——Dify 帮你藏起来的那层。",
     readingTime: 20,
-    comingSoon: true,
   },
   // ── Dify 篇 ──
   {
@@ -82,7 +80,6 @@ export const chapters: ChapterMeta[] = [
     description:
       "DeepSeek 接入、聊天助手、Prompt 编排——上班摸鱼零安装直接试（云服务版）。",
     readingTime: 20,
-    comingSoon: true,
   },
   {
     slug: "dify-rag",
@@ -92,7 +89,6 @@ export const chapters: ChapterMeta[] = [
     description:
       "实战锚点 · hakka-ecommerce：把客家电商的商品资料做成知识库，理解分段、索引与召回。",
     readingTime: 20,
-    comingSoon: true,
   },
   {
     slug: "dify-workflow",
@@ -101,7 +97,6 @@ export const chapters: ChapterMeta[] = [
     difficulty: "进阶",
     description: "从单次对话到多步骤流程：节点连线、条件分支、变量传递、迭代节点。",
     readingTime: 20,
-    comingSoon: true,
   },
   {
     slug: "dify-cooking-app",
@@ -111,7 +106,6 @@ export const chapters: ChapterMeta[] = [
     description:
       "实战锚点 · cooking-app：用 Dify 重做一遍烹饪问答，并回答关键问题——什么时候必须离开平台写代码。",
     readingTime: 25,
-    comingSoon: true,
   },
   // ── LangChain 篇 ──
   {
@@ -179,7 +173,7 @@ export const chapters: ChapterMeta[] = [
     title: "为什么需要 LangGraph",
     group: "langgraph",
     difficulty: "进阶",
-    description: "LangChain AgentExecutor 的局限，StateGraph 心智模型。",
+    description: "createAgent（1.0）帮你做了什么、什么时候不够用，StateGraph 心智模型。",
     readingTime: 15,
     comingSoon: true,
   },
