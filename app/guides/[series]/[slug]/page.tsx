@@ -12,6 +12,7 @@ import {
   estimateReadingTime,
 } from "@/lib/guide/data"
 import { isRegisteredSeries, getSeriesMeta } from "@/lib/guide/series"
+import { stripLeadingH1 } from "@/lib/utils/content"
 
 /**
  * 章节内容页：/guides/[series]/[slug]
@@ -132,7 +133,7 @@ export default async function ChapterPage({
         {/* 正文 */}
         {hasContent ? (
           <div className="prose prose-lg max-w-none min-w-0">
-            <PostContent content={chapter.content} />
+            <PostContent content={stripLeadingH1(chapter.content)} />
           </div>
         ) : (
           <p className="text-sm text-muted-foreground/60 py-8 text-center">
