@@ -158,6 +158,39 @@ model GuideSeriesConfig {
   @@map("guide_series_config")
 }
 
+// ─── 树洞（生活区）──────────────────────────────
+// 设计见 docs_memo/0917-树洞生活区设计方案.md：
+// 情绪短句在 about 碎碎念；树洞收录具体的事（游戏/动漫/随笔）。
+
+model LifeCategory {
+  id    String @id @default(cuid())
+  key   String @unique        // game | anime | essay | ...
+  name  String                // 单机游戏 / 动漫·影视
+  icon  String                // lucide 图标名
+  order Int    @default(10)
+  posts LifePost[]
+
+  @@map("life_categories")
+}
+
+model LifePost {
+  id          String        @id @default(cuid())
+  categoryId  String
+  category    LifeCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  title       String?       // 短记无标题（title 为空 = 短记，有 = 长文）
+  description String?       // 长文摘要（列表大卡用；不填则截取正文）
+  content     String        // markdown 正文
+  images      Json?         // OSS URL 数组（短记配图 / 长文封面取 images[0]）
+  date        DateTime      @default(now()) // 展示日期（可补记）
+  published   Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([categoryId, date(sort: Desc)])
+  @@index([published, date(sort: Desc)])
+  @@map("life_posts")
+}
+
 // 碎碎念（关于页时间线，短句/情绪记录）
 // 个人单站，不记作者。
 model Thought {

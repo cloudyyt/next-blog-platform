@@ -37,8 +37,8 @@ export interface ImageUploaderProps {
   size?: number
   /** 封面宽高比，仅 shape=square 生效。默认 16/9 */
   aspect?: number
-  /** 上传目录：avatar / cover-post / cover-guide（API 侧文件夹名用斜杠） */
-  folder: "avatar" | "cover/post" | "cover/guide"
+  /** 上传目录：avatar / cover-post / cover-guide / life（API 侧文件夹名用斜杠） */
+  folder: "avatar" | "cover/post" | "cover/guide" | "life"
   /**
    * 自定义上传端点。默认走 /api/admin/upload（admin 权限，附 folder）。
    * 设为自定义端点（如 /api/auth/upload-avatar）时按该端点逻辑上传，
@@ -51,6 +51,9 @@ export interface ImageUploaderProps {
   label?: string
   /** 提示文案（显示在标签下） */
   hint?: string
+  /** 紧凑模式：隐藏下方按钮组——上传/重选/移除全部走预览区（悬浮操作），
+   *  适合一排多图的场景（如树洞配图），避免「选择图片」文案与占位提示重复 */
+  compact?: boolean
   className?: string
 }
 
@@ -65,6 +68,7 @@ export function ImageUploader({
   onUploaded,
   label,
   hint,
+  compact,
   className,
 }: ImageUploaderProps) {
   const inputRef = React.useRef<HTMLInputElement>(null)
@@ -185,6 +189,28 @@ export function ImageUploader({
           </div>
         )}
 
+        {/* compact 模式：有图时悬浮操作（重选/移除） */}
+        {compact && displayUrl && !uploading && (
+          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={triggerPick}
+              className="p-1.5 rounded-md bg-white/90 text-gray-800 hover:bg-white transition-colors cursor-pointer"
+              aria-label="重新选择"
+            >
+              <ImagePlus className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={clear}
+              className="p-1.5 rounded-md bg-white/90 text-red-600 hover:bg-white transition-colors cursor-pointer"
+              aria-label="移除"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
+
         {/* 上传中遮罩 */}
         {uploading && (
           <div className="absolute inset-0 bg-background/70 flex flex-col items-center justify-center gap-1">
@@ -194,8 +220,8 @@ export function ImageUploader({
         )}
       </div>
 
-      {/* 操作按钮组 */}
-      <div className="flex items-center gap-2 flex-wrap">
+      {/* 操作按钮组（compact 模式隐藏，交互走预览区） */}
+      <div className={cn("flex items-center gap-2 flex-wrap", compact && "hidden")}>
         {!pendingFile ? (
           <>
             <Button

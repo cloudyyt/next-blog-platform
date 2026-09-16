@@ -18,10 +18,16 @@ import { VisualThemeContext } from "@/components/providers/visual-theme-provider
 export function DocsHeader({
   onOpenSidebar,
   brandHref,
+  brandText = "zijieLeo Docs",
+  brandIcon,
 }: {
   onOpenSidebar?: () => void
   /** 品牌「zijieLeo Docs」点击目标（缺省回书架） */
   brandHref?: string
+  /** 品牌文案（其他站点如树洞复用此 header 时传入） */
+  brandText?: string
+  /** 品牌图标（默认 BookOpen；树洞等站点可传树形图标） */
+  brandIcon?: React.ReactNode
 }) {
   const visualThemeContext = useContext(VisualThemeContext)
   const visualTheme = visualThemeContext?.theme ?? "cyber-neon"
@@ -60,8 +66,8 @@ export function DocsHeader({
               href={brandHref ?? "/guides"}
               className="flex items-center gap-2 text-base sm:text-lg font-bold font-display hover:text-primary transition-colors"
             >
-              <BookOpen className="w-5 h-5 text-primary" />
-              <span>zijieLeo Docs</span>
+              {brandIcon ?? <BookOpen className="w-5 h-5 text-primary" />}
+              <span>{brandText}</span>
             </Link>
           </div>
 

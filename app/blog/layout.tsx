@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { UserAvatar } from "@/components/ui/user-avatar"
 import { ProfileDialog } from "@/components/blog/profile-dialog"
-import { User, LogOut, BookOpen, ArrowLeft } from "lucide-react"
+import { User, LogOut, BookOpen, ArrowLeft, TreePine } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { SearchInput } from "@/components/blog/search-input"
@@ -96,6 +96,13 @@ export default function BlogLayout({
                 >
                   <BookOpen className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">书架</span>
+                </a>
+                <a
+                  href="/treehole"
+                  className="text-sm sm:text-base hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hidden sm:inline-flex items-center gap-1"
+                >
+                  <TreePine className="w-3.5 h-3.5" />
+                  <span>树洞</span>
                 </a>
                 <Suspense fallback={<div className="w-28 sm:w-44 h-9" />}>
                   <SearchInput />

@@ -11,6 +11,7 @@ export const ALLOWED_FOLDERS = [
   "cover/post",
   "cover/guide",
   "content",
+  "life",
 ] as const
 
 export type UploadFolder = (typeof ALLOWED_FOLDERS)[number]

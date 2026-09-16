@@ -90,7 +90,8 @@ export async function POST(request: NextRequest) {
           resized = pipeline.resize(1600, undefined, { fit: "inside", withoutEnlargement: true })
           break
         case "content":
-          // 正文插图：宽 1200，等比缩放（省流量）
+        case "life":
+          // 正文插图 / 树洞配图：宽 1200，等比缩放（省流量）
           resized = pipeline.resize(1200, undefined, { fit: "inside", withoutEnlargement: true })
           break
       }

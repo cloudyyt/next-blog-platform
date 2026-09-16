@@ -8,7 +8,7 @@
  */
 import { randomUUID } from "crypto"
 import { ossDriver } from "./oss"
-import type { StorageDriver, UploadFolder, StoredFile } from "./types"
+import { ALLOWED_FOLDERS, type StorageDriver, type UploadFolder, type StoredFile } from "./types"
 
 export { ALLOWED_FOLDERS } from "./types"
 export type { UploadFolder, StoredFile }
@@ -22,9 +22,7 @@ export function getStorage(): StorageDriver {
  * 校验 folder 是否在白名单内（防路径注入：folder 直接拼进 key）
  */
 export function isAllowedFolder(folder: string): folder is UploadFolder {
-  return (["avatar", "cover/post", "cover/guide", "content"] as const).includes(
-    folder as UploadFolder
-  )
+  return ALLOWED_FOLDERS.includes(folder as UploadFolder)
 }
 
 /**
