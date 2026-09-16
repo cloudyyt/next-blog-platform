@@ -96,8 +96,6 @@ export default async function ChapterPage({
             </Link>
             <ChevronRight className="w-3 h-3 text-muted-foreground/50 shrink-0" />
             <span className="text-muted-foreground/80 shrink-0">{groupLabel}</span>
-            <ChevronRight className="w-3 h-3 text-muted-foreground/50 shrink-0" />
-            <span className="text-foreground/80 truncate">{chapter.title}</span>
           </nav>
 
           <div className="flex items-center gap-2 text-[11px] shrink-0">
