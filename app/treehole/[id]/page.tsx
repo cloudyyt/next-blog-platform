@@ -36,7 +36,7 @@ export default async function TreeholePostPage({
   if (!post || !post.title) notFound() // 短记无详情页
 
   return (
-    <article className="max-w-3xl mx-auto">
+    <article className="max-w-4xl mx-auto">
       <div className="rounded-xl border border-border/60 bg-background shadow-soft px-6 py-8 sm:px-10 sm:py-12">
         {/* 面包屑 */}
         <nav
@@ -54,7 +54,7 @@ export default async function TreeholePostPage({
         </nav>
 
         {/* H1 */}
-        <h1 className="text-2xl sm:text-3xl font-bold font-display leading-tight mb-3">
+        <h1 className="text-2xl sm:text-3xl font-bold font-kai leading-tight mb-3">
           {post.title}
         </h1>
 
@@ -68,7 +68,7 @@ export default async function TreeholePostPage({
         </p>
 
         {/* 正文 */}
-        <div className="prose prose-lg max-w-none min-w-0">
+        <div className="prose prose-lg max-w-none min-w-0 font-kai [&_h2]:font-kai [&_h3]:font-kai [&_strong]:font-kai">
           <PostContent content={stripLeadingH1(post.content)} />
         </div>
 
