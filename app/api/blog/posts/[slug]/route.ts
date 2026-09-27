@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { withTimeout } from "@/lib/db-utils"
+import { toBlogPost } from "@/lib/blog/mapper"
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -56,28 +57,7 @@ export async function GET(
       )
     }
 
-    // 格式化返回数据
-    const formattedPost = {
-      id: post.id,
-      title: post.title,
-      slug: post.slug,
-      content: post.content,
-      excerpt: post.excerpt,
-      coverImage: post.coverImage,
-      published: post.published,
-      authorId: post.authorId,
-      author: {
-        id: post.author.id,
-        name: post.author.name,
-        email: "", // 保持兼容性
-      },
-      categories: post.categories,
-      tags: post.tags,
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString(),
-    }
-
-    return NextResponse.json(formattedPost)
+    return NextResponse.json(toBlogPost(post))
   } catch (error: any) {
     console.error("Error fetching post:", error)
     // 数据库连接失败时返回 404，而不是 500，避免服务器崩溃

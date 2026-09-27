@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { toBlogPosts } from "@/lib/blog/mapper"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
@@ -32,21 +33,7 @@ export async function GET(request: NextRequest) {
       take: 30,
     })
 
-    const formatted = posts.map((post) => ({
-      id: post.id,
-      title: post.title,
-      slug: post.slug,
-      excerpt: post.excerpt,
-      coverImage: post.coverImage,
-      published: post.published,
-      viewCount: post.viewCount ?? 0,
-      authorId: post.authorId,
-      author: { id: post.author.id, name: post.author.name, email: "" },
-      categories: post.categories,
-      tags: post.tags,
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString(),
-    }))
+    const formatted = toBlogPosts(posts)
 
     return NextResponse.json({ posts: formatted, total: formatted.length })
   } catch (error) {

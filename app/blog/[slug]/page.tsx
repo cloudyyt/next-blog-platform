@@ -8,6 +8,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Calendar, User, Clock, Eye } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import { toBlogPost, toBlogPosts } from "@/lib/blog/mapper"
 import { PostContent } from "@/components/blog/post-content"
 import { PostUnlock } from "@/components/blog/post-unlock"
 import { TableOfContents } from "@/components/blog/table-of-contents"
@@ -46,27 +47,7 @@ async function getPostBySlug(slug: string) {
 
   if (!post) return null
 
-  return {
-    id: post.id,
-    title: post.title,
-    slug: post.slug,
-    content: post.content,
-    excerpt: post.excerpt,
-    coverImage: post.coverImage,
-    published: post.published,
-    encrypted: post.encrypted,
-    viewCount: post.viewCount ?? 0,
-    authorId: post.authorId,
-    author: {
-      id: post.author.id,
-      name: post.author.name,
-      email: "",
-    },
-    categories: post.categories,
-    tags: post.tags,
-    createdAt: post.createdAt.toISOString(),
-    updatedAt: post.updatedAt.toISOString(),
-  }
+  return toBlogPost(post)
 }
 
 async function getRelatedPosts(postId: string, categorySlug?: string) {
@@ -91,21 +72,7 @@ async function getRelatedPosts(postId: string, categorySlug?: string) {
       take: 3,
     })
 
-    return posts.map((p) => ({
-      id: p.id,
-      title: p.title,
-      slug: p.slug,
-      content: p.content,
-      excerpt: p.excerpt,
-      coverImage: p.coverImage,
-      published: p.published,
-      authorId: p.authorId,
-      author: { id: p.author.id, name: p.author.name, email: "" },
-      categories: p.categories,
-      tags: p.tags,
-      createdAt: p.createdAt.toISOString(),
-      updatedAt: p.updatedAt.toISOString(),
-    }))
+    return toBlogPosts(posts)
   } catch (error) {
     console.error("Failed to fetch related posts:", error)
     return []

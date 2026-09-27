@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { withTimeout } from "@/lib/db-utils"
+import { toBlogPosts } from "@/lib/blog/mapper"
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -88,30 +89,8 @@ export async function GET(request: Request) {
         5000
       )
 
-      // 格式化返回数据
-      const formattedPosts = posts.map((post) => ({
-        id: post.id,
-        title: post.title,
-        slug: post.slug,
-        content: post.content,
-        excerpt: post.excerpt,
-        coverImage: post.coverImage,
-        published: post.published,
-        viewCount: post.viewCount ?? 0,
-        authorId: post.authorId,
-        author: {
-          id: post.author.id,
-          name: post.author.name,
-          email: "", // 保持兼容性
-        },
-        categories: post.categories,
-        tags: post.tags,
-        createdAt: post.createdAt.toISOString(),
-        updatedAt: post.updatedAt.toISOString(),
-      }))
-
       return NextResponse.json({
-        posts: formattedPosts,
+        posts: toBlogPosts(posts),
         total,
         page,
         limit,

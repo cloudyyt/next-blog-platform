@@ -4,6 +4,7 @@
  */
 import { Suspense } from "react"
 import { prisma } from "@/lib/prisma"
+import { toBlogPosts } from "@/lib/blog/mapper"
 import { BlogPageClient } from "@/components/blog/blog-page-client"
 import { Loading } from "@/components/ui/loading"
 
@@ -58,29 +59,7 @@ async function getPostsFromDB(tagSlug?: string, categorySlug?: string) {
       prisma.post.count({ where }),
     ])
 
-    const formatted = posts.map((post) => ({
-      id: post.id,
-      title: post.title,
-      slug: post.slug,
-      content: post.content,
-      excerpt: post.excerpt,
-      coverImage: post.coverImage,
-      published: post.published,
-      encrypted: post.encrypted,
-      viewCount: post.viewCount ?? 0,
-      authorId: post.authorId,
-      author: {
-        id: post.author.id,
-        name: post.author.name,
-        email: "",
-      },
-      categories: post.categories,
-      tags: post.tags,
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString(),
-    }))
-
-    return { posts: formatted, total }
+    return { posts: toBlogPosts(posts), total }
   } catch (error) {
     console.error("Failed to fetch posts:", error)
     return { posts: [], total: 0 }
