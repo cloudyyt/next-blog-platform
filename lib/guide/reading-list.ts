@@ -30,7 +30,7 @@ export const READING_LIST: ReadingBook[] = [
     link: douban("代码整洁之道"),
   },
   {
-    title: "埃隆·马斯克传",
+    title: "埃隆·马斯克",
     author: "沃尔特·艾萨克森",
     comment: "把不可能拆成工程问题，再一层层往前拱。当小说读，也当方法读。",
     status: "reading",

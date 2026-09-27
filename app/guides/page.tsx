@@ -57,7 +57,7 @@ export default async function GuidesPage() {
         <section>
           <div className="mb-6 flex items-center gap-2.5">
             <PenLine className="h-4 w-4 text-primary" />
-            <h2 className="font-handwriting text-lg font-bold">自己写的几本</h2>
+            <h2 className="font-handwriting text-lg font-bold">自己整理收集的</h2>
             <span className="rounded-full border border-border/60 px-2 py-0.5 text-[10px] text-muted-foreground">
               {books.length} 本 · 持续连载
             </span>
