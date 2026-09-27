@@ -1,14 +1,29 @@
+import { randomBytes } from "crypto"
 import { PrismaClient } from "@prisma/client"
 import { hashPassword } from "../lib/auth"
 
 const prisma = new PrismaClient()
+
+/**
+ * 取种子账号初始密码：优先环境变量（SEED_ADMIN_PASSWORD / SEED_TEST_PASSWORD），
+ * 未提供则生成随机密码并只在控制台打印一次。
+ * upsert 的 update 为空，重复执行不会覆盖已有账号的密码。
+ */
+function getSeedPassword(envKey: string, label: string): string {
+  const fromEnv = process.env[envKey]
+  if (fromEnv) return fromEnv
+
+  const generated = randomBytes(12).toString("base64url")
+  console.log(`🔑 已为「${label}」生成随机初始密码（仅显示这一次，请立即保存）: ${generated}`)
+  return generated
+}
 
 async function main() {
   console.log("🌱 开始创建测试数据...")
 
   // 1. 创建管理员用户（博主）
   console.log("📝 创建用户...")
-  const adminPassword = await hashPassword("admin123")
+  const adminPassword = await hashPassword(getSeedPassword("SEED_ADMIN_PASSWORD", "管理员"))
   const admin = await prisma.user.upsert({
     where: { name: "博主" },
     update: {},
@@ -1859,7 +1874,7 @@ jobs:
   // 5. 创建一些测试用户和评论
   console.log("💬 创建测试用户和评论...")
   
-  const testUserPassword = await hashPassword("test123")
+  const testUserPassword = await hashPassword(getSeedPassword("SEED_TEST_PASSWORD", "测试用户"))
   const testUser = await prisma.user.upsert({
     where: { name: "测试用户" },
     update: {},

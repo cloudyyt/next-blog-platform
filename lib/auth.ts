@@ -5,7 +5,21 @@
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production"
+/**
+ * 读取 JWT 密钥（缺失即拒绝工作，不回退到默认值）。
+ *
+ * 不在模块顶层抛错：seed 等脚本会 import 本文件的 hashPassword，
+ * 顶层抛错会连带阻断与令牌无关的调用方。真正的签发/校验走到这里时才 fail fast。
+ */
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET
+  if (!secret) {
+    throw new Error(
+      "JWT_SECRET 未配置：拒绝签发/校验登录令牌。请在环境变量中配置强随机密钥（≥32 字符）。"
+    )
+  }
+  return secret
+}
 
 export interface JWTPayload {
   userId: string
@@ -34,7 +48,7 @@ export async function verifyPassword(
  * 生成 JWT Token
  */
 export function generateToken(payload: JWTPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" })
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: "7d" })
 }
 
 /**
@@ -42,7 +56,7 @@ export function generateToken(payload: JWTPayload): string {
  */
 export function verifyToken(token: string): JWTPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload
+    return jwt.verify(token, getJwtSecret()) as JWTPayload
   } catch (error) {
     return null
   }
