@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { PostEditor } from "@/components/admin/post-editor"
-import { Skeleton } from "@/components/ui/skeleton"
+import { PenLine } from "lucide-react"
+import { WritingStudio } from "@/components/admin/writing-studio"
 import { authFetch } from "@/lib/admin-fetch"
 
 interface PostData {
@@ -50,35 +50,27 @@ export default function EditPostPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-10 w-48" />
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 space-y-4">
-            <Skeleton className="h-14 w-full rounded-lg" />
-            <Skeleton className="h-8 w-3/4 rounded-md" />
-            <Skeleton className="h-[500px] w-full rounded-lg" />
-          </div>
-          <div className="w-80 space-y-4">
-            <Skeleton className="h-24 w-full rounded-lg" />
-            <Skeleton className="h-32 w-full rounded-lg" />
-            <Skeleton className="h-48 w-full rounded-lg" />
-            <Skeleton className="h-48 w-full rounded-lg" />
-          </div>
-        </div>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
+        <PenLine className="h-7 w-7 animate-pulse text-[#B3402A]/70" />
+        <p className="font-handwriting text-sm tracking-widest text-[#8A8171]">
+          正在翻开这篇手记……
+        </p>
       </div>
     )
   }
 
   if (notFound) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 space-y-4">
-        <h2 className="text-2xl font-bold">文章不存在</h2>
-        <p className="text-muted-foreground">找不到该文章，可能已被删除。</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
+        <h2 className="font-brush text-2xl text-[#1A1A1A]">文章不存在</h2>
+        <p className="font-handwriting text-sm text-[#8A8171]">
+          找不到这篇文章，可能已被删除。
+        </p>
         <button
           onClick={() => router.push("/admin/posts")}
-          className="text-primary hover:underline"
+          className="font-handwriting cursor-pointer text-sm text-[#B3402A] hover:underline"
         >
-          返回文章列表
+          返回文章列表 →
         </button>
       </div>
     )
@@ -87,7 +79,7 @@ export default function EditPostPage() {
   if (!post) return null
 
   return (
-    <PostEditor
+    <WritingStudio
       mode="edit"
       postId={params.id as string}
       initialData={{

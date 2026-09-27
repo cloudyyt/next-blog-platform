@@ -42,24 +42,16 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, logout, isAuthenticated, loading } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const isLoginPage = pathname === "/admin/login"
-
   useEffect(() => {
-    if (isLoginPage) return
-
     if (!loading && (!isAuthenticated || user?.role !== "admin")) {
       router.push("/admin/login")
     }
-  }, [loading, isAuthenticated, user, router, isLoginPage])
+  }, [loading, isAuthenticated, user, router])
 
   const handleLogout = () => {
     logout()
     toast.success("退出登录成功")
     router.push("/admin/login")
-  }
-
-  if (isLoginPage) {
-    return <>{children}</>
   }
 
   if (loading) {

@@ -76,6 +76,43 @@
 }
 
 @layer utilities {
+  /* ── 写作书房（/admin/posts/new、edit）────────────────
+     纸感书房配色：纸张米白 + 墨色 + 朱砂点睛。
+     paper-scope 强制覆盖 shadcn 主题变量（写作时恒为纸感浅色，
+     不随全站明暗切换），内部复用的选择器/上传器等组件自动继承。 */
+  .paper-scope {
+    --background: 42 33% 98%;
+    --foreground: 0 0% 10%;
+    --card: 45 43% 99%;
+    --card-foreground: 0 0% 10%;
+    --popover: 45 43% 99%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 9 61% 40%;          /* 朱砂 */
+    --primary-foreground: 40 30% 98%;
+    --secondary: 42 25% 93%;
+    --secondary-foreground: 30 10% 26%;
+    --muted: 42 25% 93%;
+    --muted-foreground: 35 10% 40%;
+    --accent: 35 40% 50%;
+    --accent-foreground: 40 30% 98%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 40 30% 98%;
+    --border: 43 31% 88%;
+    --input: 43 30% 90%;
+    --ring: 9 61% 40%;
+    --radius: 0.75rem;
+  }
+
+  /* 手写字体：霞鹜文楷（webfont，区别于碎碎念的系统楷体栈） */
+  .font-handwriting {
+    font-family: "LXGW WenKai", var(--font-kai);
+  }
+
+  /* 毛笔书法：马善政楷书，用于写作书房的标题 */
+  .font-brush {
+    font-family: "Ma Shan Zheng", "LXGW WenKai", var(--font-kai);
+  }
+
   .font-kai {
     font-family: var(--font-kai);
   }
