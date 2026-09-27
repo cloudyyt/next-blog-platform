@@ -9,7 +9,7 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:generate:prod": "prisma generate",
