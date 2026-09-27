@@ -103,6 +103,33 @@
     --radius: 0.75rem;
   }
 
+  /* ── 书房世界（/guides 全域）────────────────────
+     暖纸墙面 + 墨色文字 + 木质主色 + 暖金点缀。
+     固定浅色（书房不该跟着明暗主题变黑），整域套 study-scope 后，
+     background/foreground/primary 等主题 token 全部映射为书房配色。 */
+  .study-scope {
+    --background: 40 44% 92%;          /* 暖纸墙 #F5EFE3 */
+    --foreground: 38 33% 13%;          /* 墨色 #2C2416 */
+    --card: 43 59% 96%;                /* 阅读纸面 #FBF7EE */
+    --card-foreground: 38 33% 13%;
+    --popover: 43 59% 96%;
+    --popover-foreground: 38 33% 13%;
+    --primary: 28 45% 41%;             /* 木质 #96613A */
+    --primary-foreground: 42 45% 95%;
+    --secondary: 40 41% 89%;
+    --secondary-foreground: 35 25% 25%;
+    --muted: 40 41% 89%;
+    --muted-foreground: 39 32% 45%;    /* #8A7A5E */
+    --accent: 39 53% 52%;              /* 暖金 #C9973F */
+    --accent-foreground: 40 40% 97%;
+    --destructive: 8 55% 45%;
+    --destructive-foreground: 40 40% 97%;
+    --border: 40 42% 84%;              /* #E5DBC6 */
+    --input: 40 42% 86%;
+    --ring: 28 45% 41%;
+    --radius: 0.75rem;
+  }
+
   /* 手写字体：霞鹜文楷（webfont，区别于碎碎念的系统楷体栈） */
   .font-handwriting {
     font-family: "LXGW WenKai", var(--font-kai);
