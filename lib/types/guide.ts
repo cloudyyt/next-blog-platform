@@ -164,4 +164,6 @@ export interface GuideHomeCardData {
   publishedCount: number
   totalCount: number
   rangeLabel: string
+  /** 可读章节 slug（按目录顺序），书架「点书续读」用 */
+  readableSlugs: string[]
 }

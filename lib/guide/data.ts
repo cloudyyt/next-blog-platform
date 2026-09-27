@@ -244,7 +244,8 @@ export const getAllSeriesHomeCardData = cache(async () => {
         getGuideSeriesConfig(meta.key),
         prisma.guideChapter.findMany({
           where: { series: meta.key, published: true },
-          select: { slug: true, group: true, comingSoon: true },
+          select: { slug: true, group: true, comingSoon: true, order: true },
+          orderBy: [{ group: "asc" }, { order: "asc" }],
         }),
         getGuideGroups(meta.key),
       ])
@@ -275,6 +276,7 @@ export const getAllSeriesHomeCardData = cache(async () => {
         publishedCount: published.length,
         totalCount: chapters.length,
         rangeLabel,
+        readableSlugs: published.map((c) => c.slug),
       }
     }),
   )
