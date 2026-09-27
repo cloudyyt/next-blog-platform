@@ -155,13 +155,15 @@ export function BlogPageClient({
               </div>
             )
           ) : initialPosts.length > 0 ? (
+            /* key 绑定筛选条件：切换分类/标签时强制重挂载，否则内部 state 不随 props 重置 */
             <LoadMoreButton
+              key={`${tagSlug ?? "all"}-${categorySlug ?? "all"}`}
               initialPosts={initialPosts}
               totalPosts={totalPosts}
               pageSize={pageSize}
               tagSlug={tagSlug}
               categorySlug={categorySlug}
-                          />
+            />
           ) : (
             <div className="text-center py-12 rounded-xl border bg-card/80 backdrop-blur-sm">
               <p className="text-muted-foreground">暂无文章</p>
