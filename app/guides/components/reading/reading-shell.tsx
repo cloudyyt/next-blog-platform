@@ -144,7 +144,8 @@ export function ReadingShell({
           aria-label="章节目录"
           className={cn(
             "absolute left-0 top-0 flex h-full w-80 max-w-[85vw] flex-col border-r border-border bg-card shadow-[16px_0_48px_rgba(60,35,15,0.18)]",
-            "transition-transform duration-300 ease-out motion-reduce:transition-none",
+            /* iOS 风格抽屉专用曲线（emil 动效体系 --ease-drawer） */
+            "transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none",
             drawerOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >

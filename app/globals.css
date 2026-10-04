@@ -128,6 +128,30 @@
     --input: 40 42% 86%;
     --ring: 28 45% 41%;
     --radius: 0.75rem;
+    /* 动效 token（emil 动效体系）：强 ease-out / iOS 抽屉曲线 */
+    --ease-strong-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* 章节正文入场（@starting-style：挂载即入场，零 JS） */
+  .chapter-enter {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 250ms var(--ease-strong-out),
+      transform 250ms var(--ease-strong-out);
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chapter-enter {
+      transform: none;
+      transition: opacity 200ms ease;
+    }
   }
 
   /* 手写字体：霞鹜文楷（webfont，区别于碎碎念的系统楷体栈） */

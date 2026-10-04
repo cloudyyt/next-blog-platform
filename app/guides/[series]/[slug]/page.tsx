@@ -101,7 +101,7 @@ export default async function ChapterPage({
       totalChapters={readableSlugs.length}
       toc={sidebar}
     >
-      <article className="mx-auto w-full max-w-4xl px-4 pb-16 pt-8 sm:pt-10">
+      <article className="chapter-enter mx-auto w-full max-w-4xl px-4 pb-16 pt-8 sm:pt-10">
         {/* 阅读纸面 */}
         <div className="rounded-xl border border-border/70 bg-card px-6 py-8 shadow-[0_10px_30px_-14px_rgba(90,60,25,0.35)] sm:px-10 sm:py-12">
           {/* 面包屑 + 元信息 */}
@@ -168,7 +168,7 @@ export default async function ChapterPage({
           {prev ? (
             <Link
               href={`/guides/${series}/${prev.slug}`}
-              className="group flex flex-col gap-1 rounded-xl border border-border/70 bg-card/80 p-4 outline-none transition-all cursor-pointer hover:border-accent/50 hover:bg-card focus-visible:ring-2 focus-visible:ring-ring"
+              className="group flex flex-col gap-1 rounded-xl border border-border/70 bg-card/80 p-4 outline-none cursor-pointer transition-[transform,border-color,background-color] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] motion-reduce:transform-none hover:border-accent/50 hover:bg-card focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
                 <ArrowLeft className="h-3 w-3" />
@@ -184,7 +184,7 @@ export default async function ChapterPage({
           {next ? (
             <Link
               href={`/guides/${series}/${next.slug}`}
-              className="group flex flex-col gap-1 rounded-xl border border-border/70 bg-card/80 p-4 text-right outline-none transition-all cursor-pointer hover:border-accent/50 hover:bg-card focus-visible:ring-2 focus-visible:ring-ring"
+              className="group flex flex-col gap-1 rounded-xl border border-border/70 bg-card/80 p-4 text-right outline-none cursor-pointer transition-[transform,border-color,background-color] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] motion-reduce:transform-none hover:border-accent/50 hover:bg-card focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span className="flex items-center gap-1 justify-end text-xs text-muted-foreground">
                 下一章
@@ -197,7 +197,7 @@ export default async function ChapterPage({
           ) : (
             <Link
               href={`/guides/${series}`}
-              className="group flex flex-col gap-1 rounded-xl border border-border/70 bg-card/80 p-4 text-right outline-none transition-all cursor-pointer hover:border-accent/50 hover:bg-card focus-visible:ring-2 focus-visible:ring-ring"
+              className="group flex flex-col gap-1 rounded-xl border border-border/70 bg-card/80 p-4 text-right outline-none cursor-pointer transition-[transform,border-color,background-color] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] motion-reduce:transform-none hover:border-accent/50 hover:bg-card focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span className="flex items-center gap-1 justify-end text-xs text-muted-foreground">
                 读完这章

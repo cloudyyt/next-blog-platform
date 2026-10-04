@@ -62,7 +62,9 @@ export function ContinueButton({
           "flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full",
           "bg-primary font-handwriting text-base font-medium text-primary-foreground",
           "shadow-[0_6px_16px_-6px_rgba(120,70,30,0.6)]",
-          "transition-all duration-200 hover:brightness-110 hover:shadow-[0_8px_20px_-6px_rgba(120,70,30,0.7)]",
+          "transition-[transform,filter,box-shadow] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)]",
+          "active:scale-[0.97] motion-reduce:transform-none",
+          "hover:brightness-110 hover:shadow-[0_8px_20px_-6px_rgba(120,70,30,0.7)]",
           "outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         )}
       >
