@@ -143,8 +143,7 @@ export const chapters: ChapterMeta[] = [
     description:
       "Embedding、向量库、检索链——用代码重做 Dify 知识库，理解平台替你做了什么。",
     readingTime: 25,
-    comingSoon: true,
-  },
+      },
   {
     slug: "lc-mcp",
     title: "MCP 协议：工具接入的事实标准",
@@ -162,8 +161,7 @@ export const chapters: ChapterMeta[] = [
     description:
       "实战锚点 · cooking-app：把 ai.service.ts 从裸 SDK 重构成 LangChain.js（工具 + 记忆 + 结构化输出全套）。",
     readingTime: 30,
-    comingSoon: true,
-  },
+      },
   // ── LangGraph 篇 ──
   {
     slug: "lg-loops",
@@ -181,8 +179,7 @@ export const chapters: ChapterMeta[] = [
     difficulty: "实战",
     description: "中断 / 恢复 / 时间旅行——关键节点交还人类决策。",
     readingTime: 20,
-    comingSoon: true,
-  },
+      },
   {
     slug: "lg-multi-agent",
     title: "多 Agent 协作：宠物日记工作流",
@@ -191,8 +188,7 @@ export const chapters: ChapterMeta[] = [
     description:
       "实战锚点 · lovelyPet：supervisor 模式实战，给萌宠日记生成做多 Agent 编排。",
     readingTime: 30,
-    comingSoon: true,
-  },
+      },
   // ── 工程化篇 ──
   {
     slug: "eng-ts-vs-python",
@@ -202,8 +198,7 @@ export const chapters: ChapterMeta[] = [
     description:
       "实战锚点 · lovelyPet：Python Agent 服务废弃、AI 并入全栈 TS 的完整决策复盘——两条路线的真实权衡。",
     readingTime: 20,
-    comingSoon: true,
-  },
+      },
   {
     slug: "eng-context",
     title: "Context Engineering：上下文工程",
@@ -221,8 +216,7 @@ export const chapters: ChapterMeta[] = [
     description:
       "chunking 策略、混合检索、rerank、评测体系——JD 里最重的 RAG 落地经验，面试深水区。",
     readingTime: 30,
-    comingSoon: true,
-  },
+      },
   {
     slug: "eng-production",
     title: "部署、可观测与面试准备",
@@ -231,6 +225,5 @@ export const chapters: ChapterMeta[] = [
     description:
       "LangSmith / Langfuse tracing、成本控制、错误降级；微调与 RAG / Prompt 的边界；简历与面试怎么讲 Agent 项目。",
     readingTime: 20,
-    comingSoon: true,
-  },
+      },
 ]
