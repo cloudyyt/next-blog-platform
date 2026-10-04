@@ -14,15 +14,41 @@
 
 ## 应用岗的一天（时间去向）
 
-```mermaid
-pie title 工作时间分布（经验估计）
-    "RAG 数据与检索调优" : 30
-    "Prompt 设计与评测" : 20
-    "常规工程开发" : 20
-    "工具与业务对接" : 15
-    "兜底 / 安全 / 降本" : 10
-    "编排创新" : 5
-```
+
+<figure>
+<svg viewBox="0 0 800 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Agent 应用岗工作时间分布：RAG 30%、Prompt 20%、工程开发 20%、工具对接 15%、安全降本 10%、编排创新 5%">
+<rect width="800" height="230" fill="#FBF7EE" rx="14"/>
+<rect x="1" y="1" width="798" height="228" fill="none" stroke="#D4C9A9" stroke-width="1.5" rx="14"/>
+<text x="400" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#2C2416">工作时间分布（经验估计）</text>
+<!-- Stacked bar -->
+<rect x="24" y="58" width="226" height="48" rx="8" fill="#D4744C"/>
+<text x="137" y="80" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#FFF8F0">30%</text>
+<text x="137" y="96" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#FFE8DC">RAG 调优</text>
+<rect x="258" y="58" width="150" height="48" fill="#C9973F"/>
+<text x="333" y="80" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#FFF8F0">20%</text>
+<text x="333" y="96" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#F5E8CE">Prompt</text>
+<rect x="416" y="58" width="150" height="48" fill="#7A9B6D"/>
+<text x="491" y="80" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#FFF8F0">20%</text>
+<text x="491" y="96" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#E2ECD9">工程开发</text>
+<rect x="574" y="58" width="113" height="48" fill="#5B7FA6"/>
+<text x="630" y="80" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#FFF8F0">15%</text>
+<text x="630" y="96" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#DCE6EF">工具对接</text>
+<rect x="695" y="58" width="57" height="48" fill="#96613A"/>
+<text x="723" y="80" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#FFF8F0">10%</text>
+<rect x="760" y="58" width="16" height="48" rx="4" fill="#B8A98A"/>
+<text x="768" y="76" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#FFF">5%</text>
+<!-- Labels below bar -->
+<text x="137" y="130" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#8A7A5E">RAG 数据与检索调优</text>
+<text x="333" y="130" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#8A7A5E">Prompt 设计与评测</text>
+<text x="491" y="130" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#8A7A5E">常规工程开发</text>
+<text x="630" y="130" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#8A7A5E">工具与业务对接</text>
+<text x="710" y="130" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#8A7A5E">安全降本 · 编排</text>
+<!-- Insight box -->
+<rect x="24" y="152" width="752" height="56" rx="10" fill="#FDF5E6" stroke="#DBCB9A"/>
+<text x="400" y="176" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#6B4226" font-weight="600">一句话：用工程手段，把不确定的智能组件包装成确定可交付的产品。</text>
+<text x="400" y="196" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#8A7A5E">RAG 是最重的一块——也是面试官最爱问的一块</text>
+</svg>
+</figure>
 
 > 一句话：**用工程手段，把一个不确定的智能组件，包装成确定可交付的产品。**
 > 前半句是你的存量能力，后半句是转岗要补的。

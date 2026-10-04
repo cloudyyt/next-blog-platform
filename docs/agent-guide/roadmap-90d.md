@@ -18,10 +18,44 @@
 
 ## 90 天三段式
 
-```mermaid
-flowchart LR
-    A["第 1-30 天<br/>见与跑通"] --> B["第 31-60 天<br/>代码重写"] --> C["第 61-90 天<br/>深度与作品"]
-```
+
+<figure>
+<svg viewBox="0 0 800 170" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="90 天三段式路线：见与跑通 → 代码重写 → 深度与作品">
+<rect width="800" height="170" fill="#FBF7EE" rx="14"/>
+<rect x="1" y="1" width="798" height="168" fill="none" stroke="#D4C9A9" stroke-width="1.5" rx="14"/>
+<!-- Phase 1 -->
+<g>
+<rect x="24" y="24" width="220" height="122" rx="12" fill="#F0F5EE" stroke="#B8C9AE" stroke-width="1.5"/>
+<rect x="24" y="24" width="220" height="6" rx="3" fill="#7A9B6D"/>
+<text x="134" y="56" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#7A9B6D" font-weight="600">第 1 – 30 天</text>
+<text x="134" y="82" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700" fill="#2C2416">见与跑通</text>
+<text x="134" y="106" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#8A7A5E">Dify 跑通 · 裸 SDK 调用</text>
+<text x="134" y="126" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#A89878">建全局观</text>
+</g>
+<path d="M 254 85 L 278 85" stroke="#B8A98A" stroke-width="2" stroke-linecap="round"/>
+<path d="M 272 79 L 280 85 L 272 91" fill="none" stroke="#B8A98A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<!-- Phase 2 -->
+<g>
+<rect x="290" y="24" width="220" height="122" rx="12" fill="#FDF5E6" stroke="#DBCB9A" stroke-width="1.5"/>
+<rect x="290" y="24" width="220" height="6" rx="3" fill="#C9973F"/>
+<text x="400" y="56" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#C9973F" font-weight="600">第 31 – 60 天</text>
+<text x="400" y="82" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700" fill="#2C2416">代码重写</text>
+<text x="400" y="106" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#8A7A5E">LangChain 重构项目</text>
+<text x="400" y="126" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#A89878">拿回控制权</text>
+</g>
+<path d="M 520 85 L 544 85" stroke="#B8A98A" stroke-width="2" stroke-linecap="round"/>
+<path d="M 538 79 L 546 85 L 538 91" fill="none" stroke="#B8A98A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<!-- Phase 3 -->
+<g>
+<rect x="556" y="24" width="220" height="122" rx="12" fill="#FEF3EB" stroke="#E8C9B0" stroke-width="1.5"/>
+<rect x="556" y="24" width="220" height="6" rx="3" fill="#D4744C"/>
+<text x="666" y="56" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#D4744C" font-weight="600">第 61 – 90 天</text>
+<text x="666" y="82" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700" fill="#2C2416">深度与作品</text>
+<text x="666" y="106" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#8A7A5E">LangGraph · 评测 · 观测</text>
+<text x="666" y="126" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#A89878">代表作 + 面试</text>
+</g>
+</svg>
+</figure>
 
 | 阶段 | 目标 | 产出物 |
 |---|---|---|

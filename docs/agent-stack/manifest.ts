@@ -28,7 +28,7 @@ export const GROUPS: Record<ChapterGroup, GroupMeta> = {
   dify: { label: "Dify 篇", hint: "平台层 · 可视化建立全局流程" },
   langchain: { label: "LangChain 篇", hint: "框架层 · 基础件 + MCP 标准" },
   langgraph: { label: "LangGraph 篇", hint: "编排层 · 图状态与多 Agent" },
-  engineering: { label: "工程化篇", hint: "落地 · RAG 深水区 / 观测 / 求职" },
+  engineering: { label: "工程化篇", hint: "落地 · 上下文工程 / RAG 深水区 / 安全 / 求职" },
 }
 
 export const GROUP_ORDER: ChapterGroup[] = [
@@ -116,8 +116,7 @@ export const chapters: ChapterMeta[] = [
     description:
       "实战锚点 · cooking-app：对照裸 OpenAI SDK 代码，理解 ChatModel、流式输出与结构化输出。",
     readingTime: 20,
-    comingSoon: true,
-  },
+      },
   {
     slug: "lc-tools",
     title: "工具调用：从原生 FC 到框架 Tools",
@@ -126,27 +125,16 @@ export const chapters: ChapterMeta[] = [
     description:
       "原生 Function Calling 的 JSON 细节 → LangChain 工具封装 → 错误处理与重试——Agent 的「手」。",
     readingTime: 20,
-    comingSoon: true,
-  },
-  {
-    slug: "lc-mcp",
-    title: "MCP 协议：工具接入的事实标准",
-    group: "langchain",
-    difficulty: "进阶",
-    description:
-      "2026 年 Agent 连接外部系统的事实标准（月下载近亿）：亲手写一个 MCP Server 并接入 Agent——面试新高频。",
-    readingTime: 25,
-    comingSoon: true,
-  },
+      },
   {
     slug: "lc-memory",
     title: "记忆与多轮对话",
     group: "langchain",
     difficulty: "进阶",
-    description: "从无状态到短期 / 长期记忆，多轮对话的状态管理。",
-    readingTime: 15,
-    comingSoon: true,
-  },
+    description:
+      "从无状态到会话持久化：短期记忆、长期记忆、项目记忆三层体系；参考 easy-agent 的 session + memory 实现。",
+    readingTime: 20,
+      },
   {
     slug: "lc-rag",
     title: "RAG 代码化：拆开 Dify 的黑盒",
@@ -156,6 +144,15 @@ export const chapters: ChapterMeta[] = [
       "Embedding、向量库、检索链——用代码重做 Dify 知识库，理解平台替你做了什么。",
     readingTime: 25,
     comingSoon: true,
+  },
+  {
+    slug: "lc-mcp",
+    title: "MCP 协议：工具接入的事实标准",
+    group: "langchain",
+    difficulty: "进阶",
+    description:
+      "2026 年 Agent 连接外部系统的事实标准（月下载近亿）：三种传输、工具适配器、亲手写一个 MCP Server。",
+    readingTime: 25,
   },
   {
     slug: "lc-refactor",
@@ -169,32 +166,14 @@ export const chapters: ChapterMeta[] = [
   },
   // ── LangGraph 篇 ──
   {
-    slug: "lg-why-graph",
-    title: "为什么需要 LangGraph",
-    group: "langgraph",
-    difficulty: "进阶",
-    description: "createAgent（1.0）帮你做了什么、什么时候不够用，StateGraph 心智模型。",
-    readingTime: 15,
-    comingSoon: true,
-  },
-  {
-    slug: "lg-state-graph",
-    title: "StateGraph 核心：状态、节点与路由",
-    group: "langgraph",
-    difficulty: "进阶",
-    description: "节点 / 边 / 条件路由 / 状态设计——图编排的基本功。",
-    readingTime: 25,
-    comingSoon: true,
-  },
-  {
     slug: "lg-loops",
-    title: "循环与 ReAct：用图重写 Agent 循环",
+    title: "Agentic Loop：从裸循环到图编排",
     group: "langgraph",
     difficulty: "实战",
-    description: "循环、终止条件、ReAct 模式的图实现。",
-    readingTime: 25,
-    comingSoon: true,
-  },
+    description:
+      "Agent 的心脏是一个 while 循环：Reason → Act → Observe → 再循环。从 easy-agent 的 20 行裸实现拆到 LangGraph 的 StateGraph 图编排，一次讲透。",
+    readingTime: 30,
+      },
   {
     slug: "lg-hitl",
     title: "Human-in-the-loop 与检查点",
@@ -225,6 +204,15 @@ export const chapters: ChapterMeta[] = [
     readingTime: 20,
     comingSoon: true,
   },
+  {
+    slug: "eng-context",
+    title: "Context Engineering：上下文工程",
+    group: "engineering",
+    difficulty: "实战",
+    description:
+      "2026 年 Agent 工程的核心技能：上下文压缩策略、Token 预算精细管理、长任务状态管理。参考 easy-agent 的 compaction + budget 实现。",
+    readingTime: 25,
+      },
   {
     slug: "eng-rag-deep",
     title: "RAG 深水区：从能用到好用",

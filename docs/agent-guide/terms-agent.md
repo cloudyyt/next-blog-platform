@@ -8,16 +8,50 @@
 - **前端类比**：模型是产品经理（写工单），你的代码是程序员（干活回填）
 - **循环**：模型要工具 → 你执行 → 结果回填 → 模型继续 → ……直到给出最终答案
 
-```mermaid
-sequenceDiagram
-    participant U as 用户
-    participant M as 模型
-    participant T as 你的工具
-    U->>M: 今晚北京适合跑步吗
-    M->>T: 调用 getWeather("北京")
-    T->>M: 18°C 空气优
-    M->>U: 适合，建议傍晚去
-```
+
+<figure>
+<svg viewBox="0 0 800 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Function Calling 时序：用户提问，模型决定调用工具，工具返回结果，模型组织回答">
+<defs>
+<marker id="fc-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+<path d="M0,0 L10,5 L0,10 z" fill="#5B7FA6"/>
+</marker>
+<marker id="fc-arr-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+<path d="M0,0 L10,5 L0,10 z" fill="#C9973F"/>
+</marker>
+</defs>
+<rect width="800" height="260" fill="#FBF7EE" rx="14"/>
+<rect x="1" y="1" width="798" height="258" fill="none" stroke="#D4C9A9" stroke-width="1.5" rx="14"/>
+<!-- 三个参与者 -->
+<rect x="80" y="20" width="120" height="36" rx="18" fill="#EDF2F7" stroke="#5B7FA6" stroke-width="1.5"/>
+<text x="140" y="43" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#2C2416">用户</text>
+<rect x="340" y="20" width="120" height="36" rx="18" fill="#FDF5E6" stroke="#C9973F" stroke-width="1.5"/>
+<text x="400" y="43" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#2C2416">模型</text>
+<rect x="600" y="20" width="120" height="36" rx="18" fill="#F0F5EE" stroke="#7A9B6D" stroke-width="1.5"/>
+<text x="660" y="43" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#2C2416">你的工具</text>
+<!-- 生命线 -->
+<line x1="140" y1="56" x2="140" y2="230" stroke="#D4C9A9" stroke-width="1" stroke-dasharray="4,4"/>
+<line x1="400" y1="56" x2="400" y2="230" stroke="#D4C9A9" stroke-width="1" stroke-dasharray="4,4"/>
+<line x1="660" y1="56" x2="660" y2="230" stroke="#D4C9A9" stroke-width="1" stroke-dasharray="4,4"/>
+<!-- 消息 1: 用户→模型 -->
+<line x1="140" y1="84" x2="396" y2="84" stroke="#5B7FA6" stroke-width="2" marker-end="url(#fc-arr)"/>
+<rect x="160" y="66" width="216" height="20" rx="4" fill="#EDF2F7"/>
+<text x="268" y="80" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#2C2416">① 今晚北京适合跑步吗</text>
+<!-- 消息 2: 模型→工具 -->
+<line x1="400" y1="124" x2="656" y2="124" stroke="#C9973F" stroke-width="2" marker-end="url(#fc-arr-gold)"/>
+<rect x="420" y="106" width="216" height="20" rx="4" fill="#FDF5E6"/>
+<text x="528" y="120" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#6B4226">② getWeather("北京")</text>
+<!-- 消息 3: 工具→模型 -->
+<line x1="660" y1="164" x2="404" y2="164" stroke="#7A9B6D" stroke-width="2" marker-end="url(#fc-arr)"/>
+<rect x="424" y="146" width="216" height="20" rx="4" fill="#F0F5EE"/>
+<text x="532" y="160" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#2A3420">③ 18°C 空气优</text>
+<!-- 消息 4: 模型→用户 -->
+<line x1="400" y1="204" x2="144" y2="204" stroke="#C9973F" stroke-width="2" marker-end="url(#fc-arr-gold)"/>
+<rect x="164" y="186" width="216" height="20" rx="4" fill="#FDF5E6"/>
+<text x="272" y="200" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#6B4226">④ 适合，建议傍晚去</text>
+<!-- 底部注释 -->
+<text x="400" y="242" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#A89878">模型不执行代码 · 它输出「想调用什么工具」的 JSON · 你的代码执行后把结果喂回去</text>
+</svg>
+</figure>
 
 ## 🃏 Agent（智能体）
 

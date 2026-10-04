@@ -76,13 +76,37 @@ Dify 2.x 还提供**知识流水线**（Knowledge Pipeline）：抽取→清洗�
 
 平台替你跑的完整链路：
 
-```mermaid
-flowchart LR
-    Q["用户提问<br/>「能放几天」"] --> E["Embedding<br/>问题→向量"]
-    E --> S["向量检索<br/>和哪个块最像？"]
-    S --> C["取 Top-K 块<br/>拼进上下文"]
-    C --> L["LLM 基于块回答<br/>+ 引用"]
-```
+<figure>
+<svg viewBox="0 0 800 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="RAG 检索流程：用户提问 → Embedding → 向量检索 → 取 Top-K 块 → LLM 回答">
+<defs>
+<marker id="rag-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+<path d="M0,0 L10,5 L0,10 z" fill="#8A7A5E"/>
+</marker>
+</defs>
+<rect width="800" height="150" fill="#FBF7EE" rx="14"/>
+<rect x="1" y="1" width="798" height="148" fill="none" stroke="#D4C9A9" stroke-width="1.5" rx="14"/>
+<rect x="24" y="36" width="130" height="72" rx="10" fill="#EDF2F7" stroke="#A8BCD0" stroke-width="1.5"/>
+<text x="89" y="62" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#2C2416">用户提问</text>
+<text x="89" y="82" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#8A7A5E">「能放几天」</text>
+<line x1="154" y1="72" x2="176" y2="72" stroke="#8A7A5E" stroke-width="1.5" marker-end="url(#rag-arr)"/>
+<rect x="180" y="36" width="130" height="72" rx="10" fill="#F0F5EE" stroke="#B8C9AE" stroke-width="1.5"/>
+<text x="245" y="62" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#2C2416">Embedding</text>
+<text x="245" y="82" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#8A7A5E">问题 → 向量</text>
+<line x1="310" y1="72" x2="332" y2="72" stroke="#8A7A5E" stroke-width="1.5" marker-end="url(#rag-arr)"/>
+<rect x="336" y="36" width="140" height="72" rx="10" fill="#FDF5E6" stroke="#DBCB9A" stroke-width="1.5"/>
+<text x="406" y="62" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#2C2416">向量检索</text>
+<text x="406" y="82" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#8A7A5E">和哪个块最像？</text>
+<line x1="476" y1="72" x2="498" y2="72" stroke="#8A7A5E" stroke-width="1.5" marker-end="url(#rag-arr)"/>
+<rect x="502" y="36" width="130" height="72" rx="10" fill="#FEF3EB" stroke="#E8C9B0" stroke-width="1.5"/>
+<text x="567" y="62" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#2C2416">取 Top-K 块</text>
+<text x="567" y="82" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#8A7A5E">拼进上下文</text>
+<line x1="632" y1="72" x2="654" y2="72" stroke="#8A7A5E" stroke-width="1.5" marker-end="url(#rag-arr)"/>
+<rect x="658" y="36" width="118" height="72" rx="10" fill="#E8F5E8" stroke="#A8C9A8" stroke-width="1.5"/>
+<text x="717" y="62" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#2C5232">LLM 回答</text>
+<text x="717" y="82" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6B8A5E">基于块 + 引用</text>
+<text x="400" y="132" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#A89878">垃圾进垃圾出——语料质量 = RAG 效果上限</text>
+</svg>
+</figure>
 
 记住这张图——第 11 章（`lc-rag`）你会用代码把这条链亲手写一遍，届时 Dify 的每个开关都会变成你代码里的一行。三个现在就能感知的坑：
 

@@ -16,14 +16,66 @@
 
 新建应用 → Chatflow。画布上先认识零件：
 
-```mermaid
-flowchart LR
-    A["开始节点<br/>（输入定义）"] --> B["LLM 节点<br/>（分类）"] --> C{"条件分支"}
-    C -->|售后| D["知识库检索 + 回答"]
-    C -->|查订单| E["HTTP 请求节点<br/>（查你的 API）"]
-    C -->|闲聊| F["直接回答节点"]
-    E --> G["LLM 组织语言回答"]
-```
+<figure>
+<svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dify 工作流：开始 → LLM 分类 → 三路分支（售后/查订单/闲聊）→ 各自处理 → 回答">
+<defs>
+<marker id="wf-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+<path d="M0,0 L10,5 L0,10 z" fill="#8A7A5E"/>
+</marker>
+</defs>
+<rect width="800" height="320" fill="#FBF7EE" rx="14"/>
+<rect x="1" y="1" width="798" height="318" fill="none" stroke="#D4C9A9" stroke-width="1.5" rx="14"/>
+<!-- 顶排：开始 → 分类 -->
+<rect x="24" y="24" width="140" height="52" rx="10" fill="#EDF2F7" stroke="#A8BCD0" stroke-width="1.5"/>
+<text x="94" y="46" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#2C2416">开始节点</text>
+<text x="94" y="62" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#8A7A5E">输入定义</text>
+<line x1="164" y1="50" x2="188" y2="50" stroke="#8A7A5E" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+<rect x="192" y="24" width="160" height="52" rx="10" fill="#FDF5E6" stroke="#DBCB9A" stroke-width="1.5"/>
+<text x="272" y="46" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#2C2416">LLM 节点 · 分类</text>
+<text x="272" y="62" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#8A7A5E">判断用户意图</text>
+<!-- 分支中心点 -->
+<circle cx="380" cy="50" r="6" fill="#C9973F"/>
+<line x1="352" y1="50" x2="374" y2="50" stroke="#8A7A5E" stroke-width="1.5"/>
+<!-- 分支线 -->
+<line x1="380" y1="50" x2="380" y2="110" stroke="#8A7A5E" stroke-width="1.5"/>
+<line x1="380" y1="110" x2="140" y2="110" stroke="#8A7A5E" stroke-width="1.5"/>
+<line x1="140" y1="110" x2="140" y2="128" stroke="#8A7A5E" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+<line x1="380" y1="110" x2="380" y2="128" stroke="#8A7A5E" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+<line x1="380" y1="110" x2="620" y2="110" stroke="#8A7A5E" stroke-width="1.5"/>
+<line x1="620" y1="110" x2="620" y2="128" stroke="#8A7A5E" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+<!-- 分支标签 -->
+<text x="140" y="106" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#8A7A5E">售后</text>
+<text x="380" y="106" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#8A7A5E">查订单</text>
+<text x="620" y="106" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#8A7A5E">闲聊</text>
+<!-- 售后分支 -->
+<rect x="64" y="132" width="152" height="60" rx="10" fill="#F0F5EE" stroke="#7A9B6D" stroke-width="1.5"/>
+<text x="140" y="156" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="600" fill="#2A3420">知识库检索</text>
+<text x="140" y="174" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#6B8A5E">FAQ → 回答</text>
+<!-- 查订单分支 -->
+<rect x="308" y="132" width="144" height="60" rx="10" fill="#EDF2F7" stroke="#5B7FA6" stroke-width="1.5"/>
+<text x="380" y="156" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="600" fill="#1E2E3E">HTTP 请求节点</text>
+<text x="380" y="174" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#5B7FA6">查你的 API</text>
+<line x1="452" y1="162" x2="476" y2="162" stroke="#8A7A5E" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+<rect x="480" y="132" width="144" height="60" rx="10" fill="#FDF5E6" stroke="#C9973F" stroke-width="1.5"/>
+<text x="552" y="156" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="600" fill="#6B4226">LLM 组织回答</text>
+<text x="552" y="174" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#8A7A5E">把 API 数据变人话</text>
+<!-- 闲聊分支 -->
+<rect x="548" y="132" width="144" height="60" rx="10" fill="#FEF3EB" stroke="#E8C9B0" stroke-width="1.5"/>
+<text x="620" y="156" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="600" fill="#3A2E1E">直接回答节点</text>
+<text x="620" y="174" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#8A7A5E">不查任何资料</text>
+<!-- 汇聚箭头 -->
+<line x1="140" y1="192" x2="140" y2="220" stroke="#8A7A5E" stroke-width="1" stroke-dasharray="4,3"/>
+<line x1="552" y1="192" x2="552" y2="220" stroke="#8A7A5E" stroke-width="1" stroke-dasharray="4,3"/>
+<line x1="620" y1="192" x2="620" y2="220" stroke="#8A7A5E" stroke-width="1" stroke-dasharray="4,3"/>
+<line x1="140" y1="220" x2="620" y2="220" stroke="#8A7A5E" stroke-width="1" stroke-dasharray="4,3"/>
+<line x1="380" y1="220" x2="380" y2="240" stroke="#8A7A5E" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+<!-- 输出 -->
+<rect x="308" y="244" width="144" height="44" rx="22" fill="#E8F5E8" stroke="#A8C9A8" stroke-width="1.5"/>
+<text x="380" y="271" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#2C5232">用户收到回答</text>
+<!-- 底部注释 -->
+<text x="400" y="308" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#A89878">同一套思想的代码版 = LangGraph 的 StateGraph（条件路由 + 节点）</text>
+</svg>
+</figure>
 
 ### 节点 1：开始（定义输入变量）
 
