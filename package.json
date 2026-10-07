@@ -18,7 +18,8 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
-    "db:seed:guide": "tsx prisma/seed-guide.ts"
+    "db:seed:guide": "tsx prisma/seed-guide.ts",
+    "db:seed:treehole": "tsx prisma/seed-treehole-book.ts"
   },
   "dependencies": {
     "@fontsource/ma-shan-zheng": "^5.3.1",

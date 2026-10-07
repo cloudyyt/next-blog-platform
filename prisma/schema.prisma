@@ -216,3 +216,57 @@ model AboutConfig {
   @@map("about_config")
 }
 
+// ─── 树洞电子书（生活书）──────────────────────────
+// 旧 LifeCategory/LifePost 时间线已停止公开使用；
+// 新结构面向「书 → 二级标题（章节） → 正式文章/短记插页」。
+
+model TreeholeBookConfig {
+  id          String   @id @default("singleton")
+  title       String
+  author      String
+  subtitle    String?
+  description String
+  coverStyle  String   @default("wind-cloud") // wind-cloud | four-seasons
+  defaultView String   @default("cover") // cover | toc
+  updatedAt   DateTime @updatedAt
+
+  @@map("treehole_book_configs")
+}
+
+model TreeholeSection {
+  id            String          @id @default(cuid())
+  slug          String          @unique
+  element       String // wind | cloud | spring | summer | autumn | winter | rain | snow
+  title         String
+  tone          String
+  plannedTitles String? // 换行分隔的待写篇目，仅前台占位展示
+  published     Boolean         @default(true)
+  order         Int             @default(0)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  entries       TreeholeEntry[]
+
+  @@index([published, order])
+  @@map("treehole_sections")
+}
+
+model TreeholeEntry {
+  id        String          @id @default(cuid())
+  slug      String          @unique
+  sectionId String
+  section   TreeholeSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  kind      String          @default("article") // article | note
+  title     String?
+  excerpt   String?
+  content   String
+  weather   String?
+  date      DateTime        @default(now())
+  published Boolean         @default(true)
+  order     Int             @default(0)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@index([sectionId, order])
+  @@index([published, date(sort: Desc)])
+  @@map("treehole_entries")
+}
