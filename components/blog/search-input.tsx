@@ -11,6 +11,7 @@ export function SearchInput() {
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
   const [focused, setFocused] = useState(false)
+  const [compactOpen, setCompactOpen] = useState(false)
 
   const query = searchParams.get("q") || ""
 
@@ -47,10 +48,20 @@ export function SearchInput() {
           "h-9",
           focused
             ? "border-primary/50 ring-2 ring-primary/20 bg-background/90 w-40 sm:w-56"
-            : "border-border/40 bg-background/30 w-28 sm:w-44",
+            : "border-border/40 bg-background/30 w-9 sm:w-44",
         )}
       >
-        <Search className="w-3.5 h-3.5 ml-3 text-muted-foreground flex-shrink-0" />
+        <button
+          type="button"
+          onClick={() => {
+            setCompactOpen(true)
+            requestAnimationFrame(() => inputRef.current?.focus())
+          }}
+          aria-label="展开搜索"
+          className="grid h-full w-9 place-items-center text-muted-foreground sm:pointer-events-none"
+        >
+          <Search className="h-3.5 w-3.5" />
+        </button>
         <input
           ref={inputRef}
           type="text"
@@ -58,12 +69,16 @@ export function SearchInput() {
           value={query}
           onChange={(e) => handleChange(e.target.value)}
           onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
+          onBlur={() => {
+            setFocused(false)
+            if (!query.trim()) setCompactOpen(false)
+          }}
           className={cn(
-            "flex-1 bg-transparent px-2 text-sm h-full",
+            "h-full min-w-0 flex-1 bg-transparent px-2 text-sm",
             "placeholder:text-muted-foreground/50",
             "focus:outline-none",
-            "font-body min-w-0"
+            "font-body",
+            compactOpen ? "block" : "hidden sm:block"
           )}
         />
         {query && (

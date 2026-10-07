@@ -33,6 +33,7 @@ export default function BlogLayout({
   const visualThemeContext = useContext(VisualThemeContext)
   const visualTheme = visualThemeContext?.theme ?? "cyber-neon"
   const [profileOpen, setProfileOpen] = useState(false)
+  const isAdminUser = isAuthenticated && user?.role === "admin"
   // 非博客列表首页（博文详情/about 等）时，header 左侧显示「返回博客」
   const showBackToBlog = pathname !== "/blog" && pathname?.startsWith("/blog")
 
@@ -79,12 +80,6 @@ export default function BlogLayout({
               </div>
               <div className="flex items-center gap-1 sm:gap-4">
                 <a
-                  href="/blog"
-                  className="text-sm sm:text-base hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                  首页
-                </a>
-                <a
                   href="/blog/about"
                   className="text-sm sm:text-base hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hidden sm:inline-block"
                 >
@@ -97,13 +92,17 @@ export default function BlogLayout({
                   <BookOpen className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">书架</span>
                 </a>
-                <a
-                  href="/treehole"
-                  className="text-sm sm:text-base hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hidden sm:inline-flex items-center gap-1"
-                >
-                  <TreePine className="w-3.5 h-3.5" />
-                  <span>树洞</span>
-                </a>
+                {isAdminUser && (
+                  <a
+                    href="/treehole"
+                    aria-label="树洞"
+                    title="树洞"
+                    className="text-sm sm:text-base hover:text-primary transition-colors duration-200 px-2 py-1 rounded-md hover:bg-accent/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 inline-flex items-center gap-1"
+                  >
+                    <TreePine className="w-4 h-4" />
+                    <span className="hidden sm:inline">树洞</span>
+                  </a>
+                )}
                 <Suspense fallback={<div className="w-28 sm:w-44 h-9" />}>
                   <SearchInput />
                 </Suspense>
