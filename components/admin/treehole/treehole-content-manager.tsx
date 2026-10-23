@@ -177,12 +177,12 @@ export function TreeholeContentManager({
         </div>
         <div className="flex gap-2">
           <Button asChild>
-            <Link href="/admin/life/content/new?kind=article">
+            <Link href="/treehole/write/new?kind=article">
               <Plus className="mr-1 h-4 w-4" /> 新文章
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href="/admin/life/content/new?kind=note">
+            <Link href="/treehole/write/new?kind=note">
               <NotebookPen className="mr-1 h-4 w-4" /> 新短记
             </Link>
           </Button>
@@ -242,7 +242,7 @@ export function TreeholeContentManager({
                       <ArrowDown className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="icon" aria-label="编辑" asChild>
-                      <Link href={`/admin/life/content/${entry.id}/edit`}>
+                      <Link href={`/treehole/write/${entry.id}`}>
                         <Pencil className="h-4 w-4" />
                       </Link>
                     </Button>
