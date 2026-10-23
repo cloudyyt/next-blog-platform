@@ -31,6 +31,8 @@ import {
 interface MarkdownEditorProps {
   value: string
   onChange: (v: string) => void
+  /** treehole: 单栏书写 / 书页预览，暖纸书房视觉；default: 后台双栏编辑 */
+  variant?: "default" | "treehole"
 }
 
 const toolbarActions = [
@@ -46,9 +48,14 @@ const toolbarActions = [
   { icon: Quote, label: "引用", prefix: "> ", suffix: "", block: true },
 ]
 
-export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
+export function MarkdownEditor({
+  value,
+  onChange,
+  variant = "default",
+}: MarkdownEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [mobileTab, setMobileTab] = useState<"editor" | "preview">("editor")
+  const isTreehole = variant === "treehole"
 
   const insertMarkdown = (
     prefix: string,
@@ -146,11 +153,28 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden bg-card/80 backdrop-blur-sm">
+    <div
+      className={cn(
+        "overflow-hidden rounded-lg border",
+        isTreehole
+          ? "border-border/70 bg-[linear-gradient(180deg,#fffcf3,#f2e8d5)] shadow-[inset_0_1px_0_rgba(255,255,255,.8)]"
+          : "border-border bg-card/80 backdrop-blur-sm",
+      )}
+    >
       {/* Toolbar */}
-      <div className="flex items-center gap-0.5 px-2 py-1.5 border-b bg-muted/30 flex-wrap">
-        {/* Mobile tab switcher */}
-        <div className="flex md:hidden items-center mr-2 border-r pr-2">
+      <div
+        className={cn(
+          "flex flex-wrap items-center gap-0.5 border-b px-2 py-1.5",
+          isTreehole ? "border-primary/15 bg-[#e9ddc6]/80" : "border-border bg-muted/30",
+        )}
+      >
+        {/* Tab switcher. The treehole studio keeps one immersive column on every breakpoint. */}
+        <div
+          className={cn(
+            "mr-2 flex items-center border-r pr-2",
+            isTreehole ? "border-primary/20" : "border-border md:hidden",
+          )}
+        >
           <Button
             variant={mobileTab === "editor" ? "secondary" : "ghost"}
             size="sm"
@@ -191,12 +215,13 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
       </div>
 
       {/* Editor + Preview panels */}
-      <div className="flex flex-col md:flex-row">
+      <div className={cn("flex flex-col", !isTreehole && "md:flex-row")}>
         {/* Left panel: textarea */}
         <div
           className={cn(
-            "md:w-1/2 flex flex-col relative",
-            mobileTab !== "editor" && "hidden md:flex"
+            "relative flex flex-col",
+            !isTreehole && "md:w-1/2",
+            mobileTab !== "editor" && (isTreehole ? "hidden" : "hidden md:flex"),
           )}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -207,8 +232,13 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onPaste={handlePaste}
-            className="flex-1 min-h-[500px] p-4 font-mono text-sm bg-transparent resize-none focus:outline-none placeholder:text-muted-foreground"
-            placeholder="在此输入 Markdown 内容..."
+            className={cn(
+              "min-h-[500px] flex-1 resize-none bg-transparent p-4 focus:outline-none",
+              isTreehole
+                ? "font-handwriting text-[17px] leading-[2.05] text-foreground/88 placeholder:text-muted-foreground/60"
+                : "font-mono text-sm placeholder:text-muted-foreground",
+            )}
+            placeholder={isTreehole ? "从这里开始写，先不用追求完整……" : "在此输入 Markdown 内容..."}
             spellCheck={false}
           />
 
@@ -230,17 +260,24 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
         </div>
 
         {/* Divider */}
-        <div className="hidden md:block w-px bg-border" />
+        {!isTreehole && <div className="hidden w-px bg-border md:block" />}
 
         {/* Right panel: preview */}
         <div
           className={cn(
-            "md:w-1/2 min-h-[500px] p-4 overflow-auto",
-            mobileTab !== "preview" && "hidden md:block"
+            "min-h-[500px] overflow-auto p-4",
+            !isTreehole && "md:w-1/2",
+            mobileTab !== "preview" && (isTreehole ? "hidden" : "hidden md:block"),
           )}
         >
           {value ? (
-            <div className="prose prose-sm dark:prose-invert max-w-none">
+            <div
+              className={
+                isTreehole
+                  ? "prose prose-lg max-w-none font-handwriting text-foreground/88 [&_blockquote]:border-primary/45 [&_blockquote]:italic [&_blockquote]:text-muted-foreground [&_h1]:font-handwriting [&_h2]:font-handwriting [&_h3]:font-handwriting [&_p]:leading-[2.05]"
+                  : "prose prose-sm dark:prose-invert max-w-none"
+              }
+            >
               <ReactMarkdown
                 components={{
                   code({ className, children, ...props }: any) {
@@ -298,8 +335,8 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
               </ReactMarkdown>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-              预览区域
+            <div className={cn("flex h-full items-center justify-center text-muted-foreground", isTreehole ? "font-handwriting" : "text-sm")}>
+              {isTreehole ? "切换到「预览」，看看这一页在书里的样子。" : "预览区域"}
             </div>
           )}
         </div>
