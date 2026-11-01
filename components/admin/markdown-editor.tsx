@@ -274,7 +274,7 @@ export function MarkdownEditor({
             <div
               className={
                 isTreehole
-                  ? "prose prose-lg max-w-none font-handwriting text-foreground/88 [&_blockquote]:border-primary/45 [&_blockquote]:italic [&_blockquote]:text-muted-foreground [&_h1]:font-handwriting [&_h2]:font-handwriting [&_h3]:font-handwriting [&_p]:leading-[2.05]"
+                  ? "treehole-prose prose prose-lg max-w-none font-handwriting text-foreground/88 [&_blockquote]:border-primary/45 [&_blockquote]:italic [&_blockquote]:text-muted-foreground [&_h1]:font-handwriting [&_h2]:font-handwriting [&_h3]:font-handwriting [&_p]:leading-[2.05]"
                   : "prose prose-sm dark:prose-invert max-w-none"
               }
             >

@@ -143,7 +143,7 @@ export default async function TreeholeArticlePage({
               <span>{data.article.readingTime}</span>
             </div>
 
-            <div className="prose prose-lg max-w-none min-w-0 font-handwriting [&_blockquote]:border-primary/50 [&_blockquote]:text-muted-foreground [&_h2]:font-handwriting [&_h3]:font-handwriting [&_strong]:font-handwriting">
+            <div className="treehole-prose prose prose-lg max-w-none min-w-0 font-handwriting [&_blockquote]:border-primary/50 [&_blockquote]:text-muted-foreground [&_h2]:font-handwriting [&_h3]:font-handwriting [&_strong]:font-handwriting">
               <PostContent content={data.article.content} />
             </div>
 

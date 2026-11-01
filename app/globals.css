@@ -168,6 +168,12 @@
     font-family: var(--font-kai);
   }
 
+  /* 树洞电子书正文：中文书籍段首两字缩进。
+     只作用于 Markdown 顶层普通段落，不影响引用、列表、代码块和图片。 */
+  .treehole-prose > p {
+    text-indent: 2em;
+  }
+
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
