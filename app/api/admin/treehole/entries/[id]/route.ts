@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/prisma"
 import { verifyAdmin } from "@/lib/auth-middleware"
+import { normalizeTreeholeMarkdown } from "@/lib/treehole/markdown"
 
 export const dynamic = "force-dynamic"
 
@@ -27,7 +28,7 @@ export async function PUT(
     if (body?.excerpt !== undefined) {
       data.excerpt = body.excerpt ? String(body.excerpt).trim() : null
     }
-    if (body?.content !== undefined) data.content = String(body.content)
+    if (body?.content !== undefined) data.content = normalizeTreeholeMarkdown(String(body.content))
     if (body?.weather !== undefined) {
       data.weather = body.weather ? String(body.weather).trim() : null
     }

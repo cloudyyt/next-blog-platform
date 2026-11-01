@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/prisma"
 import { verifyAdmin } from "@/lib/auth-middleware"
+import { normalizeTreeholeMarkdown } from "@/lib/treehole/markdown"
 
 export const dynamic = "force-dynamic"
 
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
     const slug = String(body?.slug ?? "").trim()
     const sectionId = String(body?.sectionId ?? "").trim()
     const kind = body?.kind === "note" ? "note" : "article"
-    const content = String(body?.content ?? "").trim()
+    const content = normalizeTreeholeMarkdown(String(body?.content ?? "").trim())
     const title = body?.title ? String(body.title).trim() : null
 
     if (!/^[a-z0-9-]{2,60}$/.test(slug)) {
