@@ -28,6 +28,12 @@ export async function getTreeholeAdminData() {
     title: section.title,
     tone: section.tone,
     plannedTitles: section.plannedTitles ?? "",
+    moodTags: section.moodTags ?? "",
+    leadSentence: section.leadSentence ?? "",
+    parallelSentence: section.parallelSentence ?? "",
+    readerQuestion: section.readerQuestion ?? "",
+    imageUrl: section.imageUrl ?? "",
+    imageAlt: section.imageAlt ?? "",
     published: section.published,
     order: section.order,
     entries: section.entries.map((entry) => ({

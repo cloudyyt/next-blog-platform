@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { PrismaClient } from "@prisma/client"
 import {
   defaultTreeholeArticles,
@@ -31,6 +32,12 @@ async function main() {
         title: section.title,
         tone: section.tone,
         plannedTitles: section.plannedTitles.join("\n"),
+        moodTags: section.moodTags,
+        leadSentence: section.leadSentence,
+        parallelSentence: section.parallelSentence,
+        readerQuestion: section.readerQuestion,
+        imageUrl: section.imageUrl ?? null,
+        imageAlt: section.imageAlt ?? null,
         published: true,
         order: (index + 1) * 10,
       },
@@ -40,6 +47,12 @@ async function main() {
         title: section.title,
         tone: section.tone,
         plannedTitles: section.plannedTitles.join("\n"),
+        moodTags: section.moodTags,
+        leadSentence: section.leadSentence,
+        parallelSentence: section.parallelSentence,
+        readerQuestion: section.readerQuestion,
+        imageUrl: section.imageUrl ?? null,
+        imageAlt: section.imageAlt ?? null,
         published: true,
         order: (index + 1) * 10,
       },

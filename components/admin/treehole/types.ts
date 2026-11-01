@@ -28,6 +28,12 @@ export interface TreeholeAdminSection {
   title: string
   tone: string
   plannedTitles: string
+  moodTags: string
+  leadSentence: string
+  parallelSentence: string
+  readerQuestion: string
+  imageUrl: string
+  imageAlt: string
   published: boolean
   order: number
   entries: TreeholeAdminEntry[]
@@ -42,6 +48,8 @@ export const treeholeElementOptions = [
   { value: "cloud", label: "云" },
   { value: "rain", label: "雨" },
   { value: "snow", label: "雪" },
+  { value: "light", label: "光" },
+  { value: "sea", label: "海" },
 ] as const
 
 export function elementLabel(value: string) {

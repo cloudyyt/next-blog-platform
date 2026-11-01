@@ -35,6 +35,12 @@ export interface TreeholeSectionView {
   element: string
   title: string
   tone: string
+  moodTags: string[]
+  leadSentence: string
+  parallelSentence: string
+  readerQuestion: string
+  imageUrl: string | null
+  imageAlt: string | null
   plannedTitles: string[]
   published: boolean
   order: number
@@ -62,6 +68,12 @@ type SectionRow = {
   element: string
   title: string
   tone: string
+  moodTags: string | null
+  leadSentence: string | null
+  parallelSentence: string | null
+  readerQuestion: string | null
+  imageUrl: string | null
+  imageAlt: string | null
   plannedTitles: string | null
   published: boolean
   order: number
@@ -105,6 +117,15 @@ function toSectionView(row: SectionRow): TreeholeSectionView {
     element: row.element,
     title: row.title,
     tone: row.tone,
+    moodTags: (row.moodTags ?? "")
+      .split(/[ /\n ]/)
+      .map((item) => item.trim())
+      .filter(Boolean),
+    leadSentence: row.leadSentence ?? "",
+    parallelSentence: row.parallelSentence ?? "",
+    readerQuestion: row.readerQuestion ?? "",
+    imageUrl: row.imageUrl,
+    imageAlt: row.imageAlt,
     plannedTitles: (row.plannedTitles ?? "")
       .split(/\r?\n/)
       .map((item) => item.trim())
@@ -125,6 +146,12 @@ function fallbackHome(): TreeholeBookHome {
       element: section.element,
       title: section.title,
       tone: section.tone,
+      moodTags: section.moodTags.split("/").map((item) => item.trim()).filter(Boolean),
+      leadSentence: section.leadSentence,
+      parallelSentence: section.parallelSentence,
+      readerQuestion: section.readerQuestion,
+      imageUrl: section.imageUrl ?? null,
+      imageAlt: section.imageAlt ?? null,
       plannedTitles: section.plannedTitles,
       published: true,
       order: (sectionIndex + 1) * 10,

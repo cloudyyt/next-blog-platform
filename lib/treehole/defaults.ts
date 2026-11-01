@@ -5,7 +5,7 @@
  * LifePost 时间线；后续接入 Admin 配置时，将这份数据结构映射到数据库。
  */
 
-export type TreeholeBookElement = "wind" | "cloud" | "spring" | "summer" | "autumn" | "winter"
+export type TreeholeBookElement = "wind" | "cloud" | "spring" | "summer" | "autumn" | "winter" | "rain" | "snow" | "light" | "sea"
 
 export interface TreeholeBookSection {
   slug: string
@@ -13,6 +13,12 @@ export interface TreeholeBookSection {
   elementLabel: string
   title: string
   tone: string
+  moodTags: string
+  leadSentence: string
+  parallelSentence: string
+  readerQuestion: string
+  imageUrl?: string
+  imageAlt?: string
   state: "published" | "draft"
   plannedTitles: string[]
 }
@@ -38,55 +44,100 @@ export interface TreeholeBookNote {
 export const defaultTreeholeBook = {
   title: "因为这就是你的人生",
   author: "zijieLeo",
-  subtitle: "风与云",
+  subtitle: "天气 · 山海 · 光",
   description:
     "把那些没处放的记录，装进一本会呼吸的书。四季是情绪的章节，不是日历的章节；这里记录具体的事，也记录事情过去以后留下来的形状。",
   heroQuote: "有人被偏爱，就会有人被嫌弃；有人心碎满地，深夜独自疗愈。",
 }
 
 export const defaultTreeholeSections: TreeholeBookSection[] = [
-    {
+  {
     slug: "sprout",
-    element: "spring",
-    elementLabel: "春",
-    title: "细雨将醒",
-    tone: "迟疑、萌发、还没说出口的那些决定。",
+    element: "rain",
+    elementLabel: "春霖",
+    title: "春霖初落•迟疑•微光将醒",
+    tone: "想改变 / 还没敢 / 正在萌芽",
+    moodTags: "想改变 / 还没敢 / 正在萌芽",
+    leadSentence: "给还想再等一等、但心里已经有动静的人。",
+    parallelSentence: "雨来得很轻，疑心很重；芽还没出土，春天已经开始。",
+    readerQuestion: "你是不是有点想改变，但先被自己的犹豫按住了？",
+    imageAlt: "初春雨后的泥土与新草，远处有微弱晨光",
+    imageUrl: "https://blog-zijieleo-oss.oss-cn-guangzhou.aliyuncs.com/uploads/life/1793443866650-251ac693-treehole-spring-rain.webp",
     state: "published",
     plannedTitles: ["一点星光", "致梅芳", "“新”生活"],
   },
   {
-    slug: "blazing",
-    element: "summer",
-    elementLabel: "夏",
-    title: "灼灼夏日",
-    tone: "热烈、冲突、往外走的世界，也有亮得刺眼的时候。",
-    state: "published",
-    plannedTitles: ["我的三国梦", "烟花", "钓鱼佬"],
-  },
-  {
     slug: "cloudy",
-    element: "cloud",
-    elementLabel: "云",
-    title: "阴天多云",
-    tone: "低压、盘旋、看不清答案时仍然继续生活。",
+    element: "sea",
+    elementLabel: "海雾",
+    title: "海雾漫岸•迷航•灯塔失焦",
+    tone: "迷茫 / 内耗 / 看不清自己",
+    moodTags: "低压 / 迷茫 / 内耗",
+    leadSentence: "给站在雾里、连自己都暂时看不清的人。",
+    parallelSentence: "海在附近，岸也在附近；只有方向暂时不见了。",
+    readerQuestion: "你是不是不是不想走，而是暂时不知道该往哪里走？",
+    imageAlt: "海雾覆盖海岸线，远处灯塔在雾中失焦",
+    imageUrl: "https://blog-zijieleo-oss.oss-cn-guangzhou.aliyuncs.com/uploads/life/1793443893081-a57a6a6a-treehole-sea-fog.webp",
     state: "published",
     plannedTitles: ["恐怖片", "友达以上，恋人未满", "不过如此"],
   },
   {
+    slug: "cold-rain",
+    element: "rain",
+    elementLabel: "冷雨",
+    title: "冷雨叩窗•心碎•灯火失温",
+    tone: "心碎 / 被放下 / 深夜未愈",
+    moodTags: "心碎 / 被放下 / 深夜未愈",
+    leadSentence: "给刚被放下、却还在替对方留灯的人。",
+    parallelSentence: "窗外的雨有声音，屋里的解释没有；有人转身很快，有人收灯很慢。",
+    readerQuestion: "你是不是还在等一句其实已经有答案的话？",
+    imageAlt: "夜晚冷雨打在玻璃上，城市灯光化成蓝橙色光斑",
+    imageUrl: "https://blog-zijieleo-oss.oss-cn-guangzhou.aliyuncs.com/uploads/life/1793443920626-9daef434-treehole-cold-rain.webp",
+    state: "published",
+    plannedTitles: ["被比较", "被删除", "深夜自我怀疑"],
+  },
+  {
+    slug: "blazing",
+    element: "light",
+    elementLabel: "烈日",
+    title: "烈日翻山•不甘•影子很短",
+    tone: "愤怒 / 不甘 / 还有力气",
+    moodTags: "热烈 / 愤怒 / 不甘",
+    leadSentence: "给心里还有火、又被现实晒得发烫的人。",
+    parallelSentence: "光越强，影子越短；话越少，心里越响。",
+    readerQuestion: "你是不是不甘心被这样安排，所以还想再翻一次山？",
+    imageAlt: "强日光翻过山脊，山路投下短而硬的影子",
+    imageUrl: "https://blog-zijieleo-oss.oss-cn-guangzhou.aliyuncs.com/uploads/life/1793443948060-7f9cc4e5-treehole-blazing-light.webp",
+    state: "published",
+    plannedTitles: ["我的三国梦", "烟花", "钓鱼佬"],
+  },
+  {
     slug: "snow",
-    element: "winter",
-    elementLabel: "冬",
-    title: "雪落无声",
-    tone: "沉淀、收束、与过去的自己慢慢和解。",
+    element: "snow",
+    elementLabel: "落雪",
+    title: "落雪封径•无声•与己和解",
+    tone: "安静 / 沉淀 / 和解",
+    moodTags: "沉默 / 疲惫 / 想先放下",
+    leadSentence: "给暂时不想说话、只想把事情放下来的人。",
+    parallelSentence: "雪把路盖住，也把争吵盖住；不是所有和解，都需要当场完成。",
+    readerQuestion: "你是不是不是好了，只是终于允许自己先停下来？",
+    imageAlt: "雪覆盖山径，远处山体被雾雪压低",
+    imageUrl: "https://blog-zijieleo-oss.oss-cn-guangzhou.aliyuncs.com/uploads/life/1793444278332-ec6f72ca-treehole-silent-snow.webp",
     state: "published",
     plannedTitles: ["月入3000", "荒原上的家", "雪落无声"],
   },
   {
     slug: "wind",
     element: "wind",
-    elementLabel: "风",
-    title: "风吹过的时候",
-    tone: "自由、漂泊、被带走又留下。",
+    elementLabel: "长风",
+    title: "长风渡海•漂泊•无岸也行",
+    tone: "漂泊 / 自由 / 想离开",
+    moodTags: "想逃 / 自由 / 漂泊",
+    leadSentence: "给想去远方、但被现实拉住衣角的人。",
+    parallelSentence: "风没有承诺方向，海没有承诺岸；人还是要往前走一段。",
+    readerQuestion: "你是不是想离开的不是地方，而是现在的自己？",
+    imageAlt: "长风掠过海岸草甸，远处海面有轻微波光",
+    imageUrl: "https://blog-zijieleo-oss.oss-cn-guangzhou.aliyuncs.com/uploads/life/1793444288697-98115577-treehole-endless-wind.webp",
     state: "published",
     plannedTitles: ["跳出去", "a big big world", "白月光和匠人", "迷路"],
   },
@@ -137,7 +188,7 @@ export const defaultTreeholeArticles: TreeholeBookArticle[] = [
   },
   {
     slug: "heartbreak",
-    sectionSlug: "cloudy",
+    sectionSlug: "cold-rain",
     title: "心碎",
     date: "2025-05-31",
     readingTime: "约 12 分钟",
@@ -163,7 +214,7 @@ export const defaultTreeholeArticles: TreeholeBookArticle[] = [
   },
   {
     slug: "because-this-is-my-life",
-    sectionSlug: "cloudy",
+    sectionSlug: "snow",
     title: "因为这就是我的人生",
     date: "2025-06-24",
     readingTime: "约 15 分钟",

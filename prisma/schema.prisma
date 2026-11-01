@@ -234,17 +234,23 @@ model TreeholeBookConfig {
 }
 
 model TreeholeSection {
-  id            String          @id @default(cuid())
-  slug          String          @unique
-  element       String // wind | cloud | spring | summer | autumn | winter | rain | snow
-  title         String
-  tone          String
-  plannedTitles String? // 换行分隔的待写篇目，仅前台占位展示
-  published     Boolean         @default(true)
-  order         Int             @default(0)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  entries       TreeholeEntry[]
+  id              String          @id @default(cuid())
+  slug            String          @unique
+  element         String // wind | cloud | spring | summer | autumn | winter | rain | snow
+  title           String
+  tone            String
+  plannedTitles   String? // 换行分隔的待写篇目，仅前台占位展示
+  moodTags        String? // 读者心情标签，可用 / 或换行分隔
+  leadSentence    String? // 一句话入口
+  parallelSentence String? // 排句
+  readerQuestion  String? // 读者问句
+  imageUrl        String? // 章节主视觉 URL
+  imageAlt        String? // 章节主视觉 alt
+  published       Boolean         @default(true)
+  order           Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  entries         TreeholeEntry[]
 
   @@index([published, order])
   @@map("treehole_sections")

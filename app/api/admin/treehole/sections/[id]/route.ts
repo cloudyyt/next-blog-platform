@@ -5,7 +5,7 @@ import { verifyAdmin } from "@/lib/auth-middleware"
 
 export const dynamic = "force-dynamic"
 
-const ELEMENTS = ["wind", "cloud", "spring", "summer", "autumn", "winter", "rain", "snow"]
+const ELEMENTS = ["wind", "cloud", "spring", "summer", "autumn", "winter", "rain", "snow", "light", "sea"]
 
 function revalidateTreehole() {
   revalidatePath("/treehole", "page")
@@ -28,6 +28,18 @@ export async function PUT(
     if (body?.plannedTitles !== undefined) {
       data.plannedTitles = String(body.plannedTitles).trim() || null
     }
+    if (body?.moodTags !== undefined) data.moodTags = String(body.moodTags).trim() || null
+    if (body?.leadSentence !== undefined) {
+      data.leadSentence = String(body.leadSentence).trim() || null
+    }
+    if (body?.parallelSentence !== undefined) {
+      data.parallelSentence = String(body.parallelSentence).trim() || null
+    }
+    if (body?.readerQuestion !== undefined) {
+      data.readerQuestion = String(body.readerQuestion).trim() || null
+    }
+    if (body?.imageUrl !== undefined) data.imageUrl = String(body.imageUrl).trim() || null
+    if (body?.imageAlt !== undefined) data.imageAlt = String(body.imageAlt).trim() || null
     if (body?.published !== undefined) data.published = Boolean(body.published)
     if (body?.order !== undefined) data.order = Number(body.order)
     if (body?.element !== undefined) {

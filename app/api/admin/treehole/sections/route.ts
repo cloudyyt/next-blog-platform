@@ -5,7 +5,7 @@ import { verifyAdmin } from "@/lib/auth-middleware"
 
 export const dynamic = "force-dynamic"
 
-const ELEMENTS = ["wind", "cloud", "spring", "summer", "autumn", "winter", "rain", "snow"]
+const ELEMENTS = ["wind", "cloud", "spring", "summer", "autumn", "winter", "rain", "snow", "light", "sea"]
 
 function revalidateTreehole() {
   revalidatePath("/treehole", "page")
@@ -44,6 +44,12 @@ export async function POST(request: NextRequest) {
         element,
         tone,
         plannedTitles: body?.plannedTitles ? String(body.plannedTitles).trim() : null,
+        moodTags: body?.moodTags ? String(body.moodTags).trim() : null,
+        leadSentence: body?.leadSentence ? String(body.leadSentence).trim() : null,
+        parallelSentence: body?.parallelSentence ? String(body.parallelSentence).trim() : null,
+        readerQuestion: body?.readerQuestion ? String(body.readerQuestion).trim() : null,
+        imageUrl: body?.imageUrl ? String(body.imageUrl).trim() : null,
+        imageAlt: body?.imageAlt ? String(body.imageAlt).trim() : null,
         published: Boolean(body?.published ?? true),
         order: (maxOrder._max.order ?? 0) + 10,
       },
