@@ -1,3 +1,4 @@
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 const elementColors: Record<string, string> = {
@@ -9,6 +10,8 @@ const elementColors: Record<string, string> = {
   autumn: "#a98b45",
   rain: "#6d7f92",
   snow: "#9a9a92",
+  light: "#c4823a",
+  sea: "#5e7585",
 }
 
 export function BookCover({
@@ -16,12 +19,14 @@ export function BookCover({
   author,
   elements = ["spring", "summer", "cloud", "winter", "wind"],
   coverStyle = "wind-cloud",
+  images = [],
   className,
 }: {
   title: string
   author: string
   elements?: string[]
   coverStyle?: string
+  images?: { url: string; alt: string }[]
   className?: string
 }) {
   const windCloud = coverStyle !== "four-seasons"
@@ -92,7 +97,34 @@ export function BookCover({
       <span className="absolute left-[50px] top-[48px] [writing-mode:vertical-rl] font-handwriting text-[clamp(20px,7cqw,40px)] leading-[1.08] tracking-[.09em] text-[#383021] drop-shadow-[0_1px_0_rgba(255,255,255,.55)]">
         {title}
       </span>
-      <span className="absolute right-[28px] top-[158px] [writing-mode:vertical-rl] text-xs font-medium tracking-[.28em] text-[#6f5e46]">
+      {images.length > 0 && (
+        <div className="absolute right-[22px] top-[142px] grid w-[38%] grid-cols-2 gap-[5px]">
+          {images.slice(0, 6).map((image, index) => (
+            <span
+              key={`${image.url}-${index}`}
+              className="relative block aspect-square overflow-hidden rounded-[2px] border border-[#f8f0dd]/80 bg-[#e7d8ba] shadow-[0_3px_8px_rgba(66,40,13,.28)]"
+              style={{ transform: `rotate(${index % 2 === 0 ? -1.4 : 1.2}deg)` }}
+            >
+              <Image
+                src={image.url}
+                alt={image.alt}
+                fill
+                unoptimized
+                className="object-cover"
+                sizes="120px"
+              />
+            </span>
+          ))}
+        </div>
+      )}
+
+      <span
+        className={[
+          "absolute [writing-mode:vertical-rl] text-xs font-medium tracking-[.28em] text-[#6f5e46]",
+          images.length > 0 ? "right-[calc(22px+42%)]" : "right-[28px] top-[158px]",
+          images.length > 0 ? "top-[158px]" : "",
+        ].join(" ")}
+      >
         {author} 著
       </span>
     </div>

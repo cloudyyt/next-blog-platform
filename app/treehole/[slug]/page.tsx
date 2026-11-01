@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowRight } from "lucide-react"
@@ -17,6 +18,25 @@ const elementLabels: Record<string, string> = {
   cloud: "云",
   rain: "雨",
   snow: "雪",
+  light: "光",
+  sea: "海",
+}
+
+function SectionTitle({ title }: { title: string }) {
+  const parts = title.split("•").map((item) => item.trim()).filter(Boolean)
+  if (parts.length < 2) return <>{title}</>
+  return (
+    <>
+      {parts.map((part, index) => (
+        <span key={`${part}-${index}`} className="inline-flex items-center">
+          {index > 0 && (
+            <i aria-hidden className="mx-1 inline-block h-[.3em] w-[.3em] rounded-full bg-current opacity-55" />
+          )}
+          {part}
+        </span>
+      ))}
+    </>
+  )
 }
 
 
@@ -69,6 +89,34 @@ export default async function TreeholeArticlePage({
       groups={groups}
     >
       <article className="mx-auto w-full max-w-5xl px-0 pb-14 pt-8 sm:px-6">
+        <div className="mx-auto mb-6 max-w-3xl overflow-hidden rounded-xl border border-border/70 shadow-[0_24px_48px_-42px_rgba(72,46,17,.75)]">
+          {data.section.imageUrl ? (
+            <div className="relative h-44 sm:h-56">
+              <Image
+                src={data.section.imageUrl}
+                alt={data.section.imageAlt ?? data.section.title}
+                fill
+                unoptimized
+                className="object-cover"
+                sizes="768px"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#2b2118]/70 via-[#2b2118]/12 to-transparent" />
+            </div>
+          ) : (
+            <div className="relative h-36 bg-[linear-gradient(135deg,rgba(150,97,58,.18),#f8f2e3_55%,rgba(150,97,58,.10))] sm:h-44">
+              <div className="absolute inset-0 bg-[radial-gradient(rgba(91,67,35,.12)_1px,transparent_1px)] opacity-45" style={{ backgroundSize: "18px 18px" }} />
+            </div>
+          )}
+          <div className="bg-card/90 px-5 py-4">
+            <p className="font-handwriting text-sm text-foreground/75">
+              <SectionTitle title={data.section.title} />
+            </p>
+            <p className="mt-2 font-handwriting text-[13px] leading-7 text-muted-foreground">
+              {data.section.parallelSentence}
+            </p>
+          </div>
+        </div>
+
         <div className="relative mx-auto min-h-[620px] max-w-3xl border border-border/70 bg-card px-5 pb-10 pt-11 sm:px-12 sm:pb-12 sm:pt-14">
           <span
             aria-hidden
@@ -81,7 +129,7 @@ export default async function TreeholeArticlePage({
           <div className="relative">
             <p className="mb-4 flex items-center justify-center gap-3 text-[10px] font-semibold tracking-[.24em] text-primary">
               <span className="h-px w-6 bg-primary/50" />
-              {data.section.title}
+              <SectionTitle title={data.section.title} />
               <span className="h-px w-6 bg-primary/50" />
             </p>
             <h1 className="mx-auto max-w-2xl text-center font-handwriting text-3xl leading-snug sm:text-4xl">
