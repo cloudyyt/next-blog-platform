@@ -52,6 +52,12 @@ export function TreeholeSectionsManager({
     title: "",
     tone: "",
     plannedTitles: "",
+    moodTags: "",
+    leadSentence: "",
+    parallelSentence: "",
+    readerQuestion: "",
+    imageUrl: "",
+    imageAlt: "",
   })
 
   async function createSection() {
@@ -66,10 +72,24 @@ export function TreeholeSectionsManager({
       "章节已创建",
     )
     if (created) {
-      const row = { ...created, plannedTitles: created.plannedTitles ?? "", entries: [] }
+      const row = {
+        ...created,
+        plannedTitles: created.plannedTitles ?? "",
+        moodTags: created.moodTags ?? "",
+        leadSentence: created.leadSentence ?? "",
+        parallelSentence: created.parallelSentence ?? "",
+        readerQuestion: created.readerQuestion ?? "",
+        imageUrl: created.imageUrl ?? "",
+        imageAlt: created.imageAlt ?? "",
+        entries: [],
+      }
       setSections((prev) => [...prev, row])
       setExpandedId(row.id)
-      setNewSection({ slug: "", element: "cloud", title: "", tone: "", plannedTitles: "" })
+      setNewSection({
+        slug: "", element: "cloud", title: "", tone: "", plannedTitles: "",
+        moodTags: "", leadSentence: "", parallelSentence: "", readerQuestion: "",
+        imageUrl: "", imageAlt: "",
+      })
     }
     setCreating(false)
   }
@@ -86,6 +106,12 @@ export function TreeholeSectionsManager({
           title: section.title,
           tone: section.tone,
           plannedTitles: section.plannedTitles,
+          moodTags: section.moodTags,
+          leadSentence: section.leadSentence,
+          parallelSentence: section.parallelSentence,
+          readerQuestion: section.readerQuestion,
+          imageUrl: section.imageUrl,
+          imageAlt: section.imageAlt,
           published: section.published,
           order: section.order,
         }),
@@ -96,7 +122,18 @@ export function TreeholeSectionsManager({
       setSections((prev) =>
         prev.map((item) =>
           item.id === section.id
-            ? { ...item, ...saved, plannedTitles: saved.plannedTitles ?? "", entries: item.entries }
+            ? {
+                ...item,
+                ...saved,
+                plannedTitles: saved.plannedTitles ?? "",
+                moodTags: saved.moodTags ?? "",
+                leadSentence: saved.leadSentence ?? "",
+                parallelSentence: saved.parallelSentence ?? "",
+                readerQuestion: saved.readerQuestion ?? "",
+                imageUrl: saved.imageUrl ?? "",
+                imageAlt: saved.imageAlt ?? "",
+                entries: item.entries,
+              }
             : item,
         ),
       )
@@ -188,6 +225,50 @@ export function TreeholeSectionsManager({
               value={newSection.tone}
               onChange={(event) => setNewSection({ ...newSection, tone: event.target.value })}
               placeholder="自由、漂泊、被带走又留下"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label>心情标签</Label>
+            <Input
+              value={newSection.moodTags}
+              placeholder="低压 / 迷茫 / 内耗"
+              onChange={(event) => setNewSection({ ...newSection, moodTags: event.target.value })}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label>一句话入口</Label>
+            <Input
+              value={newSection.leadSentence}
+              onChange={(event) => setNewSection({ ...newSection, leadSentence: event.target.value })}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label>读者问句</Label>
+            <Input
+              value={newSection.readerQuestion}
+              onChange={(event) => setNewSection({ ...newSection, readerQuestion: event.target.value })}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label>排句</Label>
+            <Textarea
+              rows={2}
+              value={newSection.parallelSentence}
+              onChange={(event) => setNewSection({ ...newSection, parallelSentence: event.target.value })}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label>章节主图 URL</Label>
+            <Input
+              value={newSection.imageUrl}
+              onChange={(event) => setNewSection({ ...newSection, imageUrl: event.target.value })}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label>章节主图 Alt</Label>
+            <Input
+              value={newSection.imageAlt}
+              onChange={(event) => setNewSection({ ...newSection, imageAlt: event.target.value })}
             />
           </div>
           <div className="grid gap-2">
@@ -308,6 +389,74 @@ export function TreeholeSectionsManager({
                       {busyId === section.id ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Save className="mr-1 h-4 w-4" />}
                       保存章节
                     </Button>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>心情标签</Label>
+                    <Input
+                      value={section.moodTags}
+                      placeholder="低压 / 迷茫 / 内耗"
+                      onChange={(event) =>
+                        setSections((prev) =>
+                          prev.map((item) => (item.id === section.id ? { ...item, moodTags: event.target.value } : item)),
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-2 md:col-span-2">
+                    <Label>一句话入口</Label>
+                    <Input
+                      value={section.leadSentence}
+                      onChange={(event) =>
+                        setSections((prev) =>
+                          prev.map((item) => (item.id === section.id ? { ...item, leadSentence: event.target.value } : item)),
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-2 md:col-span-2">
+                    <Label>排句</Label>
+                    <Textarea
+                      rows={2}
+                      value={section.parallelSentence}
+                      onChange={(event) =>
+                        setSections((prev) =>
+                          prev.map((item) => (item.id === section.id ? { ...item, parallelSentence: event.target.value } : item)),
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-2 md:col-span-2">
+                    <Label>读者问句</Label>
+                    <Input
+                      value={section.readerQuestion}
+                      onChange={(event) =>
+                        setSections((prev) =>
+                          prev.map((item) => (item.id === section.id ? { ...item, readerQuestion: event.target.value } : item)),
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>章节主图 URL</Label>
+                    <Input
+                      value={section.imageUrl}
+                      onChange={(event) =>
+                        setSections((prev) =>
+                          prev.map((item) => (item.id === section.id ? { ...item, imageUrl: event.target.value } : item)),
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>章节主图 Alt</Label>
+                    <Input
+                      value={section.imageAlt}
+                      onChange={(event) =>
+                        setSections((prev) =>
+                          prev.map((item) => (item.id === section.id ? { ...item, imageAlt: event.target.value } : item)),
+                        )
+                      }
+                    />
                   </div>
                   <div className="grid gap-2 md:col-span-2">
                     <Label>待写篇目</Label>
