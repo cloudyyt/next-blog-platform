@@ -216,6 +216,77 @@ model AboutConfig {
   @@map("about_config")
 }
 
+// ─── 灵感池（树洞上游素材系统）────────────────────
+// 白天先低压力捕捉，晚上在后台整理成话题，再孵化成树洞草稿。
+// 支持文字 / 图片 / 录音；录音 V1 保留原件，不做自动转写。
+
+model InspirationItem {
+  id           String   @id @default(cuid())
+  type         String   // text | image | audio
+  content      String?  // 文字内容 / 图片说明 / 录音转写或备注
+  imageUrl     String?
+  audioUrl     String?
+  audioSeconds Int?
+  tags         String[] @default([])
+  status       String   @default("inbox") // inbox | topic | draft | incubated | archived
+  source       String   @default("notes") // notes | admin
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  topics InspirationTopicLink[]
+
+  @@index([createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([type, createdAt(sort: Desc)])
+  @@map("inspiration_items")
+}
+
+model InspirationTopic {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  status      String   @default("growing") // growing | draft | published | archived
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items       InspirationTopicLink[]
+  draftLinks  InspirationDraftLink[]
+
+  @@index([status, updatedAt(sort: Desc)])
+  @@map("inspiration_topics")
+}
+
+// 显式关联表：同一碎片可以服务多个话题，也可保留在时间线原位。
+model InspirationTopicLink {
+  id        String   @id @default(cuid())
+  itemId    String
+  topicId   String
+  createdAt DateTime @default(now())
+
+  item  InspirationItem  @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  topic InspirationTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, topicId])
+  @@index([topicId, createdAt(sort: Desc)])
+  @@index([itemId])
+  @@map("inspiration_topic_links")
+}
+
+// 灵感池和树洞写作间的血缘关系；发布后仍可回溯这篇文章来自哪些碎片。
+model InspirationDraftLink {
+  id        String   @id @default(cuid())
+  topicId   String
+  entryId   String
+  createdAt DateTime @default(now())
+
+  topic InspirationTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  entry TreeholeEntry    @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  @@unique([topicId, entryId])
+  @@index([topicId, createdAt(sort: Desc)])
+  @@map("inspiration_draft_links")
+}
+
 // ─── 树洞电子书（生活书）──────────────────────────
 // 旧 LifeCategory/LifePost 时间线已停止公开使用；
 // 新结构面向「书 → 二级标题（章节） → 正式文章/短记插页」。
@@ -271,6 +342,8 @@ model TreeholeEntry {
   order     Int             @default(0)
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
+
+  inspirationDraftLinks InspirationDraftLink[]
 
   @@index([sectionId, order])
   @@index([published, date(sort: Desc)])
