@@ -5,6 +5,7 @@
 import type { Metadata } from "next"
 import { Fraunces, Nunito } from "next/font/google"
 import "./globals.css"
+import "@/styles/admin-next.css"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { VisualThemeProvider } from "@/components/providers/visual-theme-provider"
 import { ToastProvider } from "@/components/providers/toast-provider"

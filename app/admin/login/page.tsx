@@ -37,7 +37,9 @@ export default function AdminLoginPage() {
       }
 
       toast.success("登录成功")
-      router.push("/admin")
+
+      const redirect = new URLSearchParams(window.location.search).get("redirect")
+      router.push(redirect?.startsWith("/") ? redirect : "/admin")
     } catch (error: any) {
       toast.error(error.message || "登录失败")
     } finally {
