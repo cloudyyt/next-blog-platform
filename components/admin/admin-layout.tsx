@@ -16,7 +16,6 @@ import {
   Users,
   MessageSquare,
   BookOpen,
-  NotebookPen,
   Sparkles,
   Lightbulb,
   TreePine,
@@ -29,7 +28,6 @@ import { toast } from "sonner"
 const navigation = [
   { name: "仪表盘", href: "/admin", icon: LayoutDashboard },
   { name: "灵感池", href: "/admin/inspirations", icon: Lightbulb },
-  { name: "快速笔记", href: "/notes", icon: NotebookPen },
   { name: "文章管理", href: "/admin/posts", icon: FileText },
   { name: "Agent 指南", href: "/admin/guide", icon: BookOpen },
   { name: "关于页", href: "/admin/about", icon: Sparkles },
