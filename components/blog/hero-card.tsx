@@ -50,7 +50,21 @@ export function HeroCard({ post, className }: HeroCardProps) {
               priority
               sizes="(max-width: 768px) 100vw, 50vw"
               overlay={
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/10 md:bg-gradient-to-l md:from-transparent md:to-black/5" />
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/10 to-transparent" />
+                  {post.categories.length > 0 && (
+                    <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
+                      {post.categories.map((category) => (
+                        <span
+                          key={category.id}
+                          className="text-xs px-2 py-0.5 rounded-full bg-white/90 text-gray-800 backdrop-blur-sm font-medium"
+                        >
+                          {category.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </>
               }
             />
           ) : (
@@ -58,25 +72,23 @@ export function HeroCard({ post, className }: HeroCardProps) {
               <span className="text-6xl font-bold text-primary/20 select-none">
                 {post.title.charAt(0)}
               </span>
+              {post.categories.length > 0 && (
+                <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
+                  {post.categories.map((category) => (
+                    <span
+                      key={category.id}
+                      className="text-xs px-2 py-0.5 rounded-full bg-white/90 text-gray-800 backdrop-blur-sm font-medium"
+                    >
+                      {category.name}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
           {/* 内容区域 */}
           <div className="p-6 md:p-8 flex flex-col justify-center space-y-4">
-            {/* 分类 */}
-            {post.categories.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {post.categories.map((category) => (
-                  <span
-                    key={category.id}
-                    className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium"
-                  >
-                    {category.name}
-                  </span>
-                ))}
-              </div>
-            )}
-
             {/* 标题 */}
             <h2 className="text-2xl md:text-3xl font-bold leading-snug group-hover:text-primary transition-colors line-clamp-2">
               {post.title}

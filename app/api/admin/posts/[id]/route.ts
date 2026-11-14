@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/prisma"
 import { verifyAdmin } from "@/lib/auth-middleware"
 
@@ -91,6 +92,9 @@ export async function PUT(
       },
     })
 
+    revalidatePath("/blog", "page")
+    revalidatePath(`/blog/${post.slug}`, "page")
+    revalidatePath("/blog/feed.xml")
     return NextResponse.json(post)
   } catch (error: any) {
     if (error.code === "P2025") {
@@ -121,6 +125,9 @@ export async function DELETE(
       where: { id: params.id },
     })
 
+    revalidatePath("/blog", "page")
+    revalidatePath("/blog/[slug]", "page")
+    revalidatePath("/blog/feed.xml", "page")
     return NextResponse.json({ message: "删除成功" })
   } catch (error: any) {
     if (error.code === "P2025") {

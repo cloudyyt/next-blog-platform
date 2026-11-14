@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/prisma"
 import { verifyAdmin } from "@/lib/auth-middleware"
 
@@ -107,6 +108,9 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    revalidatePath("/blog", "page")
+    revalidatePath(`/blog/${post.slug}`, "page")
+    revalidatePath("/blog/feed.xml")
     return NextResponse.json(post)
   } catch (err: any) {
     if (err?.code === "P2002") {
